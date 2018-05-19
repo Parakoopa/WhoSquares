@@ -1,5 +1,4 @@
 import * as ts from "typescript";
-import * as tsconfig from "tsconfig";
 
 const formatHost: ts.FormatDiagnosticsHost = {
     getCanonicalFileName: path => path,
