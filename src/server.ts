@@ -11,6 +11,9 @@ import {Socket} from "socket.io";
 // usw.
 import {Request, Response} from "express";
 import {Server} from 'http';
+import {compileClientTypeScript} from "./compileClientTypeScript";
+
+compileClientTypeScript();
 
 const app = express();
 
@@ -18,13 +21,14 @@ const http = new Server(app);
 const io = socket(http);
 
 app.use('/phaser', express.static(__dirname + '/../node_modules/phaser'));
-app.use('/scripts', express.static(__dirname + '/client/scripts'));
+// /scripts auf dem Server zeigt auf den dist Ordner in dem die kompilierten .ts Dateien aus dem "echten" scripts Ordner landen.
+app.use('/scripts', express.static(__dirname + '/client/dist'));
 
 app.get('/', (req: Request, res: Response) => res.sendFile(__dirname + '/client/index.html'));
-
 
 io.on('connection', (socket: Socket) => {
     socket.emit('HelloWorld', "HelloWorld");
 });
 
+console.log("Server is running. Port 8080");
 http.listen(8080);

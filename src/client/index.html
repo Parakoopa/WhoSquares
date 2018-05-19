@@ -5,7 +5,14 @@
 </head>
 <body>
 <h1>Hello World!</h1>
-<script src="/scripts/example.js"></script>
+<canvas id="game"></canvas>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/phaser/build/phaser.js"></script>
+<script src="/scripts/main.js"></script>
+<script>
+    window.onload = function() {
+        main();
+    }
+</script>
 </body>
 </html>

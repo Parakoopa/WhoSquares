@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Who Sqaures?" type="NodeJSConfigurationType" factoryName="Node.js" node-parameters="--require ts-node/register ./src/server.ts" working-dir="$PROJECT_DIR$">
+    <method />
+  </configuration>
+</component>

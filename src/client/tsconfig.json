@@ -4,7 +4,8 @@
     "noImplicitThis": true,
     "target": "es5",
     "lib": [
-      "es7"
+      "es7",
+      "DOM"
     ],
     "module": "commonjs",
     "moduleResolution": "node",
@@ -13,13 +14,14 @@
     "removeComments": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "paths": {
-      "*": [
-        "../../node_modules/*"
-      ]
-    }
+    "typeRoots": [
+      "../../node_modules/@types"
+    ]
   },
+  "files": [
+    "../../node_modules/phaser/typescript/phaser.d.ts"
+  ],
   "include": [
-    "src/**/*"
+    "scripts/**/*"
   ]
 }
