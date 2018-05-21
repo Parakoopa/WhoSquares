@@ -1,4 +1,4 @@
-import Socket = NodeJS.Socket;
+import {Socket} from "socket.io";
 
 export class Client {
 
