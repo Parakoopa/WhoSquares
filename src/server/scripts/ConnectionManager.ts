@@ -1,14 +1,18 @@
 import {Client} from './Client';
-import {Socket} from "socket.io";
+import {Socket} from 'socket.io';
+import {Room} from './Room';
 
 export class ConnectionManager {
 
     private _io: SocketIO.Server;
-    private _clients:Array<Client>;
-    private _minLobbySize: number = 2;
+    private readonly _clients:Array<Client>;
+    private _minimumClientsPerGame: number = 2;
+    private readonly _rooms:Array<Room>;
+    private _maxRoomClients: number = 10;
 
     constructor( io: SocketIO.Server ){
         this._clients = [];
+        this._rooms = [];
         this._io = io;
     }
 
@@ -26,9 +30,14 @@ export class ConnectionManager {
             socket.on('disconnect', () => {
                 this.RemoveClient(socket);
             });
+            //Client requests to join specific room
+            socket.on('joinRoom', (data) =>{ //ToDo Find out which type data has
+                let resp:Response = this.JoinRoom(this.ClientBySocket(socket), data);
+                socket.emit('joinRoom', resp);
+            });
 
             //Start Game if minimum amount of Clients are connected
-            if(this._clients.length >= this._minLobbySize){
+            if(this._clients.length >= this._minimumClientsPerGame){
                 this.EmitStartEvent();
             }
         });
@@ -43,6 +52,60 @@ export class ConnectionManager {
         this._clients.forEach(function (client:Client) {
             client.Socket().emit('Start', "No data given");
         })
+    }
+
+    /**
+     * Create Room if necessary
+     * Return responses: RoomIsFull or JoinedRoom + clientCount
+     * @param {Client} client
+     * @param {string} roomName
+     * @returns {string}
+     * @constructor
+     */
+    private JoinRoom(client:Client, roomName:string):Response{
+        let room:Room = this.RoomByName(roomName);
+        if(room == null)room = this.CreateRoom();
+        else if(room.GetClients.length > this._maxRoomClients){
+            return {
+                response: "RoomIsFull",
+                values: {}
+            };
+        }
+
+        if(!room.ContainsClient(client)){
+            let color:string = room.AddClient(client);
+            return {
+                response: "JoinedRoom",
+                values: {"clientCount": room.GetClients.length,
+                         "color":color
+                }
+            };
+        }
+    }
+
+    /**
+     * Create room with unique id
+     * @returns {Room}
+     * @constructor
+     */
+    private CreateRoom():Room{
+        let room:Room = new Room(this.GetGUID().toString());
+        this._rooms.push(room);
+        return room;
+    }
+
+    /**
+     * Return room based on its unique id (name)
+     * @param {string} roomName
+     * @returns {Room}
+     * @constructor
+     */
+    private RoomByName(roomName:string):Room{
+        for (let i = 0; i < this._rooms.length ; i++) {
+            let room = this._rooms[i];
+            if(room.Name() == roomName) return room;
+        }
+        return null;
     }
 
     /**
