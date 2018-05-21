@@ -6,12 +6,11 @@
 import * as express from 'express';
 // var express = require('socket.io');
 import * as socket from 'socket.io';
-// var Socket = require('socket.io').Socket;
-import {Socket} from "socket.io";
 // usw.
 import {Request, Response} from "express";
 import {Server} from 'http';
 import {compileClientTypeScript} from "./compileClientTypeScript";
+import {ConnectionManager} from "./server/scripts/ConnectionManager";
 
 compileClientTypeScript();
 
@@ -26,9 +25,10 @@ app.use('/scripts', express.static(__dirname + '/client/dist'));
 
 app.get('/', (req: Request, res: Response) => res.sendFile(__dirname + '/client/index.html'));
 
-io.on('connection', (socket: Socket) => {
-    socket.emit('HelloWorld', "HelloWorld");
-});
+//Handle all Incoming/Outgoing Events
+const connectionManager = new ConnectionManager(io);
+connectionManager.EventListener();
+
 
 console.log("Server is running. Port 8080");
 http.listen(8080);
