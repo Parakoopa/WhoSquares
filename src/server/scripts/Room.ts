@@ -7,9 +7,9 @@ import {Client} from "./Client";
 export class Room {
 
     private readonly _name: string;
-    private _clients: Array<Client>;
+    private _clients: Client[];
     private _clientColorMap: Map<string, Client>;
-    private readonly _colors: Array<string> = ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
+    private readonly _colors: string[] = ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
 
     constructor(name: string) {
         this._name = name;
@@ -29,7 +29,7 @@ export class Room {
      */
     public AddClient(client: Client): string {
         this._clients.push(client);
-        let color: string = this.GetUnassignedColor();
+        const color: string = this.GetUnassignedColor();
         this._clientColorMap.set(color, client);
         return color;
     }
@@ -40,9 +40,9 @@ export class Room {
      * @constructor
      */
     public RemoveClient(client: Client): void {
-        let index: number = this._clients.indexOf(client);
+        const index: number = this._clients.indexOf(client);
         if (index > -1) this._clients.splice(index, 1);
-        //ResetColor
+        // ResetColor
         this.ResetColor(client);
     }
 
@@ -61,7 +61,7 @@ export class Room {
      * @returns {Array<Client>}
      * @constructor
      */
-    public GetClients(): Array<Client> {
+    public GetClients(): Client[] {
         return this._clients;
     }
 
@@ -71,15 +71,15 @@ export class Room {
      * @returns {string}
      * @constructor
      */
-    public GetClientColor(client:Client):string{
-        let self = this;
-        let returnColor:string;
-        this._colors.forEach(function (color: string) {
-            if( self._clientColorMap.get(color) == client) {
+    public GetClientColor(client: Client): string {
+        const self = this;
+        let returnColor: string;
+        this._colors.forEach(function(color: string) {
+            if ( self._clientColorMap.get(color) == client) {
                 returnColor = color;
             }
         });
-        return returnColor; //Should not be null, but can be improved!
+        return returnColor; // Should not be null, but can be improved!
     }
 
     /**
@@ -88,10 +88,10 @@ export class Room {
      * @constructor
      */
     private SetColors(): void {
-        let self = this;
-        this._colors.forEach(function (color: string) {
+        const self = this;
+        this._colors.forEach(function(color: string) {
             self._clientColorMap.set(color, null);
-        })
+        });
     }
 
     /**
@@ -100,7 +100,7 @@ export class Room {
      * @constructor
      */
     private GetUnassignedColor(): string {
-        for (let key in this._clientColorMap.keys()) {
+        for (const key in this._clientColorMap.keys()) {
             if (this._clientColorMap.get(key) == null) return key;
         }
         return null;
@@ -111,12 +111,9 @@ export class Room {
      * @param {Client} client
      * @constructor
      */
-    private ResetColor(client:Client):void{
-        let color:string = this.GetClientColor(client);
+    private ResetColor(client: Client): void {
+        const color: string = this.GetClientColor(client);
         this._clientColorMap.set(color, null);
     }
 
 }
-
-
-

@@ -3,12 +3,12 @@
 // Um euch den Umstieg leichter zu machen packe ich in jede Zeile darüber, wie man's sonst mit Node machen würde.
 
 // var express = require('express');
-import * as express from 'express';
-// var express = require('socket.io');
-import * as socket from 'socket.io';
+import * as express from "express";
 // usw.
 import {Request, Response} from "express";
-import {Server} from 'http';
+import {Server} from "http";
+// var express = require('socket.io');
+import * as socket from "socket.io";
 import {compileClientTypeScript} from "./compileClientTypeScript";
 import {ConnectionManager} from "./server/scripts/ConnectionManager";
 
@@ -19,16 +19,15 @@ const app = express();
 const http = new Server(app);
 const io = socket(http);
 
-app.use('/phaser', express.static(__dirname + '/../node_modules/phaser'));
-// /scripts auf dem Server zeigt auf den dist Ordner in dem die kompilierten .ts Dateien aus dem "echten" scripts Ordner landen.
-app.use('/scripts', express.static(__dirname + '/client/dist'));
+app.use("/phaser", express.static(__dirname + "/../node_modules/phaser"));
+//scripts auf dem Server zeigt auf den dist Ordner in dem die kompilierten .ts Dateien aus dem "echten" scripts Ordner landen.
+app.use("/scripts", express.static(__dirname + "/client/dist"));
 
-app.get('/', (req: Request, res: Response) => res.sendFile(__dirname + '/client/index.html'));
+app.get("/", (req: Request, res: Response) => res.sendFile(__dirname + "/client/index.html"));
 
-//Handle all Incoming/Outgoing Events
+// Handle all Incoming/Outgoing Events
 const connectionManager = new ConnectionManager(io);
 connectionManager.EventListener();
-
 
 console.log("Server is running. Port 8080");
 http.listen(8080);
