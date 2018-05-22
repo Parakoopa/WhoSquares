@@ -8,10 +8,13 @@
 <canvas id="game"></canvas>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/phaser/build/phaser.js"></script>
-<script src="/scripts/main.js"></script>
+<!-- Von unserem Code NUR die main.js importieren, den Rest über import Statements in den TS Dateien! -->
+<script src="/requirejs/require.js" data-main="/scripts/main.js"></script>
 <script>
     window.onload = function() {
-        main();
+        require(["main"], function(main) {
+            main.main();
+        });
     }
 </script>
 </body>

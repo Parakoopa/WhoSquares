@@ -1,9 +1,9 @@
 // DAS HIER IST NUR EIN BEISPIEL. Bitte strukturiert das einigermaßen sinnvoll in den eigentlichen Tickets
 // und packt das nicht einfach so untereinander...
 
-// Da das hier im Browser läuft braucht man kein export davor schreiben, Funktionen die so definiert werden sind global verfügbar.
-// wird in index.html aufgerufen.
-function main() {
+import {bla} from "./test";
+
+export function main() {
     let textMessage = "warte auf server";
 
     let textElement: Phaser.Text = null;
@@ -29,5 +29,6 @@ function main() {
         const guid: string = resp.guid;
         textMessage = resp.response + ":\n" + guid;
         console.log(textMessage);
+        bla();
     });
 }
