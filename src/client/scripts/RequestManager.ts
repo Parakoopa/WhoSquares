@@ -34,7 +34,7 @@ export class RequestManager {
             }
         });
         //Start Game
-        this._socket.on("startGame", (resp: Response) => {
+        this._socket.on("startGame", (resp: IResponse) => {
           //todo  const textMessage: string = resp.response;
            // this._game.TextElement(textMessage);
             //console.log(textMessage);
