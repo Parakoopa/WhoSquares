@@ -77,9 +77,9 @@ export class ConnectionManager {
             const color: string = room.AddClient(client);
             return {
                 response: "joinedRoom",
-                values: {clientCount: room.GetClients.length,
-                         color: color
-                }
+                clientCount: room.GetClients().length,
+                color: color,
+                values: {}
             };
         }
     }

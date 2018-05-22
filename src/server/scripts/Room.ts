@@ -14,6 +14,7 @@ export class Room {
         ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
 
     constructor(name: string, size: number) {
+        this._clients = [];
         this._name = name;
         this._size = size;
         this._clientColorMap = new Map();
@@ -91,9 +92,8 @@ export class Room {
      * @constructor
      */
     private SetColors(): void {
-        const self = this;
         for (const color of this._colors) {
-            self._clientColorMap.set(color, null);
+            this._clientColorMap.set(color, null);
         }
     }
 
@@ -103,8 +103,8 @@ export class Room {
      * @constructor
      */
     private GetUnassignedColor(): string {
-        for (const key in this._clientColorMap.keys()) {
-            if (this._clientColorMap.get(key) == null) return key;
+        for (const key of Array.from(this._clientColorMap.keys())) {
+            if (this._clientColorMap.get(key) === null) return key;
         }
         return null;
     }

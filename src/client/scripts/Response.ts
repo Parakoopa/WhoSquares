@@ -4,6 +4,8 @@
 interface Response {
     response: string;
     guid?: string;
+    clientCount?: number;
+    color?: string;
     values: {};
 
 }

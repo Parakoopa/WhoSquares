@@ -28,7 +28,7 @@ export class Game {
                     self._textMessage,
                     {font: "32px Arial", fill: "#ff0044", align: "center"}
                 );
-                self._textElement.anchor.setTo(0.5, 3.5);
+                self._textElement.anchor.setTo(0.5, 5);
             },
 
             update() {
