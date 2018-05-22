@@ -24,7 +24,7 @@ export class Game {
             },
             create() {
                 // Add Button to start Game
-                const button = game.add.button(game.world.centerX - 82, 10, "startButton", self.startGame, this, 2, 1, 0);
+                const button = game.add.button(game.world.centerX - 82, 10, "startButton", () => self.startGame(), this, 2, 1, 0);
                 // Add grid
                 grid.CreateGrid(game, "gridTile");
 
@@ -53,7 +53,6 @@ export class Game {
     }
 
     private startGame() {
-        console.log(this._reqManager);
         this._reqManager.StartGame();
     }
 

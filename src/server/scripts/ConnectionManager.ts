@@ -22,11 +22,11 @@ export class ConnectionManager {
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const client: Client = new Client(socket, this.GetGUID());
-            this._clients.push(client);
+            const newClient: Client = new Client(socket, this.GetGUID());
+            this._clients.push(newClient);
             socket.emit("connection", {
                 response: "connected",
-                guid: client.Guid(),
+                guid: newClient.Guid(),
                 values: {}
             } as IConnectionResponse);
 
@@ -45,6 +45,7 @@ export class ConnectionManager {
             socket.on("startGame", () => {
                 const client: Client = this.ClientBySocket(socket);
                 const room: Room = client.Room;
+                console.log("sdfonsdkjbfs");
                 if (room.Owner() === client ) {
                     this.StartGame(room.GetClients());
                 }
@@ -58,8 +59,8 @@ export class ConnectionManager {
      * @constructor
      */
     private StartGame(clients: Client[]) {
-        for (const client of this._clients) {
-            client.Socket().emit("StartGame", "No data given");//Todo add Response
+        for (const client of clients) {
+            client.Socket().emit("startGame", {response: "Game has been started"});
         }
     }
 

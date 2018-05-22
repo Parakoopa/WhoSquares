@@ -33,11 +33,11 @@ export class RequestManager {
                 console.log(textMessage);
             }
         });
-        //Start Game
+        // Start Game
         this._socket.on("startGame", (resp: IResponse) => {
-          //todo  const textMessage: string = resp.response;
-           // this._game.TextElement(textMessage);
-            //console.log(textMessage);
+           const textMessage: string = resp.response;
+           this._game.TextElement(textMessage);
+           console.log(textMessage);
         });
     }
 
