@@ -8,7 +8,7 @@ export class ConnectionManager {
     private readonly _clients: Client[];
     private _minimumClientsPerGame: number = 2;
     private readonly _rooms: Room[];
-    private _maxRoomClients: number = 10;
+    private _maxRoomSize: number = 10;
 
     constructor( io: SocketIO.Server ) {
         this._clients = [];
@@ -24,12 +24,13 @@ export class ConnectionManager {
         this._io.on("connection", (socket: Socket) => {
             const client: Client = new Client(socket, this.GetGUID());
             this._clients.push(client);
-            socket.emit("HelloWorld", "Welcome! GUID:\n" + client.Guid());
+            socket.emit("connection", {response: "connected", values: {'guid': client.Guid()}});
 
             // Disconnect
             socket.on("disconnect", () => {
                 this.RemoveClient(socket);
             });
+
             // Client requests to join specific room
             socket.on("joinRoom", (data) => { // ToDo Find out which type data has
                 const resp: Response = this.JoinRoom(this.ClientBySocket(socket), data);
@@ -65,9 +66,9 @@ export class ConnectionManager {
     private JoinRoom(client: Client, roomName: string): Response {
         let room: Room = this.RoomByName(roomName);
         if (room == null)room = this.CreateRoom();
-        else if (room.GetClients.length > this._maxRoomClients) {
+        else if (room.GetClients.length > room.Size()) {
             return {
-                response: "RoomIsFull",
+                response: "roomIsFull",
                 values: {}
             };
         }
@@ -75,7 +76,7 @@ export class ConnectionManager {
         if (!room.ContainsClient(client)) {
             const color: string = room.AddClient(client);
             return {
-                response: "JoinedRoom",
+                response: "joinedRoom",
                 values: {clientCount: room.GetClients.length,
                          color: color
                 }
@@ -89,7 +90,7 @@ export class ConnectionManager {
      * @constructor
      */
     private CreateRoom(): Room {
-        const room: Room = new Room(this.GetGUID().toString());
+        const room: Room = new Room(this.GetGUID().toString(), this._maxRoomSize);
         this._rooms.push(room);
         return room;
     }

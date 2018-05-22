@@ -7,18 +7,24 @@ import {Client} from "./Client";
 export class Room {
 
     private readonly _name: string;
+    private readonly _size: number;
     private _clients: Client[];
     private _clientColorMap: Map<string, Client>;
     private readonly _colors: string[] = ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
 
-    constructor(name: string) {
+    constructor(name: string, size: number) {
         this._name = name;
+        this._size = size;
         this._clientColorMap = new Map();
         this.SetColors();
     }
 
     public Name(): string {
         return this._name;
+    }
+
+    public Size(): number {
+        return this._size;
     }
 
     /**
