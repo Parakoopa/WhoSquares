@@ -8,7 +8,7 @@ function main() {
 
     let textElement: Phaser.Text = null;
 
-    const game = new Phaser.Game(800, 600, Phaser.AUTO, '', {
+    const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
         create() {
             textElement = game.add.text(
                 game.world.centerX,
@@ -25,8 +25,9 @@ function main() {
     });
 
     const socket = io();
-    socket.on('HelloWorld', function(msg: string){
-        console.log("HelloWorld:" + msg);
-        textMessage = msg;
+    socket.on("connection", function(resp: Response) {
+        const guid: string = resp.guid;
+        textMessage = resp.response + ":\n" + guid;
+        console.log(textMessage);
     });
 }

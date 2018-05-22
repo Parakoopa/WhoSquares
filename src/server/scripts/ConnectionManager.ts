@@ -24,7 +24,7 @@ export class ConnectionManager {
         this._io.on("connection", (socket: Socket) => {
             const client: Client = new Client(socket, this.GetGUID());
             this._clients.push(client);
-            socket.emit("connection", {response: "connected", values: {'guid': client.Guid()}});
+            socket.emit("connection", {response: "connected", guid: client.Guid(), values: {}});
 
             // Disconnect
             socket.on("disconnect", () => {
