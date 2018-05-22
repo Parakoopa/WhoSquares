@@ -10,7 +10,8 @@ export class Room {
     private readonly _size: number;
     private _clients: Client[];
     private _clientColorMap: Map<string, Client>;
-    private readonly _colors: string[] = ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
+    private readonly _colors: string[] =
+        ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
 
     constructor(name: string, size: number) {
         this._name = name;
@@ -78,14 +79,10 @@ export class Room {
      * @constructor
      */
     public GetClientColor(client: Client): string {
-        const self = this;
-        let returnColor: string;
-        this._colors.forEach(function(color: string) {
-            if ( self._clientColorMap.get(color) == client) {
-                returnColor = color;
-            }
-        });
-        return returnColor; // Should not be null, but can be improved!
+        for (const color of this._colors) {
+            if (this._clientColorMap.get(color) === client) return color;
+        }
+        return null; // Should not be null, but can be improved?
     }
 
     /**
@@ -95,9 +92,9 @@ export class Room {
      */
     private SetColors(): void {
         const self = this;
-        this._colors.forEach(function(color: string) {
+        for (const color of this._colors) {
             self._clientColorMap.set(color, null);
-        });
+        }
     }
 
     /**

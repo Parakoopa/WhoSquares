@@ -50,9 +50,9 @@ export class ConnectionManager {
      * @constructor
      */
     private EmitStartEvent() {
-        this._clients.forEach((client) => {
+        for (const client of this._clients) {
             client.Socket().emit("Start", "No data given");
-        });
+        }
     }
 
     /**
@@ -102,9 +102,8 @@ export class ConnectionManager {
      * @constructor
      */
     private RoomByName(roomName: string): Room {
-        for (let i = 0; i < this._rooms.length ; i++) {
-            const room = this._rooms[i];
-            if (room.Name() == roomName) return room;
+        for (const room of this._rooms) {
+            if (room.Name() === roomName) return room;
         }
         return null;
     }
@@ -127,9 +126,8 @@ export class ConnectionManager {
      * @constructor
      */
     private ClientBySocket(socket: Socket): Client {
-        for (let i = 0; i < this._clients.length ; i++) {
-            const client = this._clients[i];
-            if (client.Socket() == socket) return client;
+        for (const client of this._clients) {
+            if (client.Socket() === socket) return client;
         }
         return null;
     }
