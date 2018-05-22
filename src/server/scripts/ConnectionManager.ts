@@ -24,7 +24,11 @@ export class ConnectionManager {
         this._io.on("connection", (socket: Socket) => {
             const client: Client = new Client(socket, this.GetGUID());
             this._clients.push(client);
-            socket.emit("connection", {response: "connected", guid: client.Guid(), values: {}});
+            socket.emit("connection", {
+                response: "connected",
+                guid: client.Guid(),
+                values: {}
+            } as IConnectionResponse);
 
             // Disconnect
             socket.on("disconnect", () => {
@@ -33,7 +37,7 @@ export class ConnectionManager {
 
             // Client requests to join specific room
             socket.on("joinRoom", (data) => { // ToDo Find out which type data has
-                const resp: Response = this.JoinRoom(this.ClientBySocket(socket), data);
+                const resp = this.JoinRoom(this.ClientBySocket(socket), data);
                 socket.emit("joinRoom", resp);
             });
 
@@ -67,13 +71,12 @@ export class ConnectionManager {
      * @returns {string}
      * @constructor
      */
-    private JoinRoom(client: Client, roomName: string): Response {
+    private JoinRoom(client: Client, roomName: string): IJoinedReponse | IRoomIsFullResponse {
         let room: Room = this.RoomByName(roomName);
         if (room == null)room = this.CreateRoom();
         else if (room.GetClients.length > room.Size()) {
             return {
-                response: "roomIsFull",
-                values: {}
+                response: "roomIsFull"
             };
         }
 
@@ -82,8 +85,7 @@ export class ConnectionManager {
             return {
                 response: "joinedRoom",
                 clientCount: room.GetClients().length,
-                color,
-                values: {}
+                color: color
             };
         }
     }
