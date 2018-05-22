@@ -9,6 +9,7 @@
 
     const game: Game = new Game(); // Phaser
     const reqManager = new RequestManager(game);
+    game.reqManager(reqManager);
     reqManager.EventListener();
    // bla();
     reqManager.JoinRoom("TestRoom");

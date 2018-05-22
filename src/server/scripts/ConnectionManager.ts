@@ -37,10 +37,14 @@ export class ConnectionManager {
                 socket.emit("joinRoom", resp);
             });
 
-            // Start Game if minimum amount of Clients are connected
-            if (this._clients.length >= this._minimumClientsPerGame) {
-                this.EmitStartEvent();
-            }
+            // Start Game
+            socket.on("startGame", () => {
+                const client: Client = this.ClientBySocket(socket);
+                const room: Room = client.Room;
+                if (room.Owner() === client ) {
+                    this.StartGame(room.GetClients());
+                }
+            });
         });
 
     }
@@ -49,9 +53,9 @@ export class ConnectionManager {
      * Tell all Clients to start Game
      * @constructor
      */
-    private EmitStartEvent() {
+    private StartGame(clients: Client[]) {
         for (const client of this._clients) {
-            client.Socket().emit("Start", "No data given");
+            client.Socket().emit("StartGame", "No data given");//Todo add Response
         }
     }
 
@@ -78,7 +82,7 @@ export class ConnectionManager {
             return {
                 response: "joinedRoom",
                 clientCount: room.GetClients().length,
-                color: color,
+                color,
                 values: {}
             };
         }

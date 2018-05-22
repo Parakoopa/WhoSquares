@@ -8,6 +8,7 @@ export class Room {
 
     private readonly _name: string;
     private readonly _size: number;
+    private _owner: Client;
     private _clients: Client[];
     private _clientColorMap: Map<string, Client>;
     private readonly _colors: string[] =
@@ -29,6 +30,10 @@ export class Room {
         return this._size;
     }
 
+    public Owner(): Client {
+        return this._owner;
+    }
+
     /**
      * Add Client & assign/return its color
      * @param {Client} client
@@ -36,7 +41,9 @@ export class Room {
      * @constructor
      */
     public AddClient(client: Client): string {
+        if (!this._owner) this._owner = client;
         this._clients.push(client);
+        client.Room = this;
         const color: string = this.GetUnassignedColor();
         this._clientColorMap.set(color, client);
         return color;
@@ -50,6 +57,7 @@ export class Room {
     public RemoveClient(client: Client): void {
         const index: number = this._clients.indexOf(client);
         if (index > -1) this._clients.splice(index, 1);
+        client.Room = null;
         // ResetColor
         this.ResetColor(client);
     }
