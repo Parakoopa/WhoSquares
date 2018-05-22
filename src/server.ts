@@ -22,7 +22,8 @@ const io = socket(http);
 app.use("/phaser", express.static(__dirname + "/../node_modules/phaser"));
 app.use("/requirejs", express.static(__dirname + "/../node_modules/requirejs"));
 //scripts auf dem Server zeigt auf den dist Ordner in dem die kompilierten .ts Dateien aus dem "echten" scripts Ordner landen.
-app.use("/scripts", express.static(__dirname + "/client/dist"));
+app.use("/scripts", express.static(__dirname + "/client/scripts"));
+app.use("/dist", express.static(__dirname + "/client/dist"));
 app.use("/img", express.static(__dirname + "/client/img"));
 
 app.get("/", (req: Request, res: Response) => res.sendFile(__dirname + "/client/index.html"));
