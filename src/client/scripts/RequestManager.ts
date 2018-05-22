@@ -13,13 +13,13 @@ export class RequestManager {
     }
 
     public EventListener() {
-        this._socket.on("connection", (resp: Response) => {
+        this._socket.on("connection", (resp: IConnectionResponse) => {
             const guid: string = resp.guid;
             const textMessage = resp.response + ":\n" + guid;
             this._game.TextElement(textMessage);
             console.log(textMessage);
         });
-        this._socket.on("joinRoom", (resp: Response) => {
+        this._socket.on("joinRoom", (resp: IRoomIsFullResponse | IJoinedReponse) => {
             if (resp.response === "joinedRoom") {
                 const clientCount: number = resp.clientCount;
                 const color: string = resp.color;

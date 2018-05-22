@@ -12,7 +12,8 @@
         "no-namespace": false,
         "no-trailing-whitespace": false,
         "variable-name": ["allow-leading-underscore"],
-        "member-ordering": false
+        "member-ordering": false,
+        "object-literal-sort-keys": false
     },
     "rulesDirectory": []
 }
