@@ -42,10 +42,10 @@ export class ConnectionManager {
             });
 
             // Start Game
+            // ToDo Add Response for not being room owner
             socket.on("startGame", () => {
                 const client: Client = this.ClientBySocket(socket);
                 const room: Room = client.Room;
-                console.log("sdfonsdkjbfs");
                 if (room.Owner() === client ) {
                     this.StartGame(room.GetClients());
                 }
@@ -74,7 +74,7 @@ export class ConnectionManager {
      */
     private JoinRoom(client: Client, roomName: string): IJoinedReponse | IRoomIsFullResponse {
         let room: Room = this.RoomByName(roomName);
-        if (room == null)room = this.CreateRoom();
+        if (room === null)room = this.CreateRoom(roomName);
         else if (room.GetClients.length > room.Size()) {
             return {
                 response: "roomIsFull"
@@ -86,7 +86,7 @@ export class ConnectionManager {
             return {
                 response: "joinedRoom",
                 clientCount: room.GetClients().length,
-                color: color
+                color
             };
         }
     }
@@ -96,8 +96,8 @@ export class ConnectionManager {
      * @returns {Room}
      * @constructor
      */
-    private CreateRoom(): Room {
-        const room: Room = new Room(this.GetGUID().toString(), this._maxRoomSize);
+    private CreateRoom(roomName: string): Room {
+        const room: Room = new Room(roomName, this.GetGUID(), this._maxRoomSize);
         this._rooms.push(room);
         return room;
     }
@@ -110,7 +110,7 @@ export class ConnectionManager {
      */
     private RoomByName(roomName: string): Room {
         for (const room of this._rooms) {
-            if (room.Name() === roomName) return room;
+            if (room.Name().toString() === roomName) return room;
         }
         return null;
     }
@@ -144,7 +144,7 @@ export class ConnectionManager {
      * @returns {string}
      * @constructor
      */
-    private GetGUID() {
+    private GetGUID(): string {
         // src: https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)

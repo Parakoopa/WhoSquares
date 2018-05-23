@@ -7,6 +7,7 @@ import {Client} from "./Client";
 export class Room {
 
     private readonly _name: string;
+    private readonly _guid: string;
     private readonly _size: number;
     private _owner: Client;
     private _clients: Client[];
@@ -14,9 +15,10 @@ export class Room {
     private readonly _colors: string[] =
         ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
 
-    constructor(name: string, size: number) {
+    constructor(name: string, guid: string, size: number) {
         this._clients = [];
         this._name = name;
+        this._guid = guid;
         this._size = size;
         this._clientColorMap = new Map();
         this.SetColors();
@@ -24,6 +26,10 @@ export class Room {
 
     public Name(): string {
         return this._name;
+    }
+
+    public guid(): string {
+        return this._guid;
     }
 
     public Size(): number {
@@ -111,8 +117,8 @@ export class Room {
      * @constructor
      */
     private GetUnassignedColor(): string {
-        for (const key of Array.from(this._clientColorMap.keys())) {
-            if (this._clientColorMap.get(key) === null) return key;
+        for (const color of Array.from(this._clientColorMap.keys())) {
+            if (this._clientColorMap.get(color) === null) return color;
         }
         return null;
     }
