@@ -1,4 +1,5 @@
 import Game = Phaser.Game;
+import Sprite = Phaser.Sprite;
 
 export class Grid {
 
@@ -26,30 +27,55 @@ export class Grid {
      * @constructor
      */
     public CreateGrid(game: Game, imageName: string): void {
-        const group = game.add.group();
-        //  Creates x sprites for each frame (a frame is basically a row)
-        group.createMultiple(this._sizeX, imageName, this.CreateFrame(this._sizeY), true);
-        //  Align the sprites into rows of x, by however many we need (the -1 argument)
-        //  With 40x40 pixel spacing per sprite
-        group.align(this._sizeX, -1, this._cellSize,  this._cellSize);
         const offset = this._sizeX * this._cellSize / 2.0;
-        group.x = game.world.centerX - offset;
-        group.y = game.world.centerY - offset;
+        const xOffset: number = game.world.centerX - offset;
+        const yOffset: number = game.world.centerY - offset;
+
+
+        //  Creates x sprites for each frame (a frame is basically a row)
+        for (let y = 0; y < this._sizeY; y++) {
+            for (let x = 0; x < this._sizeX; x++) {
+                const sprite = game.add.sprite(
+                    xOffset + this._cellSize * x,
+                    yOffset + this._cellSize * y,
+                    imageName);
+                sprite.name = "tile" + y + "_" + x;
+                sprite.inputEnabled = true;
+                sprite.events.onInputDown.add(Grid.onDown, this);
+                sprite.events.onInputOver.add(Grid.onOver, this);
+                sprite.events.onInputOut.add(Grid.onOut, this);
+            }
+        }
 
     }
 
     /**
-     * An simple int array
-     * @param {number} size
-     * @returns {number[]}
-     * @constructor
+     * Change Color of clicked tile while on it
+     * (Overwrites onOver)
+     * @param {Phaser.Sprite} sprite
      */
-    private CreateFrame(size: number) {
-        const frame = Array<number>();
-        for (let i = 0; i < size ; i++) {
-            frame.push(i);
-        }
-        return frame;
+    public static onDown(sprite: Sprite) {
+        console.log("Works");
+        sprite.tint = 0x00ff00;
+    }
+
+    /**
+     * Hover Color
+     * (While mouse is over tile)
+     * @param {Phaser.Sprite} sprite
+     */
+    private static onOver(sprite: Sprite) {
+        console.log("Works2");
+        sprite.tint = 0xff0000;
+    }
+
+    /**
+     * Reset tint to show original color
+     * @param {Phaser.Sprite} sprite
+     */
+    private static onOut(sprite: Sprite) {
+        console.log("Works3");
+        sprite.tint = 0xffffff;
     }
 
 }

@@ -1,4 +1,5 @@
 import {Grid} from "./Grid";
+import {InputManager} from "./InputManager";
 import {RequestManager} from "./RequestManager";
 
 export class Game {
@@ -6,6 +7,7 @@ export class Game {
     private _textMessage = "warte auf server";
     private _textElement: Phaser.Text = null;
     private _reqManager: RequestManager;
+    private _inputManager: InputManager;
 
     constructor() {
         const grid: Grid = new Grid(8, 8, 40);
@@ -21,10 +23,16 @@ export class Game {
                 game.load.image("gridTile", "./img/square32_grey.png");
                 game.load.image("startButton", "./img/startButton.png");
 
+                // Manage Input
+                self._inputManager = new InputManager(game);
+
             },
             create() {
                 // Add Button to start Game
-                const button = game.add.button(game.world.centerX - 82, 10, "startButton", () => self.startGame(), this, 2, 1, 0);
+                const button = game.add.button(
+                    game.world.centerX - 82, 10, "startButton",
+                    () => self.startGame(), this, 2, 1, 0);
+
                 // Add grid
                 grid.CreateGrid(game, "gridTile");
 
@@ -39,7 +47,8 @@ export class Game {
 
             update() {
                 self._textElement.text = self._textMessage;
-            }
+                self._inputManager.Debug();
+                }
         });
 
     }
