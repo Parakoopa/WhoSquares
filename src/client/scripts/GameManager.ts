@@ -54,8 +54,8 @@ export class GameManager {
 
     }
 
-    public placeTile(tileName: string): void {
-          this._reqManager.PlaceTile(tileName);
+    public placeTile(x:number, y:number): void {
+          this._reqManager.PlaceTile(x,y);
     }
 
     public reqManager(reqManager: RequestManager) {
@@ -67,7 +67,7 @@ export class GameManager {
     }
 
     private startGame() {
-        this._reqManager.StartGame();
+        this._reqManager.StartGame(this._grid.sizeX(), this._grid.sizeY());
     }
 
 }

@@ -27,7 +27,6 @@ app.use("/dist", express.static(__dirname + "/client/dist"));
 app.use("/img", express.static(__dirname + "/client/img"));
 
 app.get("/", (req: Request, res: Response) => res.sendFile(__dirname + "/client/index.html"));
-
 // Handle all Incoming/Outgoing Events
 const connectionManager = new ConnectionManager(io);
 connectionManager.EventListener();

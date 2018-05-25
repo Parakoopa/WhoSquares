@@ -10,15 +10,41 @@ interface IResponse {
 
 interface IConnectionResponse extends IResponse {
     response: "connected";
-    guid: string;
+    clientKey: string;
 }
 
 interface IRoomIsFullResponse extends IResponse {
     response: "roomIsFull";
 }
 
-interface IJoinedReponse extends IResponse {
+interface IJoinedResponse extends IResponse {
     response: "joinedRoom";
+    roomKey: string;
     clientCount: number;
     color: string;
+}
+
+interface IRoomIsFullResponse extends IResponse {
+    response: "roomIsFull";
+}
+
+interface IStartGameResponse extends IResponse {
+    response: "startGame";
+}
+
+interface INotOwnerResponse extends IResponse {
+    response: "notOwner";
+}
+
+interface IPlacedTileResponse extends IResponse {
+    response: "placedTile";
+    roomKey: string;
+    clientColor: string;
+    x: number;
+    y: number;
+}
+
+interface INotYourTurnResponse extends IResponse {
+    response: "notYourTurn";
+    roomKey: string;
 }

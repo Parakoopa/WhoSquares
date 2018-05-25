@@ -5,6 +5,8 @@ export class RequestManager {
 
     private _socket: Socket;
     private _game: GameManager;
+    private _clientKey: string;
+    private _roomKey: string;
 
     constructor(game: GameManager) {
         this._socket = io();
@@ -14,14 +16,15 @@ export class RequestManager {
     public EventListener() {
         // Initial Connection
         this._socket.on("connection", (resp: IConnectionResponse) => {
-            const guid: string = resp.guid;
-            const textMessage = resp.response + ":\n" + guid;
+            const clientKey: string = resp.clientKey;
+            const textMessage = resp.response + ":\n" + clientKey;
             this._game.TextElement(textMessage);
             console.log(textMessage);
         });
         // Join room
-        this._socket.on("joinRoom", (resp: IRoomIsFullResponse | IJoinedReponse) => {
+        this._socket.on("joinRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
             if (resp.response === "joinedRoom") {
+                this._roomKey = resp.roomKey;
                 const clientCount: number = resp.clientCount;
                 const color: string = resp.color;
                 const textMessage: string = resp.response + ": color: " + color + ", clients: " + clientCount;
@@ -33,6 +36,10 @@ export class RequestManager {
                 console.log(textMessage);
             }
         });
+        this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
+            //ToDo
+            console.log(resp.response);
+        });
         // Start GameManager
         this._socket.on("startGame", (resp: IResponse) => {
            const textMessage: string = resp.response;
@@ -42,15 +49,20 @@ export class RequestManager {
     }
 
     public JoinRoom(roomName: string): void {
-        this._socket.emit("joinRoom", roomName);
+        const clientKey = this._roomKey;
+        this._socket.emit("joinRoom", {request: "joinRoom", clientKey, roomName});
     }
 
-    public StartGame(): void {
-        this._socket.emit("startGame");
+    public StartGame(sizeX: number, sizeY: number): void {
+        const clientKey = this._roomKey;
+        const roomKey = this._roomKey;
+        this._socket.emit("startGame", {request: "startGame", clientKey, roomKey, sizeX, sizeY});
     }
 
-    public PlaceTile(tileName: string): void {
-        this._socket.emit("placeTile", tileName);
+    public PlaceTile(x: number, y: number): void {
+        const clientKey = this._roomKey;
+        const roomKey = this._roomKey;
+        this._socket.emit("placeTile" , {request: "placeTile", clientKey, roomKey, x, y});
     }
 
 }

@@ -25,6 +25,13 @@ export class Grid {
 
     }
 
+    public sizeX(): number {
+        return this._sizeX;
+    }
+
+    public sizeY(): number {
+        return this._sizeY;
+    }
     /**
      * Creates a grid of image tiles
      * @param {Phaser.Game} game
@@ -40,13 +47,15 @@ export class Grid {
         //  Creates x sprites for each frame (a frame is basically a row)
         for (let y = 0; y < this._sizeY; y++) {
             for (let x = 0; x < this._sizeX; x++) {
-                const sprite = game.add.sprite(
+                let sprite = game.add.sprite(
                     xOffset + this._cellSize * x,
                     yOffset + this._cellSize * y,
                     imageName);
                 sprite.name = "tile" + y + "_" + x;
+                sprite.data.x = x;
+                sprite.data.y = y;
                 sprite.inputEnabled = true;
-                sprite.events.onInputDown.add(this.onDown,this,0, sprite);
+                sprite.events.onInputDown.add(this.onDown, this, 0, sprite);
                 sprite.events.onInputOver.add(this.onOver, this);
                 sprite.events.onInputOut.add(this.onOut, this);
             }
@@ -61,7 +70,7 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     public onDown(sprite: Sprite) {
-        this._gameManager.placeTile(sprite.name);
+        this._gameManager.placeTile(sprite.x, sprite.y);
         sprite.tint = 0x00ff00;
 
     }

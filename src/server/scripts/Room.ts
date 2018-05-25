@@ -1,4 +1,5 @@
 import {Client} from "./Client";
+import {ServerGrid} from "./ServerGrid";
 
 /**
  * A Room hosts a game for clients
@@ -7,18 +8,19 @@ import {Client} from "./Client";
 export class Room {
 
     private readonly _name: string;
-    private readonly _guid: string;
+    private readonly _key: string;
     private readonly _size: number;
     private _owner: Client;
     private _clients: Client[];
+    private _serverGrid: ServerGrid;
     private _clientColorMap: Map<string, Client>;
     private readonly _colors: string[] =
         ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
 
-    constructor(name: string, guid: string, size: number) {
+    constructor(name: string, key: string, size: number) {
         this._clients = [];
         this._name = name;
-        this._guid = guid;
+        this._key = key;
         this._size = size;
         this._clientColorMap = new Map();
         this.SetColors();
@@ -28,8 +30,8 @@ export class Room {
         return this._name;
     }
 
-    public guid(): string {
-        return this._guid;
+    public key(): string {
+        return this._key;
     }
 
     public Size(): number {
@@ -38,6 +40,14 @@ export class Room {
 
     public Owner(): Client {
         return this._owner;
+    }
+
+    get grid(): ServerGrid {
+        return this._serverGrid;
+    }
+
+    set grid(value: ServerGrid) {
+        this._serverGrid = value;
     }
 
     /**
@@ -133,4 +143,21 @@ export class Room {
         this._clientColorMap.set(color, null);
     }
 
+    // Grid Interaction
+
+    /**
+     * Place Clients instead of Colors as gridis not displayed anyway
+     * @param {Client} client
+     * @param x
+     * @param y
+     */
+    public placeTile(client: Client, x: number, y: number): IPlacedTileResponse | INotYourTurnResponse {
+        const roomKey = this._key;
+        if (this._owner === client) {
+            if (this._serverGrid.placeTile(client, x, y)) {
+                const clientColor = this.GetClientColor(client);
+                return {response: "placedTile", roomKey, clientColor, x, y};
+            }
+        } else return {response: "notYourTurn", roomKey};
+    }
 }

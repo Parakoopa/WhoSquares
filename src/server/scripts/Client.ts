@@ -3,26 +3,26 @@ import {Room} from "./Room";
 
 export class Client {
 
-    private readonly _guid: string;
+    private readonly _key: string;
     private readonly _socket: Socket;
     private _room: Room;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
      * @param {NodeJS.Socket} socket
-     * @param {string} guid
+     * @param key
      */
-    constructor(socket: Socket, guid: string) {
+    constructor(socket: Socket, key: string) {
         this._socket = socket;
-        this._guid = guid;
+        this._key = key;
     }
 
     public Socket(): Socket {
         return this._socket;
     }
 
-    public Guid(): string {
-        return this._guid;
+    public key(): string {
+        return this._key;
     }
 
     get Room(): Room {

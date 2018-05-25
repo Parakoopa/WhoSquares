@@ -26,7 +26,7 @@ export class ConnectionManager {
             this._clients.push(newClient);
             socket.emit("connection", {
                 response: "connected",
-                guid: newClient.Guid(),
+                clientKey: newClient.key(),
                 values: {}
             } as IConnectionResponse);
 
@@ -36,9 +36,15 @@ export class ConnectionManager {
             });
 
             // Client requests to join specific room
-            socket.on("joinRoom", (data) => { // ToDo Find out which type data has
-                const resp = this.JoinRoom(this.ClientBySocket(socket), data);
+            socket.on("joinRoom", (req: IJoinRoomRequest) => {
+                const resp = this.JoinRoom(this.ClientBySocket(socket), req);
                 socket.emit("joinRoom", resp);
+            });
+
+            socket.on("placeTile", (req: IPlaceTileRequest) => {
+                const room: Room = this.RoomByKey(req.roomKey);
+                const resp = room.placeTile(this.ClientByKey(req.clientKey), req.x, req.y);
+                socket.emit("placedTile", resp);
             });
 
             // Start GameManager
@@ -48,6 +54,9 @@ export class ConnectionManager {
                 const room: Room = client.Room;
                 if (room.Owner() === client ) {
                     this.StartGame(room.GetClients());
+                }
+                else{
+                    socket.emit("notOwner", {response: "notOwner"});
                 }
             });
         });
@@ -60,7 +69,7 @@ export class ConnectionManager {
      */
     private StartGame(clients: Client[]) {
         for (const client of clients) {
-            client.Socket().emit("startGame", {response: "GameManager has been started"});
+            client.Socket().emit("startGame", {response: "startGame"});
         }
     }
 
@@ -68,13 +77,13 @@ export class ConnectionManager {
      * Create Room if necessary
      * Return responses: RoomIsFull or JoinedRoom + clientCount
      * @param {Client} client
-     * @param {string} roomName
+     * @param req
      * @returns {string}
      * @constructor
      */
-    private JoinRoom(client: Client, roomName: string): IJoinedReponse | IRoomIsFullResponse {
-        let room: Room = this.RoomByName(roomName);
-        if (room === null)room = this.CreateRoom(roomName);
+    private JoinRoom(client: Client, req: IJoinRoomRequest): IJoinedResponse | IRoomIsFullResponse {
+        let room: Room = this.RoomByName(req.roomName);
+        if (room === null)room = this.CreateRoom(req.roomName);
         else if (room.GetClients.length > room.Size()) {
             return {
                 response: "roomIsFull"
@@ -85,6 +94,7 @@ export class ConnectionManager {
             const color: string = room.AddClient(client);
             return {
                 response: "joinedRoom",
+                roomKey: room.key(),
                 clientCount: room.GetClients().length,
                 color
             };
@@ -115,6 +125,13 @@ export class ConnectionManager {
         return null;
     }
 
+    private RoomByKey(roomKey: string): Room {
+        for (const room of this._rooms) {
+            if (room.key() === roomKey) return room;
+        }
+        return null;
+    }
+
     /**
      * Removes Client from List of connected clients
      * @param {SocketIO.Socket} socket
@@ -135,6 +152,13 @@ export class ConnectionManager {
     private ClientBySocket(socket: Socket): Client {
         for (const client of this._clients) {
             if (client.Socket() === socket) return client;
+        }
+        return null;
+    }
+
+    private ClientByKey(key: string): Client {
+        for (const client of this._clients) {
+            if (client.key() === key) return client;
         }
         return null;
     }
