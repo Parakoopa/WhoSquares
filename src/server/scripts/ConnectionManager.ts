@@ -41,7 +41,7 @@ export class ConnectionManager {
                 socket.emit("joinRoom", resp);
             });
 
-            // Start Game
+            // Start GameManager
             // ToDo Add Response for not being room owner
             socket.on("startGame", () => {
                 const client: Client = this.ClientBySocket(socket);
@@ -55,12 +55,12 @@ export class ConnectionManager {
     }
 
     /**
-     * Tell all Clients to start Game
+     * Tell all Clients to start GameManager
      * @constructor
      */
     private StartGame(clients: Client[]) {
         for (const client of clients) {
-            client.Socket().emit("startGame", {response: "Game has been started"});
+            client.Socket().emit("startGame", {response: "GameManager has been started"});
         }
     }
 

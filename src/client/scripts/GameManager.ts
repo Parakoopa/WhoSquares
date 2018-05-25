@@ -2,19 +2,20 @@ import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
 import {RequestManager} from "./RequestManager";
 
-export class Game {
+export class GameManager {
 
     private _textMessage = "warte auf server";
     private _textElement: Phaser.Text = null;
     private _reqManager: RequestManager;
     private _inputManager: InputManager;
+    private _grid: Grid;
 
     constructor() {
-        const grid: Grid = new Grid(8, 8, 40);
+        this._grid = new Grid(this, 8, 8, 40);
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
             preload() {
-                // Center Game Canvas
+                // Center GameManager Canvas
                 game.scale.pageAlignHorizontally = true;
                 game.scale.pageAlignVertically = true;
                 game.scale.refresh();
@@ -28,13 +29,13 @@ export class Game {
 
             },
             create() {
-                // Add Button to start Game
+                // Add Button to start GameManager
                 const button = game.add.button(
                     game.world.centerX - 82, 10, "startButton",
                     () => self.startGame(), this, 2, 1, 0);
 
                 // Add grid
-                grid.CreateGrid(game, "gridTile");
+                self._grid.CreateGrid(game, "gridTile");
 
                 self._textElement = game.add.text(
                     game.world.centerX,
@@ -51,6 +52,10 @@ export class Game {
                 }
         });
 
+    }
+
+    public placeTile(tileName: string): void {
+          this._reqManager.PlaceTile(tileName);
     }
 
     public reqManager(reqManager: RequestManager) {

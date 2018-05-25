@@ -15,6 +15,7 @@ export class InputManager {
         if(this._game.input.activePointer.leftButton.onDown){
 
         }
+
     }
 
     public Debug(): void {

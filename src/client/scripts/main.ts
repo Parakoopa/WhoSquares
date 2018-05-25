@@ -1,9 +1,9 @@
-import {Game} from "./Game";
+import {GameManager} from "./GameManager";
 import {RequestManager} from "./RequestManager";
 
 export function main() {
 
-    const game: Game = new Game(); // Phaser
+    const game: GameManager = new GameManager(); // Phaser
     const reqManager = new RequestManager(game);
     game.reqManager(reqManager);
     reqManager.EventListener();

@@ -1,19 +1,24 @@
-import Game = Phaser.Game;
 import Sprite = Phaser.Sprite;
+import {GameManager} from "./GameManager";
+import Game = Phaser.Game;
 
 export class Grid {
 
     private readonly _sizeX: number;
     private readonly _sizeY: number;
     private readonly _cellSize: number;
+    private readonly _gameManager: GameManager;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
+     * @param gameManager
      * @param sizeX
      * @param sizeY
      * @param cellSize
      */
-    constructor(sizeX: number, sizeY: number, cellSize: number) {
+    constructor(gameManager: GameManager, sizeX: number, sizeY: number, cellSize: number) {
+        this._gameManager = gameManager;
+        console.log(this._gameManager);
         this._sizeX = sizeX;
         this._sizeY = sizeY;
         this._cellSize = cellSize;
@@ -27,10 +32,10 @@ export class Grid {
      * @constructor
      */
     public CreateGrid(game: Game, imageName: string): void {
+    //    const self = this;
         const offset = this._sizeX * this._cellSize / 2.0;
         const xOffset: number = game.world.centerX - offset;
         const yOffset: number = game.world.centerY - offset;
-
 
         //  Creates x sprites for each frame (a frame is basically a row)
         for (let y = 0; y < this._sizeY; y++) {
@@ -41,9 +46,9 @@ export class Grid {
                     imageName);
                 sprite.name = "tile" + y + "_" + x;
                 sprite.inputEnabled = true;
-                sprite.events.onInputDown.add(Grid.onDown, this);
-                sprite.events.onInputOver.add(Grid.onOver, this);
-                sprite.events.onInputOut.add(Grid.onOut, this);
+                sprite.events.onInputDown.add(this.onDown,this,0, sprite);
+                sprite.events.onInputOver.add(this.onOver, this);
+                sprite.events.onInputOut.add(this.onOut, this);
             }
         }
 
@@ -52,11 +57,13 @@ export class Grid {
     /**
      * Change Color of clicked tile while on it
      * (Overwrites onOver)
+     * @param self
      * @param {Phaser.Sprite} sprite
      */
-    public static onDown(sprite: Sprite) {
-        console.log("Works");
+    public onDown(sprite: Sprite) {
+        this._gameManager.placeTile(sprite.name);
         sprite.tint = 0x00ff00;
+
     }
 
     /**
@@ -64,8 +71,7 @@ export class Grid {
      * (While mouse is over tile)
      * @param {Phaser.Sprite} sprite
      */
-    private static onOver(sprite: Sprite) {
-        console.log("Works2");
+    private onOver(sprite: Sprite) {
         sprite.tint = 0xff0000;
     }
 
@@ -73,8 +79,7 @@ export class Grid {
      * Reset tint to show original color
      * @param {Phaser.Sprite} sprite
      */
-    private static onOut(sprite: Sprite) {
-        console.log("Works3");
+    private onOut(sprite: Sprite) {
         sprite.tint = 0xffffff;
     }
 

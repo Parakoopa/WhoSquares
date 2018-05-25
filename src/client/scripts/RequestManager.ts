@@ -1,12 +1,12 @@
-import {Game} from "./Game";
+import {GameManager} from "./GameManager";
 import Socket = SocketIOClient.Socket;
 
 export class RequestManager {
 
     private _socket: Socket;
-    private _game: Game;
+    private _game: GameManager;
 
-    constructor(game: Game) {
+    constructor(game: GameManager) {
         this._socket = io();
         this._game = game;
     }
@@ -33,7 +33,7 @@ export class RequestManager {
                 console.log(textMessage);
             }
         });
-        // Start Game
+        // Start GameManager
         this._socket.on("startGame", (resp: IResponse) => {
            const textMessage: string = resp.response;
            this._game.TextElement(textMessage);
@@ -47,6 +47,10 @@ export class RequestManager {
 
     public StartGame(): void {
         this._socket.emit("startGame");
+    }
+
+    public PlaceTile(tileName: string): void {
+        this._socket.emit("placeTile", tileName);
     }
 
 }
