@@ -45,13 +45,13 @@ export class Grid {
      * @param overColor
      * @constructor
      */
-    public createGrid(imageName: string, sizeX: number, sizeY: number, cellSize: number, overColor:number): void {
+    public createGrid(imageName: string, sizeX: number, sizeY: number, cellSize: number, overColor: number): void {
 
         this._sizeX = sizeX;
         this._sizeY = sizeY;
         this._overColor = overColor;
     //    const self = this;
-        const offset = this._sizeX * cellSize / 2.0;
+        const offset = this._sizeX * cellSize / 2.0 - 20; // Why -20? not centered otherwise whyever
         const xOffset: number = this._game.world.centerX - offset;
         const yOffset: number = this._game.world.centerY - offset;
         this._grid = [];
@@ -66,7 +66,7 @@ export class Grid {
                 sprite.name = "tile" + y + "_" + x;
                 sprite.data.x = x;
                 sprite.data.y = y;
-                sprite.tint = 0x555555; //Initially Grey
+                sprite.tint = 0x555555; // Initially Grey
                 sprite.data.color = 0x555555;
                 sprite.inputEnabled = true;
                 sprite.events.onInputDown.add(this.onDown, this, 0, sprite);

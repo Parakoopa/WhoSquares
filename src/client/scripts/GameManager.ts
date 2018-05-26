@@ -2,6 +2,7 @@ import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
 import {RequestManager} from "./RequestManager";
 import Game = Phaser.Game;
+import Sprite = Phaser.Sprite;
 
 export class GameManager {
 
@@ -12,6 +13,7 @@ export class GameManager {
     private _inputManager: InputManager;
     private _grid: Grid;
     private _color: number = 0xffffff;
+    private _turnInfoSprite: Sprite;
 
     constructor() {
         const self = this;
@@ -31,20 +33,33 @@ export class GameManager {
 
             },
             create() {
-                // Add Button to start GameManager
+                // Add Start Button
                 const button = game.add.button(
                     game.world.centerX - 82, 10, "startButton",
                     () => self.startGame(), this, 2, 1, 0);
 
-                // Add grid
-
+                // Add Feedback Text
                 self._textElement = game.add.text(
                     game.world.centerX,
-                    game.world.centerY,
+                    game.world.centerY * 0.35,
                     self._textMessage,
                     {font: "32px Arial", fill: "#ff0044", align: "center"}
                 );
-                self._textElement.anchor.setTo(0.5, 5);
+                self._textElement.anchor.setTo(0.5, 0.5);
+
+                //Add client Turn Displayer
+                const turnInfoText = game.add.text(
+                    game.world.centerX-80,
+                    game.world.centerY * 0.4 +4,
+                    "Turn of:",
+                    {font: "20px Arial", fill: "#555555", align: "center"}
+                );
+
+                self._turnInfoSprite = self._game.add.sprite(
+                    game.world.centerX,
+                    game.world.centerY*0.4,
+                    "gridTile");
+                self._turnInfoSprite.tint = 0xcccccc;
             },
 
             update() {
@@ -84,6 +99,10 @@ export class GameManager {
     private startGame() {
         // ToDo Add InputFields to set sizeX & sizeY
         this._reqManager.StartGame(5, 5);
+    }
+
+    public turnInfo(color:number):void{
+        this._turnInfoSprite.tint = color;
     }
 
 }

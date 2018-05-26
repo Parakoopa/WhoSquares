@@ -32,7 +32,7 @@ export class RequestManager {
         });
         // placedtile
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
-            const color:number = parseInt(resp.clientColor, 16);
+            const color: number = parseInt(resp.clientColor, 16);
             this._game.placedTile(color, resp.x, resp.y);
             this._game.TextElement(resp.response);
         });
@@ -45,6 +45,11 @@ export class RequestManager {
 
             const textMessage: string = resp.response;
             this._game.TextElement(textMessage);
+        });
+
+        this._socket.on("informTurn", (resp: IinformTurnResponse) => {
+            const color: number = parseInt(resp.turnColor, 16);
+            this._game.turnInfo(color);
         });
     }
 

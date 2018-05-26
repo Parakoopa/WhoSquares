@@ -174,6 +174,11 @@ export class Room {
         }
     }
 
+    public turnClient(): string {
+        const client: Client = this._clients[this._turnClientIndex];
+        return this.GetClientColor(client);
+    }
+
     private setNextTurnClient(): void {
         this._turnClientIndex += 1;
         if (this._turnClientIndex === this._clients.length) this._turnClientIndex = 0;

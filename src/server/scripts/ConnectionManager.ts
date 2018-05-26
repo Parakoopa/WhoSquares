@@ -85,8 +85,10 @@ export class ConnectionManager {
         if (sizeX <  3) sizeX =  3;
         if (sizeY <  3) sizeY =  3;
         room.createGame(sizeX, sizeY);
+        const turnColor = room.turnClient();
         for (const client of clients) {
             client.Socket().emit("startGame", {response: "startGame", sizeX, sizeY});
+            client.Socket().emit("informTurn", {response: "informTurn", turnColor});
         }
     }
 
