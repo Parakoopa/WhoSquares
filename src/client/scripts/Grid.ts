@@ -9,6 +9,7 @@ export class Grid {
     private _sizeY: number;
     private readonly _gameManager: GameManager;
     private _game: Phaser.Game;
+    private _overColor: number;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
@@ -41,12 +42,14 @@ export class Grid {
      * @param sizeX
      * @param sizeY
      * @param cellSize
+     * @param overColor
      * @constructor
      */
-    public createGrid(imageName: string, sizeX: number, sizeY: number, cellSize: number): void {
+    public createGrid(imageName: string, sizeX: number, sizeY: number, cellSize: number, overColor:number): void {
 
         this._sizeX = sizeX;
         this._sizeY = sizeY;
+        this._overColor = overColor;
     //    const self = this;
         const offset = this._sizeX * cellSize / 2.0;
         const xOffset: number = this._game.world.centerX - offset;
@@ -63,7 +66,8 @@ export class Grid {
                 sprite.name = "tile" + y + "_" + x;
                 sprite.data.x = x;
                 sprite.data.y = y;
-                sprite.data.color = 0xffffff;
+                sprite.tint = 0x555555; //Initially Grey
+                sprite.data.color = 0x555555;
                 sprite.inputEnabled = true;
                 sprite.events.onInputDown.add(this.onDown, this, 0, sprite);
                 sprite.events.onInputOver.add(this.onOver, this);
@@ -76,23 +80,12 @@ export class Grid {
     }
 
     /**
-     * Change Color of clicked tile while on it
-     * (Overwrites onOver)
-     * @param {Phaser.Sprite} sprite
-     */
-    public onDown(sprite: Sprite) {
-        this._gameManager.placeTile(sprite.data.x, sprite.data.y);
-        sprite.tint = 0x00ff00;
-
-    }
-
-    /**
      * Hover Color
      * (While mouse is over tile)
      * @param {Phaser.Sprite} sprite
      */
     private onOver(sprite: Sprite) {
-        sprite.tint = 0xff0000;
+        sprite.tint = this._overColor;
     }
 
     /**
@@ -103,4 +96,12 @@ export class Grid {
         sprite.tint = sprite.data.color;
     }
 
+    /**
+     * Ask server to color clicked tile
+     * (Overwrites onOver)
+     * @param {Phaser.Sprite} sprite
+     */
+    public onDown(sprite: Sprite) {
+        this._gameManager.placeTile(sprite.data.x, sprite.data.y);
+    }
 }

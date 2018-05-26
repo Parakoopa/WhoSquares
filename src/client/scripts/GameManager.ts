@@ -11,6 +11,7 @@ export class GameManager {
     private _reqManager: RequestManager;
     private _inputManager: InputManager;
     private _grid: Grid;
+    private _color: number = 0xffffff;
 
     constructor() {
         const self = this;
@@ -55,9 +56,13 @@ export class GameManager {
 
     }
 
+    public color(color:number):void{
+        this._color = color;
+    }
+
     public createGrid(sizeX: number, sizeY: number) {
         this._grid = new Grid(this, this._game);
-        this._grid.createGrid("gridTile", sizeX, sizeY, 40);
+        this._grid.createGrid("gridTile", sizeX, sizeY, 40, this._color);
     }
 
     public placeTile(x: number, y: number): void {

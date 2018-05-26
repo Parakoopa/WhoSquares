@@ -24,8 +24,8 @@ export class RequestManager {
             if (resp.response === "joinedRoom") {
                 this._roomKey = resp.roomKey;
                 const clientCount: number = resp.clientCount;
-                const color: string = resp.color;
-                this._game.TextElement(resp.response + ": color: " + color + ", clients: " + clientCount);
+                this._game.color(parseInt(resp.color, 16));
+                this._game.TextElement(resp.response + ": color: " + resp.color + ", clients: " + clientCount);
             } else if (resp.response === "roomIsFull") {
                 this._game.TextElement(resp.response);
             }
