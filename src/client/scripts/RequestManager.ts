@@ -16,10 +16,9 @@ export class RequestManager {
     public EventListener() {
         // Initial Connection
         this._socket.on("connection", (resp: IConnectionResponse) => {
-            const clientKey: string = resp.clientKey;
-            const textMessage = resp.response + ":\n" + clientKey;
+            this._clientKey = resp.clientKey;
+            const textMessage = resp.response + ":\n" +  resp.clientKey;
             this._game.TextElement(textMessage);
-            console.log(textMessage);
         });
         // Join room
         this._socket.on("joinRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
@@ -29,22 +28,25 @@ export class RequestManager {
                 const color: string = resp.color;
                 const textMessage: string = resp.response + ": color: " + color + ", clients: " + clientCount;
                 this._game.TextElement(textMessage);
-                console.log(textMessage);
             } else if (resp.response === "roomIsFull") {
                 const textMessage: string = resp.response;
                 this._game.TextElement(textMessage);
-                console.log(textMessage);
             }
         });
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
-            //ToDo
+            // ToDo
+            console.log(resp.response);
+        });
+        this._socket.on("notYourTurn", (resp: INotYourTurnResponse) => {
+            // ToDo
             console.log(resp.response);
         });
         // Start GameManager
-        this._socket.on("startGame", (resp: IResponse) => {
-           const textMessage: string = resp.response;
-           this._game.TextElement(textMessage);
-           console.log(textMessage);
+        this._socket.on("startGame", (resp: IStartGameResponse) => {
+            this._game.createGrid(resp.sizeX, resp.sizeY);
+
+            const textMessage: string = resp.response;
+            this._game.TextElement(textMessage);
         });
     }
 
@@ -60,7 +62,7 @@ export class RequestManager {
     }
 
     public PlaceTile(x: number, y: number): void {
-        const clientKey = this._roomKey;
+        const clientKey = this._clientKey;
         const roomKey = this._roomKey;
         this._socket.emit("placeTile" , {request: "placeTile", clientKey, roomKey, x, y});
     }

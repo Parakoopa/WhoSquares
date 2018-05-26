@@ -1,9 +1,11 @@
 import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
 import {RequestManager} from "./RequestManager";
+import Game = Phaser.Game;
 
 export class GameManager {
 
+    private _game: Game;
     private _textMessage = "warte auf server";
     private _textElement: Phaser.Text = null;
     private _reqManager: RequestManager;
@@ -11,7 +13,6 @@ export class GameManager {
     private _grid: Grid;
 
     constructor() {
-        this._grid = new Grid(this, 8, 8, 40);
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
             preload() {
@@ -35,7 +36,6 @@ export class GameManager {
                     () => self.startGame(), this, 2, 1, 0);
 
                 // Add grid
-                self._grid.CreateGrid(game, "gridTile");
 
                 self._textElement = game.add.text(
                     game.world.centerX,
@@ -51,11 +51,17 @@ export class GameManager {
                 self._inputManager.Debug();
                 }
         });
+        this._game = game;
 
     }
 
-    public placeTile(x:number, y:number): void {
-          this._reqManager.PlaceTile(x,y);
+    public createGrid(sizeX: number, sizeY: number) {
+        this._grid = new Grid(this, this._game);
+        this._grid.createGrid("gridTile", sizeX, sizeY, 40);
+    }
+
+    public placeTile(x: number, y: number): void {
+          this._reqManager.PlaceTile(x, y);
     }
 
     public reqManager(reqManager: RequestManager) {
@@ -67,7 +73,8 @@ export class GameManager {
     }
 
     private startGame() {
-        this._reqManager.StartGame(this._grid.sizeX(), this._grid.sizeY());
+        // ToDo Add InputFields to set sizeX & sizeY
+        this._reqManager.StartGame(5, 5);
     }
 
 }

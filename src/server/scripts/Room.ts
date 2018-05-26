@@ -145,19 +145,29 @@ export class Room {
 
     // Grid Interaction
 
+    public createGrid(sizeX: number, sizeY: number) {
+        this._serverGrid = new ServerGrid(sizeX, sizeY);
+    }
     /**
      * Place Clients instead of Colors as gridis not displayed anyway
      * @param {Client} client
      * @param x
      * @param y
      */
-    public placeTile(client: Client, x: number, y: number): IPlacedTileResponse | INotYourTurnResponse {
+    public placeTile(client: Client, x: number, y: number): IEvent { // IPlacedTileResponse | INotYourTurnResponse
         const roomKey = this._key;
         if (this._owner === client) {
             if (this._serverGrid.placeTile(client, x, y)) {
                 const clientColor = this.GetClientColor(client);
-                return {response: "placedTile", roomKey, clientColor, x, y};
+                const args = {response: "placedTile", roomKey, clientColor, x, y};
+                return {name: "placedTile", args};
+            } else{
+                const args =  {response: "notYourTurn", roomKey};
+                return {name: "notYourTurn", args}; //ToDo change to cheat Reponse
             }
-        } else return {response: "notYourTurn", roomKey};
+        } else {
+            const args =  {response: "notYourTurn", roomKey};
+            return {name: "notYourTurn", args};
+        }
     }
 }

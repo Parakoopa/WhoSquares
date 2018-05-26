@@ -6,8 +6,8 @@ import {Client} from "./Client";
 
 export class ServerGrid {
 
-    private _sizeX: number;
-    private _sizeY: number;
+    private readonly _sizeX: number;
+    private readonly _sizeY: number;
     private _grid: any[][];
 
     constructor(sizeX: number, sizeY: number) {
@@ -18,7 +18,15 @@ export class ServerGrid {
 
     private createGrid(sizeX: number, sizeY: number): void {
         const client: Client = null; // default Value
-        this._grid = [...Array(sizeY)].map((e) => Array(sizeX).fill(client));
+        const grid = [];
+        for (let y = 0; y < sizeY; y++) {
+            const row: Client[] = [];
+            for (let x = 0; x < sizeX; x++) {
+                row[x] = client;
+            }
+            grid[y] = row;
+        }
+        this._grid = grid;
     }
 
     public placeTile(client: Client, x: number, y: number): boolean {

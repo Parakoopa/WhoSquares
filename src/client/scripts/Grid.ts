@@ -4,24 +4,19 @@ import Game = Phaser.Game;
 
 export class Grid {
 
-    private readonly _sizeX: number;
-    private readonly _sizeY: number;
-    private readonly _cellSize: number;
+    private _sizeX: number;
+    private _sizeY: number;
     private readonly _gameManager: GameManager;
+    private _game: Phaser.Game;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
      * @param gameManager
-     * @param sizeX
-     * @param sizeY
-     * @param cellSize
+     * @param game
      */
-    constructor(gameManager: GameManager, sizeX: number, sizeY: number, cellSize: number) {
+    constructor(gameManager: GameManager, game: Game) {
         this._gameManager = gameManager;
-        console.log(this._gameManager);
-        this._sizeX = sizeX;
-        this._sizeY = sizeY;
-        this._cellSize = cellSize;
+        this._game = game;
 
     }
 
@@ -34,22 +29,27 @@ export class Grid {
     }
     /**
      * Creates a grid of image tiles
-     * @param {Phaser.Game} game
      * @param imageName
+     * @param sizeX
+     * @param sizeY
+     * @param cellSize
      * @constructor
      */
-    public CreateGrid(game: Game, imageName: string): void {
+    public createGrid(imageName: string, sizeX: number, sizeY: number, cellSize: number): void {
+
+        this._sizeX = sizeX;
+        this._sizeY = sizeY;
     //    const self = this;
-        const offset = this._sizeX * this._cellSize / 2.0;
-        const xOffset: number = game.world.centerX - offset;
-        const yOffset: number = game.world.centerY - offset;
+        const offset = this._sizeX * cellSize / 2.0;
+        const xOffset: number = this._game.world.centerX - offset;
+        const yOffset: number = this._game.world.centerY - offset;
 
         //  Creates x sprites for each frame (a frame is basically a row)
         for (let y = 0; y < this._sizeY; y++) {
             for (let x = 0; x < this._sizeX; x++) {
-                let sprite = game.add.sprite(
-                    xOffset + this._cellSize * x,
-                    yOffset + this._cellSize * y,
+                const sprite = this._game.add.sprite(
+                    xOffset + cellSize * x,
+                    yOffset + cellSize * y,
                     imageName);
                 sprite.name = "tile" + y + "_" + x;
                 sprite.data.x = x;
@@ -66,11 +66,10 @@ export class Grid {
     /**
      * Change Color of clicked tile while on it
      * (Overwrites onOver)
-     * @param self
      * @param {Phaser.Sprite} sprite
      */
     public onDown(sprite: Sprite) {
-        this._gameManager.placeTile(sprite.x, sprite.y);
+        this._gameManager.placeTile(sprite.data.x, sprite.data.y);
         sprite.tint = 0x00ff00;
 
     }

@@ -30,6 +30,8 @@ interface IRoomIsFullResponse extends IResponse {
 
 interface IStartGameResponse extends IResponse {
     response: "startGame";
+    sizeX: number;
+    sizeY: number;
 }
 
 interface INotOwnerResponse extends IResponse {

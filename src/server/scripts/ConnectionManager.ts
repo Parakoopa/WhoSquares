@@ -41,24 +41,23 @@ export class ConnectionManager {
                 socket.emit("joinRoom", resp);
             });
 
-            socket.on("placeTile", (req: IPlaceTileRequest) => {
-                const room: Room = this.RoomByKey(req.roomKey);
-                const resp = room.placeTile(this.ClientByKey(req.clientKey), req.x, req.y);
-                socket.emit("placedTile", resp);
-            });
-
-            // Start GameManager
-            // ToDo Add Response for not being room owner
-            socket.on("startGame", () => {
+            // Start Game, create Grid, inform Clients
+            socket.on("startGame", (req: IStartGameRequest) => {
                 const client: Client = this.ClientBySocket(socket);
                 const room: Room = client.Room;
                 if (room.Owner() === client ) {
-                    this.StartGame(room.GetClients());
-                }
-                else{
+                    this.StartGame(room.GetClients(), room, req.sizeX, req.sizeY);
+                } else {
                     socket.emit("notOwner", {response: "notOwner"});
                 }
             });
+
+            socket.on("placeTile", (req: IPlaceTileRequest) => {
+                const room: Room = this.RoomByKey(req.roomKey);
+                const event: IEvent = room.placeTile(this.ClientByKey(req.clientKey), req.x, req.y);
+                socket.emit(event.name, event.args);
+            });
+
         });
 
     }
@@ -67,9 +66,15 @@ export class ConnectionManager {
      * Tell all Clients to start GameManager
      * @constructor
      */
-    private StartGame(clients: Client[]) {
+    private StartGame(clients: Client[], room: Room, sizeX: number, sizeY: number) {
+        // ToDo Rework size adjustment
+        if (sizeX > 10) sizeX = 10;
+        if (sizeY > 10) sizeY = 10;
+        if (sizeX <  3) sizeX =  3;
+        if (sizeY <  3) sizeY =  3;
+        room.createGrid(sizeX, sizeY);
         for (const client of clients) {
-            client.Socket().emit("startGame", {response: "startGame"});
+            client.Socket().emit("startGame", {response: "startGame", sizeX, sizeY});
         }
     }
 
