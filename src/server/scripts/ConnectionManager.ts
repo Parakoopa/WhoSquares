@@ -55,7 +55,7 @@ export class ConnectionManager {
             socket.on("placeTile", (req: IPlaceTileRequest) => {
                 const room: Room = this.RoomByKey(req.roomKey);
                 const event: IEvent = room.placeTile(this.ClientByKey(req.clientKey), req.x, req.y);
-                socket.emit(event.name, event.args);
+                socket.emit(event.name, ...event.args);
             });
 
         });
