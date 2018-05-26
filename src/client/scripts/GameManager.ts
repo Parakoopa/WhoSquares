@@ -64,6 +64,10 @@ export class GameManager {
           this._reqManager.PlaceTile(x, y);
     }
 
+    public placedTile(color:number, x: number, y: number): void {
+        this._grid.placedTile(color, x, y);
+    }
+
     public reqManager(reqManager: RequestManager) {
         this._reqManager = reqManager;
     }

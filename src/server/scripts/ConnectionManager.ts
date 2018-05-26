@@ -53,6 +53,7 @@ export class ConnectionManager {
             });
 
             socket.on("placeTile", (req: IPlaceTileRequest) => {
+                this.placeTile(this.RoomByKey(req.roomKey), this.ClientByKey(req.clientKey), req.x, req.y);
                 const room: Room = this.RoomByKey(req.roomKey);
                 const event: IEvent = room.placeTile(this.ClientByKey(req.clientKey), req.x, req.y);
                 socket.emit(event.name, ...event.args);
@@ -60,6 +61,17 @@ export class ConnectionManager {
 
         });
 
+    }
+
+    private placeTile(room: Room, client: Client, x: number, y: number ): void {
+        const event: IEvent = room.placeTile(client, x, y);
+        if (event.name === "notYourTurn") {
+            client.Socket().emit(event.name, ...event.args);
+        } else {
+            for (client of room.GetClients()) {
+                client.Socket().emit(event.name, event.args);
+            }
+        }
     }
 
     /**
@@ -72,7 +84,7 @@ export class ConnectionManager {
         if (sizeY > 10) sizeY = 10;
         if (sizeX <  3) sizeX =  3;
         if (sizeY <  3) sizeY =  3;
-        room.createGrid(sizeX, sizeY);
+        room.createGame(sizeX, sizeY);
         for (const client of clients) {
             client.Socket().emit("startGame", {response: "startGame", sizeX, sizeY});
         }

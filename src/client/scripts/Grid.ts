@@ -4,6 +4,7 @@ import Game = Phaser.Game;
 
 export class Grid {
 
+    private _grid: Sprite[][];
     private _sizeX: number;
     private _sizeY: number;
     private readonly _gameManager: GameManager;
@@ -27,6 +28,13 @@ export class Grid {
     public sizeY(): number {
         return this._sizeY;
     }
+
+    public placedTile(color: number, x: number, y: number) {
+       const sprite: Sprite =  this._grid[y][x];
+       sprite.data.color = color; // save color on object as it is overwritten f.e. onOver
+       this._grid[y][x].tint = color;
+    }
+
     /**
      * Creates a grid of image tiles
      * @param imageName
@@ -43,9 +51,10 @@ export class Grid {
         const offset = this._sizeX * cellSize / 2.0;
         const xOffset: number = this._game.world.centerX - offset;
         const yOffset: number = this._game.world.centerY - offset;
-
+        this._grid = [];
         //  Creates x sprites for each frame (a frame is basically a row)
         for (let y = 0; y < this._sizeY; y++) {
+            const row = [];
             for (let x = 0; x < this._sizeX; x++) {
                 const sprite = this._game.add.sprite(
                     xOffset + cellSize * x,
@@ -54,11 +63,14 @@ export class Grid {
                 sprite.name = "tile" + y + "_" + x;
                 sprite.data.x = x;
                 sprite.data.y = y;
+                sprite.data.color = 0xffffff;
                 sprite.inputEnabled = true;
                 sprite.events.onInputDown.add(this.onDown, this, 0, sprite);
                 sprite.events.onInputOver.add(this.onOver, this);
                 sprite.events.onInputOut.add(this.onOut, this);
+                row[x] = sprite;
             }
+            this._grid[y] = row;
         }
 
     }
@@ -88,7 +100,7 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     private onOut(sprite: Sprite) {
-        sprite.tint = 0xffffff;
+        sprite.tint = sprite.data.color;
     }
 
 }

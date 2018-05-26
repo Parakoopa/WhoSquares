@@ -17,8 +17,7 @@ export class RequestManager {
         // Initial Connection
         this._socket.on("connection", (resp: IConnectionResponse) => {
             this._clientKey = resp.clientKey;
-            const textMessage = resp.response + ":\n" +  resp.clientKey;
-            this._game.TextElement(textMessage);
+            this._game.TextElement(resp.response + ":\n" +  resp.clientKey);
         });
         // Join room
         this._socket.on("joinRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
@@ -26,20 +25,19 @@ export class RequestManager {
                 this._roomKey = resp.roomKey;
                 const clientCount: number = resp.clientCount;
                 const color: string = resp.color;
-                const textMessage: string = resp.response + ": color: " + color + ", clients: " + clientCount;
-                this._game.TextElement(textMessage);
+                this._game.TextElement(resp.response + ": color: " + color + ", clients: " + clientCount);
             } else if (resp.response === "roomIsFull") {
-                const textMessage: string = resp.response;
-                this._game.TextElement(textMessage);
+                this._game.TextElement(resp.response);
             }
         });
+        // placedtile
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
-            // ToDo
-            console.log(resp.response);
+            const color:number = parseInt(resp.clientColor, 16);
+            this._game.placedTile(color, resp.x, resp.y);
+            this._game.TextElement(resp.response);
         });
         this._socket.on("notYourTurn", (resp: INotYourTurnResponse) => {
-            // ToDo
-            console.log(resp.response);
+            this._game.TextElement(resp.response);
         });
         // Start GameManager
         this._socket.on("startGame", (resp: IStartGameResponse) => {

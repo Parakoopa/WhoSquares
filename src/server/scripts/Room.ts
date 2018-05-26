@@ -11,11 +11,13 @@ export class Room {
     private readonly _key: string;
     private readonly _size: number;
     private _owner: Client;
+    private _turnClientIndex: number = 0;
     private _clients: Client[];
     private _serverGrid: ServerGrid;
     private _clientColorMap: Map<string, Client>;
     private readonly _colors: string[] =
-        ["red", "green", "blue", "yellow", "orange", "purple", "pink", "grey", "black", "white"];
+        ["FF3333", "FF9933", "FFFF33", "00FF00", "33FFFF", "9933FF", "FF33FF", "FF3399", "FF33FF"];
+        // ["red", "orange", "yellow", "green", "lightblue", "darkblue", "purple", "pink", ToDo "grey", "black", "white"];
 
     constructor(name: string, key: string, size: number) {
         this._clients = [];
@@ -145,7 +147,7 @@ export class Room {
 
     // Grid Interaction
 
-    public createGrid(sizeX: number, sizeY: number) {
+    public createGame(sizeX: number, sizeY: number) {
         this._serverGrid = new ServerGrid(sizeX, sizeY);
     }
     /**
@@ -156,18 +158,24 @@ export class Room {
      */
     public placeTile(client: Client, x: number, y: number): IEvent { // IPlacedTileResponse | INotYourTurnResponse
         const roomKey = this._key;
-        if (this._owner === client) {
+        if (this._clients[this._turnClientIndex] === client) {
             if (this._serverGrid.placeTile(client, x, y)) {
+                this.setNextTurnClient();
                 const clientColor = this.GetClientColor(client);
                 const args = {response: "placedTile", roomKey, clientColor, x, y};
                 return {name: "placedTile", args};
-            } else{
+            } else {
                 const args =  {response: "notYourTurn", roomKey};
-                return {name: "notYourTurn", args}; //ToDo change to cheat Reponse
+                return {name: "notYourTurn", args}; // ToDo change to cheat Reponse
             }
         } else {
             const args =  {response: "notYourTurn", roomKey};
             return {name: "notYourTurn", args};
         }
+    }
+
+    private setNextTurnClient(): void {
+        this._turnClientIndex += 1;
+        if (this._turnClientIndex === this._clients.length) this._turnClientIndex = 0;
     }
 }
