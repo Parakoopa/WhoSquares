@@ -31,5 +31,5 @@ app.get("/", (req: Request, res: Response) => res.sendFile(__dirname + "/client/
 const connectionManager = new ConnectionManager(io);
 connectionManager.EventListener();
 
-console.log("Server is running. Port 8080");
+console.log("Server is running. Port 8080 (http://localhost:8080)");
 http.listen(8080);
