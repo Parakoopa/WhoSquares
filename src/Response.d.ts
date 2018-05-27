@@ -8,7 +8,7 @@ interface IResponse {
     response: string;
 }
 
-interface IConnectionResponse extends IResponse {
+interface IConnectedResponse extends IResponse {
     response: "connected";
     clientKey: string;
 }

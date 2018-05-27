@@ -1,0 +1,8 @@
+
+export class Lobby {
+
+    constructor() {
+
+    }
+
+}

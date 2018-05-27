@@ -15,7 +15,7 @@ export class RequestManager {
 
     public EventListener() {
         // Initial Connection
-        this._socket.on("connection", (resp: IConnectionResponse) => {
+        this._socket.on("connected", (resp: IConnectedResponse) => {
             this._clientKey = resp.clientKey;
             this._game.TextElement(resp.response + ":\n" +  resp.clientKey);
         });

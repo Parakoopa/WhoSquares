@@ -1,5 +1,6 @@
 import {Socket} from "socket.io";
 import {Client} from "./Client";
+import {Lobby} from "./Lobby";
 import {Room} from "./Room";
 
 export class ConnectionManager {
@@ -16,19 +17,20 @@ export class ConnectionManager {
         this._io = io;
     }
 
+    private addClient(client: Client): IEvent {
+        this._clients.push(client);
+        const args =  {response: "connected", clientKey: client.key()} as IConnectedResponse;
+        return {name: "connected", args};
+    }
+
     /**
      * Add all Listening Events here
      * @constructor
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const newClient: Client = new Client(socket, this.GetGUID());
-            this._clients.push(newClient);
-            socket.emit("connection", {
-                response: "connected",
-                clientKey: newClient.key(),
-                values: {}
-            } as IConnectionResponse);
+            const event: IEvent = this.addClient(new Client(socket, this.GetGUID()));
+            socket.emit(event.name, ...event.args);
 
             // Disconnect
             socket.on("disconnect", () => {
