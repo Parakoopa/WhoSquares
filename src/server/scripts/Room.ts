@@ -1,5 +1,6 @@
 import {Client} from "./Client";
 import {ServerGrid} from "./ServerGrid";
+import {IEvent} from "../../Event";
 
 /**
  * A Room hosts a game for clients
@@ -156,21 +157,24 @@ export class Room {
      * @param x
      * @param y
      */
-    public placeTile(client: Client, x: number, y: number): IEvent { // IPlacedTileResponse | INotYourTurnResponse
+    public placeTile(client: Client, x: number, y: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
         const roomKey = this._key;
         if (this._clients[this._turnClientIndex] === client) {
             if (this._serverGrid.placeTile(client, x, y)) {
                 this.setNextTurnClient();
                 const clientColor = this.GetClientColor(client);
                 const args = {response: "placedTile", roomKey, clientColor, x, y};
-                return {name: "placedTile", args};
+                const placedEvent = {clients: this._clients, name: "placedTile", args};
+                return [placedEvent];
             } else {
                 const args =  {response: "notYourTurn", roomKey};
-                return {name: "notYourTurn", args}; // ToDo change to cheat Reponse
+                const notYourTurnEvent:IEvent = {clients: [client], name:"notYourTurn", args};
+                return [notYourTurnEvent];// ToDo change to cheat Reponse
             }
         } else {
             const args =  {response: "notYourTurn", roomKey};
-            return {name: "notYourTurn", args};
+            const notYourTurnEvent:IEvent = {clients: [client], name:"notYourTurn", args};
+            return [notYourTurnEvent];
         }
     }
 

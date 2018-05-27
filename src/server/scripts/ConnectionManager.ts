@@ -1,18 +1,17 @@
 import {Socket} from "socket.io";
+import {IEvent} from "../../Event";
 import {Client} from "./Client";
-import {Room} from "./Room";
+import {Lobby} from "./Lobby";
 
 export class ConnectionManager {
 
     private _io: SocketIO.Server;
     private readonly _clients: Client[];
-    private _minimumClientsPerGame: number = 2;
-    private readonly _rooms: Room[];
-    private _maxRoomSize: number = 10;
+    private _lobby: Lobby;
 
     constructor( io: SocketIO.Server ) {
+        this._lobby = new Lobby();
         this._clients = [];
-        this._rooms = [];
         this._io = io;
     }
 
@@ -22,133 +21,68 @@ export class ConnectionManager {
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const newClient: Client = new Client(socket, this.GetGUID());
-            this._clients.push(newClient);
-            socket.emit("connection", {
-                response: "connected",
-                clientKey: newClient.key(),
-                values: {}
-            } as IConnectionResponse);
+            const connectionEvent: IEvent = this.addClient(new Client(socket, this.getGUID()));
+            this.emitEvent(connectionEvent);
 
             // Disconnect
             socket.on("disconnect", () => {
-                this.RemoveClient(socket);
+                this.removeClient(socket);
             });
 
             // Client requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
-                const resp = this.JoinRoom(this.ClientBySocket(socket), req);
-                socket.emit("joinRoom", resp);
+                const joinEvent: IEvent = this._lobby.joinRoom(this.clientBySocket(socket), req);
+                this.emitEvent(joinEvent);
             });
 
             // Start Game, create Grid, inform Clients
             socket.on("startGame", (req: IStartGameRequest) => {
-                const client: Client = this.ClientBySocket(socket);
-                const room: Room = client.Room;
-                if (room.Owner() === client ) {
-                    this.StartGame(room.GetClients(), room, req.sizeX, req.sizeY);
-                } else {
-                    socket.emit("notOwner", {response: "notOwner"});
-                }
+                const client: Client = this.clientBySocket(socket);
+                const startEvents: IEvent[] = this._lobby.startGame(client, req.sizeX, req.sizeY);
+                this.emitEvents(startEvents);
             });
 
+            // A player colors a certain tile
             socket.on("placeTile", (req: IPlaceTileRequest) => {
-                this.placeTile(this.RoomByKey(req.roomKey), this.ClientByKey(req.clientKey), req.x, req.y);
-                const room: Room = this.RoomByKey(req.roomKey);
-                const event: IEvent = room.placeTile(this.ClientByKey(req.clientKey), req.x, req.y);
-                socket.emit(event.name, ...event.args);
+                const client: Client = this.clientBySocket(socket);
+                const placeEvents: IEvent[] =  client.Room.placeTile(client, req.x, req.y);
+                this.emitEvents(placeEvents);
             });
 
         });
 
     }
 
-    private placeTile(room: Room, client: Client, x: number, y: number ): void {
-        const event: IEvent = room.placeTile(client, x, y);
-        if (event.name === "notYourTurn") {
-            client.Socket().emit(event.name, ...event.args);
-        } else {
-            for (client of room.GetClients()) {
-                client.Socket().emit(event.name, event.args);
-            }
-        }
-    }
-
     /**
-     * Tell all Clients to start GameManager
-     * @constructor
+     * Emits a Response to all clients listed in IEvent
+     * @param {IEvent} event
      */
-    private StartGame(clients: Client[], room: Room, sizeX: number, sizeY: number) {
-        // ToDo Rework size adjustment
-        if (sizeX > 10) sizeX = 10;
-        if (sizeY > 10) sizeY = 10;
-        if (sizeX <  3) sizeX =  3;
-        if (sizeY <  3) sizeY =  3;
-        room.createGame(sizeX, sizeY);
-        const turnColor = room.turnClient();
-        for (const client of clients) {
-            client.Socket().emit("startGame", {response: "startGame", sizeX, sizeY});
-            client.Socket().emit("informTurn", {response: "informTurn", turnColor});
+    private emitEvent(event: IEvent): void {
+        console.log("Emitted to Clients: " + event.name);
+        for (let i = 0; i < event.clients.length; i++) {
+            event.clients[i].Socket().emit(event.name, ...event.args);
         }
     }
 
     /**
-     * Create Room if necessary
-     * Return responses: RoomIsFull or JoinedRoom + clientCount
+     * Emits Multiple Events made of Responses to multiple Clients
+     * @param {IEvent[]} events
+     */
+    private emitEvents(events: IEvent[]): void {
+        for (let i = 0; i < events.length; i++) {
+            this.emitEvent(events[i]);
+        }
+    }
+
+    /**
+     * Save
      * @param {Client} client
-     * @param req
-     * @returns {string}
-     * @constructor
+     * @returns {IEvent}
      */
-    private JoinRoom(client: Client, req: IJoinRoomRequest): IJoinedResponse | IRoomIsFullResponse {
-        let room: Room = this.RoomByName(req.roomName);
-        if (room === null)room = this.CreateRoom(req.roomName);
-        else if (room.GetClients.length > room.Size()) {
-            return {
-                response: "roomIsFull"
-            };
-        }
-
-        if (!room.ContainsClient(client)) {
-            const color: string = room.AddClient(client);
-            return {
-                response: "joinedRoom",
-                roomKey: room.key(),
-                clientCount: room.GetClients().length,
-                color
-            };
-        }
-    }
-
-    /**
-     * Create room with unique id
-     * @returns {Room}
-     * @constructor
-     */
-    private CreateRoom(roomName: string): Room {
-        const room: Room = new Room(roomName, this.GetGUID(), this._maxRoomSize);
-        this._rooms.push(room);
-        return room;
-    }
-
-    /**
-     * Return room based on its unique id (name)
-     * @param {string} roomName
-     * @returns {Room}
-     * @constructor
-     */
-    private RoomByName(roomName: string): Room {
-        for (const room of this._rooms) {
-            if (room.Name().toString() === roomName) return room;
-        }
-        return null;
-    }
-
-    private RoomByKey(roomKey: string): Room {
-        for (const room of this._rooms) {
-            if (room.key() === roomKey) return room;
-        }
-        return null;
+    private addClient(client: Client): IEvent {
+        this._clients.push(client);
+        const args =  {response: "connected", clientKey: client.key()} as IConnectedResponse;
+        return {clients: [client], name: "connected", args};
     }
 
     /**
@@ -156,8 +90,8 @@ export class ConnectionManager {
      * @param {SocketIO.Socket} socket
      * @constructor
      */
-    private RemoveClient(socket: Socket): void {
-        const client: Client = this.ClientBySocket(socket);
+    private removeClient(socket: Socket): void {
+        const client: Client = this.clientBySocket(socket);
         const index: number = this._clients.indexOf(client);
         if (index > -1) this._clients.splice(index, 1);
     }
@@ -168,14 +102,20 @@ export class ConnectionManager {
      * @returns {Client}
      * @constructor
      */
-    private ClientBySocket(socket: Socket): Client {
+    private clientBySocket(socket: Socket): Client {
         for (const client of this._clients) {
             if (client.Socket() === socket) return client;
         }
         return null;
     }
 
-    private ClientByKey(key: string): Client {
+    /**
+     * Return Client based on key
+     * @param {string} key
+     * @returns {Client}
+     * @constructor
+     */
+    private clientByKey(key: string): Client {
         for (const client of this._clients) {
             if (client.key() === key) return client;
         }
@@ -187,7 +127,7 @@ export class ConnectionManager {
      * @returns {string}
      * @constructor
      */
-    private GetGUID(): string {
+    private getGUID(): string {
         // src: https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)

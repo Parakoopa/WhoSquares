@@ -15,12 +15,12 @@ export class RequestManager {
 
     public EventListener() {
         // Initial Connection
-        this._socket.on("connection", (resp: IConnectionResponse) => {
+        this._socket.on("connected", (resp: IConnectedResponse) => {
             this._clientKey = resp.clientKey;
             this._game.TextElement(resp.response + ":\n" +  resp.clientKey);
         });
         // Join room
-        this._socket.on("joinRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
+        this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
             if (resp.response === "joinedRoom") {
                 this._roomKey = resp.roomKey;
                 const clientCount: number = resp.clientCount;
@@ -47,7 +47,7 @@ export class RequestManager {
             this._game.TextElement(textMessage);
         });
 
-        this._socket.on("informTurn", (resp: IinformTurnResponse) => {
+        this._socket.on("informTurn", (resp: IInformTurnResponse) => {
             const color: number = parseInt(resp.turnColor, 16);
             this._game.turnInfo(color);
         });

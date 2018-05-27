@@ -31,6 +31,10 @@ export class Grid {
     }
 
     public placedTile(color: number, x: number, y: number) {
+        console.log(this._grid);
+        console.log(this._grid.length);
+        console.log(this._grid[x].length);
+        console.log(this._grid[x][y]);
        const sprite: Sprite =  this._grid[y][x];
        sprite.data.color = color; // save color on object as it is overwritten f.e. onOver
        this._grid[y][x].tint = color;
@@ -59,6 +63,7 @@ export class Grid {
         for (let y = 0; y < this._sizeY; y++) {
             const row = [];
             for (let x = 0; x < this._sizeX; x++) {
+                console.log(x + "  " + y);
                 const sprite = this._game.add.sprite(
                     xOffset + cellSize * x,
                     yOffset + cellSize * y,
@@ -76,6 +81,7 @@ export class Grid {
             }
             this._grid[y] = row;
         }
+        console.log(this._grid.length);
 
     }
 

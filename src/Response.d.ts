@@ -8,7 +8,7 @@ interface IResponse {
     response: string;
 }
 
-interface IConnectionResponse extends IResponse {
+interface IConnectedResponse extends IResponse {
     response: "connected";
     clientKey: string;
 }
@@ -51,7 +51,7 @@ interface INotYourTurnResponse extends IResponse {
     roomKey: string;
 }
 
-interface IinformTurnResponse extends IResponse {
+interface IInformTurnResponse extends IResponse {
     response: "informTurn";
     turnColor: string;
 }
