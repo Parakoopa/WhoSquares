@@ -4,11 +4,14 @@ import {Room} from "./Room";
 
 export class Lobby {
 
-    private _minimumClientsPerGame: number = 2;
+    private _minimumClientsPerGame: number = 1;
     private readonly _rooms: Room[];
     private _maxRoomSize: number = 10;
 
-    constructor(){
+    private _minGridSize: number = 3;
+    private _maxGridSize: number = 10;
+
+    constructor() {
         this._rooms = [];
     }
     /**
@@ -18,11 +21,14 @@ export class Lobby {
     public startGame(client: Client, sizeX: number, sizeY: number): IEvent[] {
         const room: Room = client.Room;
         if (room.Owner() === client ) {
-            // ToDo Rework size adjustment
-            if (sizeX > 10) sizeX = 10;
-            if (sizeY > 10) sizeY = 10;
-            if (sizeX < 3) sizeX = 3;
-            if (sizeY < 3) sizeY = 3;
+            if (room.GetClients().length < this._minimumClientsPerGame) {
+                // ToDo Add NotEnoughPlayer Reponse
+                console.log("NotEnoughPlayer");
+            }
+            const sizes = this.adjustGameSize(sizeX, sizeY);
+            sizeX = sizes[0];
+            sizeY = sizes[1];
+
             room.createGame(sizeX, sizeY);
             const turnColor = room.turnClient();
 
@@ -42,6 +48,20 @@ export class Lobby {
     }
 
     /**
+     *
+     * @param {number} sizeX
+     * @param {number} sizeY
+     * @returns {number[]}
+     */
+    private adjustGameSize(sizeX: number, sizeY: number): number[] {
+        if (sizeX > this._maxGridSize) sizeX = this._maxGridSize;
+        if (sizeY > this._maxGridSize) sizeY = this._maxGridSize;
+        if (sizeX < this._minGridSize) sizeX = this._minGridSize;
+        if (sizeY < this._minGridSize) sizeY =  this._minGridSize;
+        return [sizeX, sizeY];
+    }
+
+    /**
      * Create Room if necessary
      * Return responses: RoomIsFull or JoinedRoom + clientCount
      * @param {Client} client
@@ -50,8 +70,8 @@ export class Lobby {
      * @constructor
      */
     public joinRoom(client: Client, req: IJoinRoomRequest): IEvent {
-        let room: Room = this.RoomByName(req.roomName);
-        if (room === null)room = this.CreateRoom(req.roomName);
+        let room: Room = this.roomByName(req.roomName);
+        if (room === null)room = this.createRoom(req.roomName);
         else if (room.GetClients.length > room.Size()) {
             const args: IRoomIsFullResponse = {response: "roomIsFull"};
             return {clients: [client], name: "roomIsFull", args};
@@ -71,14 +91,10 @@ export class Lobby {
      * @returns {Room}
      * @constructor
      */
-    private CreateRoom(roomName: string): Room {
-        const room: Room = new Room(roomName, this.GetGUID(), this._maxRoomSize);
+    private createRoom(roomName: string): Room {
+        const room: Room = new Room(roomName, this.getGUID(), this._maxRoomSize);
         this._rooms.push(room);
         return room;
-    }
-
-    public placeTile(client: Client, x: number, y: number): IEvent[] {
-        return client.Room.placeTile(client, x, y);
     }
 
     /**
@@ -87,14 +103,20 @@ export class Lobby {
      * @returns {Room}
      * @constructor
      */
-    private RoomByName(roomName: string): Room {
+    private roomByName(roomName: string): Room {
         for (const room of this._rooms) {
             if (room.Name().toString() === roomName) return room;
         }
         return null;
     }
 
-    private RoomByKey(roomKey: string): Room {
+    /**
+     * Return a room based on its key
+     * @param {string} roomKey
+     * @returns {Room}
+     * @constructor
+     */
+    private roomByKey(roomKey: string): Room {
         for (const room of this._rooms) {
             if (room.key() === roomKey) return room;
         }
@@ -107,7 +129,7 @@ export class Lobby {
      * @returns {string}
      * @constructor
      */
-    private GetGUID(): string {
+    private getGUID(): string {
         // src: https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)

@@ -20,7 +20,7 @@ export class RequestManager {
             this._game.TextElement(resp.response + ":\n" +  resp.clientKey);
         });
         // Join room
-        this._socket.on("joinRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
+        this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
             if (resp.response === "joinedRoom") {
                 this._roomKey = resp.roomKey;
                 const clientCount: number = resp.clientCount;
