@@ -51,7 +51,7 @@ interface INotYourTurnResponse extends IResponse {
     roomKey: string;
 }
 
-interface IinformTurnResponse extends IResponse {
+interface IInformTurnResponse extends IResponse {
     response: "informTurn";
     turnColor: string;
 }

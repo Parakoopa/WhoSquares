@@ -47,7 +47,7 @@ export class RequestManager {
             this._game.TextElement(textMessage);
         });
 
-        this._socket.on("informTurn", (resp: IinformTurnResponse) => {
+        this._socket.on("informTurn", (resp: IInformTurnResponse) => {
             const color: number = parseInt(resp.turnColor, 16);
             this._game.turnInfo(color);
         });
