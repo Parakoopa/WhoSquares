@@ -1,4 +1,5 @@
 import {Socket} from "socket.io";
+import {Mission} from "./Missions/Mission";
 import {Room} from "./Room";
 
 export class Client {
@@ -7,6 +8,7 @@ export class Client {
     private readonly _socket: Socket;
     private _room: Room;
     private _color: string;
+    private _mission: Mission;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
@@ -40,6 +42,14 @@ export class Client {
 
     set color(value: string) {
         this._color = value;
+    }
+
+    get mission(): Mission {
+        return this._mission;
+    }
+
+    set mission(value: Mission) {
+        this._mission = value;
     }
 
 }

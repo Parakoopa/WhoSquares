@@ -20,6 +20,10 @@ export class ServerGrid {
         return this._grid;
     }
 
+    get size(): number {
+        return this._sizeY * this._sizeY;
+    }
+
     private createGrid(sizeX: number, sizeY: number): void {
         const client: Client = null; // default Value
         const grid = [];

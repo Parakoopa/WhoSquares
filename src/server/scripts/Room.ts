@@ -3,6 +3,7 @@ import {Client} from "./Client";
 import {ColorDistributer} from "./ColorDistributer";
 import {ServerGrid} from "./ServerGrid";
 import {TurnManager} from "./TurnManager";
+import {MissionDistributer} from "./MissionDistributer";
 
 /**
  * A Room hosts a game for clients
@@ -17,6 +18,7 @@ export class Room {
     private readonly _clients: Client[];
     private _serverGrid: ServerGrid;
     private _colorDistr: ColorDistributer;
+    private _missionDistr: MissionDistributer;
     private _turnManager: TurnManager;
 
     constructor(name: string, key: string, size: number) {
@@ -25,6 +27,7 @@ export class Room {
         this._key = key;
         this._size = size;
         this._colorDistr = new ColorDistributer();
+        this._missionDistr = new MissionDistributer();
         this._turnManager = new TurnManager();
     }
 
@@ -60,9 +63,10 @@ export class Room {
      */
     public AddClient(client: Client): string { // ToDo make string into color enum
         if (!this._owner) this._owner = client;
+        client.Room = this;
         this._clients.push(client);
         this._turnManager.addClient(client);
-        client.Room = this;
+        this._missionDistr.setMission(client);
         return this._colorDistr.setClientColor(client);
     }
 
@@ -75,7 +79,7 @@ export class Room {
         const index: number = this._clients.indexOf(client);
         if (index > -1) this._clients.splice(index, 1);
         client.Room = null;
-        // ResetColor
+        this._missionDistr.resetMission(client);
         this._colorDistr.resetColor(client);
     }
 
@@ -110,9 +114,6 @@ export class Room {
      * @param y
      */
     public placeTile(client: Client, x: number, y: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
-        // ToDo Add Mission after each placeTile
-        // ToDo Let other clients precalculate their own win, so
-        // ToDo that server does not have to callcuate all the time?
         const roomKey = this._key;
         if (client === this._turnManager.curClient()) {
             if (this._serverGrid.placeTile(client, x, y)) {
@@ -120,6 +121,7 @@ export class Room {
                 const clientColor = client.color;
                 const args = {response: "placedTile", roomKey, clientColor, x, y};
                 const placedEvent = {clients: this._clients, name: "placedTile", args};
+                console.log("Client mission: " + client.mission.check(client, this._serverGrid));
                 return [placedEvent];
             } else {
                 const args =  {response: "notYourTurn", roomKey};
