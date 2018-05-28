@@ -1,6 +1,7 @@
-import {Client} from "./Client";
-import {ServerGrid} from "./ServerGrid";
 import {IEvent} from "../../Event";
+import {Client} from "./Client";
+import {ColorDistributer} from "./ColorDistributer";
+import {ServerGrid} from "./ServerGrid";
 
 /**
  * A Room hosts a game for clients
@@ -15,18 +16,14 @@ export class Room {
     private _turnClientIndex: number = 0;
     private _clients: Client[];
     private _serverGrid: ServerGrid;
-    private _clientColorMap: Map<string, Client>;
-    private readonly _colors: string[] =
-        ["FF3333", "FF9933", "FFFF33", "00FF00", "33FFFF", "9933FF", "FF33FF", "FF3399", "FF33FF"];
-        // ["red", "orange", "yellow", "green", "lightblue", "darkblue", "purple", "pink", ToDo "grey", "black", "white"];
+    private _colorDistr: ColorDistributer;
 
     constructor(name: string, key: string, size: number) {
         this._clients = [];
         this._name = name;
         this._key = key;
         this._size = size;
-        this._clientColorMap = new Map();
-        this.SetColors();
+        this._colorDistr = new ColorDistributer();
     }
 
     public Name(): string {
@@ -63,10 +60,7 @@ export class Room {
         if (!this._owner) this._owner = client;
         this._clients.push(client);
         client.Room = this;
-        const color: string = this.GetUnassignedColor();
-        this._clientColorMap.set(color, client);
-        client.color = color;
-        return color;
+        return this._colorDistr.setClientColor(client);
     }
 
     /**
@@ -79,7 +73,7 @@ export class Room {
         if (index > -1) this._clients.splice(index, 1);
         client.Room = null;
         // ResetColor
-        this.ResetColor(client);
+        this._colorDistr.resetColor(client);
     }
 
     /**
@@ -101,52 +95,21 @@ export class Room {
         return this._clients;
     }
 
-    /**
-     * Initialize all available color
-     * => Somehow add them on definition of _clientColorMap!
-     * @constructor
-     */
-    private SetColors(): void {
-        for (const color of this._colors) {
-            this._clientColorMap.set(color, null);
-        }
-    }
-
-    /**
-     * Return a color not used by any client in this room
-     * @returns {string}
-     * @constructor
-     */
-    private GetUnassignedColor(): string {
-        for (const color of Array.from(this._clientColorMap.keys())) {
-            if (this._clientColorMap.get(color) === null) return color;
-        }
-        return null;
-    }
-
-    /**
-     * Makes a color available again
-     * @param {Client} client
-     * @constructor
-     */
-    private ResetColor(client: Client): void {
-        const color: string = client.color;
-        client.color = null;
-        this._clientColorMap.set(color, null);
-    }
-
     // Grid Interaction
 
     public createGame(sizeX: number, sizeY: number) {
         this._serverGrid = new ServerGrid(sizeX, sizeY);
     }
     /**
-     * Place Clients instead of Colors as gridis not displayed anyway
+     * Place Clients instead of Colors as grids not displayed anyway
      * @param {Client} client
      * @param x
      * @param y
      */
     public placeTile(client: Client, x: number, y: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
+        // ToDo Add Mission after each placeTile
+        // ToDo Let other clients precalculate their own win, so
+        // ToDo that server does not have to callcuate all the time?
         const roomKey = this._key;
         if (this._clients[this._turnClientIndex] === client) {
             if (this._serverGrid.placeTile(client, x, y)) {
@@ -157,12 +120,12 @@ export class Room {
                 return [placedEvent];
             } else {
                 const args =  {response: "notYourTurn", roomKey};
-                const notYourTurnEvent:IEvent = {clients: [client], name:"notYourTurn", args};
-                return [notYourTurnEvent];// ToDo change to cheat Reponse
+                const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", args};
+                return [notYourTurnEvent]; // ToDo change to cheat Reponse
             }
         } else {
             const args =  {response: "notYourTurn", roomKey};
-            const notYourTurnEvent:IEvent = {clients: [client], name:"notYourTurn", args};
+            const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", args};
             return [notYourTurnEvent];
         }
     }
