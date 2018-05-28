@@ -65,6 +65,7 @@ export class Room {
         client.Room = this;
         const color: string = this.GetUnassignedColor();
         this._clientColorMap.set(color, client);
+        client.color = color;
         return color;
     }
 
@@ -101,19 +102,6 @@ export class Room {
     }
 
     /**
-     * Return the room color of a specific client
-     * @param {Client} client
-     * @returns {string}
-     * @constructor
-     */
-    public GetClientColor(client: Client): string {
-        for (const color of this._colors) {
-            if (this._clientColorMap.get(color) === client) return color;
-        }
-        return null; // Should not be null, but can be improved?
-    }
-
-    /**
      * Initialize all available color
      * => Somehow add them on definition of _clientColorMap!
      * @constructor
@@ -142,7 +130,8 @@ export class Room {
      * @constructor
      */
     private ResetColor(client: Client): void {
-        const color: string = this.GetClientColor(client);
+        const color: string = client.color;
+        client.color = null;
         this._clientColorMap.set(color, null);
     }
 
@@ -162,7 +151,7 @@ export class Room {
         if (this._clients[this._turnClientIndex] === client) {
             if (this._serverGrid.placeTile(client, x, y)) {
                 this.setNextTurnClient();
-                const clientColor = this.GetClientColor(client);
+                const clientColor = client.color;
                 const args = {response: "placedTile", roomKey, clientColor, x, y};
                 const placedEvent = {clients: this._clients, name: "placedTile", args};
                 return [placedEvent];
@@ -180,7 +169,7 @@ export class Room {
 
     public turnClient(): string {
         const client: Client = this._clients[this._turnClientIndex];
-        return this.GetClientColor(client);
+        return client.color;
     }
 
     private setNextTurnClient(): void {

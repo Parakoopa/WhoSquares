@@ -6,6 +6,7 @@ export class Client {
     private readonly _key: string;
     private readonly _socket: Socket;
     private _room: Room;
+    private _color: string;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
@@ -32,4 +33,13 @@ export class Client {
     set Room(value: Room) {
         this._room = value;
     }
+
+    get color(): string {
+        return this._color;
+    }
+
+    set color(value: string) {
+        this._color = value;
+    }
+
 }
