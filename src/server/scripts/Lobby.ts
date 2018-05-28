@@ -30,7 +30,7 @@ export class Lobby {
             sizeY = sizes[1];
 
             room.createGame(sizeX, sizeY);
-            const turnColor = room.turnClient();
+            const turnColor = client.color;
 
             const clients = room.GetClients();
             const startArgs: IStartGameResponse =  {response: "startGame", sizeX, sizeY};

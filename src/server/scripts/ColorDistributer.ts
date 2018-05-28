@@ -1,8 +1,5 @@
 import {Client} from "./Client";
-/**
- * A Room hosts a game for clients
- * Each client gets a color assigned
- */
+
 export class ColorDistributer {
 
     private _clientColorMap: Map<string, Client>;

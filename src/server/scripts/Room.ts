@@ -2,6 +2,7 @@ import {IEvent} from "../../Event";
 import {Client} from "./Client";
 import {ColorDistributer} from "./ColorDistributer";
 import {ServerGrid} from "./ServerGrid";
+import {TurnManager} from "./TurnManager";
 
 /**
  * A Room hosts a game for clients
@@ -13,10 +14,10 @@ export class Room {
     private readonly _key: string;
     private readonly _size: number;
     private _owner: Client;
-    private _turnClientIndex: number = 0;
-    private _clients: Client[];
+    private readonly _clients: Client[];
     private _serverGrid: ServerGrid;
     private _colorDistr: ColorDistributer;
+    private _turnManager: TurnManager;
 
     constructor(name: string, key: string, size: number) {
         this._clients = [];
@@ -24,6 +25,7 @@ export class Room {
         this._key = key;
         this._size = size;
         this._colorDistr = new ColorDistributer();
+        this._turnManager = new TurnManager();
     }
 
     public Name(): string {
@@ -56,9 +58,10 @@ export class Room {
      * @returns {string}
      * @constructor
      */
-    public AddClient(client: Client): string {
+    public AddClient(client: Client): string { // ToDo make string into color enum
         if (!this._owner) this._owner = client;
         this._clients.push(client);
+        this._turnManager.addClient(client);
         client.Room = this;
         return this._colorDistr.setClientColor(client);
     }
@@ -111,9 +114,9 @@ export class Room {
         // ToDo Let other clients precalculate their own win, so
         // ToDo that server does not have to callcuate all the time?
         const roomKey = this._key;
-        if (this._clients[this._turnClientIndex] === client) {
+        if (client === this._turnManager.curClient()) {
             if (this._serverGrid.placeTile(client, x, y)) {
-                this.setNextTurnClient();
+                this._turnManager.setNextClient();
                 const clientColor = client.color;
                 const args = {response: "placedTile", roomKey, clientColor, x, y};
                 const placedEvent = {clients: this._clients, name: "placedTile", args};
@@ -130,13 +133,4 @@ export class Room {
         }
     }
 
-    public turnClient(): string {
-        const client: Client = this._clients[this._turnClientIndex];
-        return client.color;
-    }
-
-    private setNextTurnClient(): void {
-        this._turnClientIndex += 1;
-        if (this._turnClientIndex === this._clients.length) this._turnClientIndex = 0;
-    }
 }
