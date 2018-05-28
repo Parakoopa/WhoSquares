@@ -64,7 +64,7 @@ export class GameManager {
 
             update() {
                 self._textElement.text = self._textMessage;
-                self._inputManager.Debug();
+                self._inputManager.debug();
                 }
         });
         this._game = game;
@@ -81,7 +81,7 @@ export class GameManager {
     }
 
     public placeTile(x: number, y: number): void {
-          this._reqManager.PlaceTile(x, y);
+          this._reqManager.placeTile(x, y);
     }
 
     public placedTile(color:number, x: number, y: number): void {
@@ -92,13 +92,13 @@ export class GameManager {
         this._reqManager = reqManager;
     }
 
-    public TextElement(text: string): void {
+    public textElement(text: string): void {
         this._textMessage = text;
     }
 
     private startGame() {
         // ToDo Add InputFields to set sizeX & sizeY
-        this._reqManager.StartGame(5, 5);
+        this._reqManager.startGame(5, 5);
     }
 
     public turnInfo(color:number):void{

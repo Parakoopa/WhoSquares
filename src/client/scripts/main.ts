@@ -6,7 +6,7 @@ export function main() {
     const game: GameManager = new GameManager(); // Phaser
     const reqManager = new RequestManager(game);
     game.reqManager(reqManager);
-    reqManager.EventListener();
-    reqManager.JoinRoom("TestRoom");
+    reqManager.eventListener();
+    reqManager.joinRoom("TestRoom");
 
 }

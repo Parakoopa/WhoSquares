@@ -13,11 +13,11 @@ export class RequestManager {
         this._game = game;
     }
 
-    public EventListener() {
+    public eventListener() {
         // Initial Connection
         this._socket.on("connected", (resp: IConnectedResponse) => {
             this._clientKey = resp.clientKey;
-            this._game.TextElement(resp.response + ":\n" +  resp.clientKey);
+            this._game.textElement(resp.response + ":\n" +  resp.clientKey);
         });
         // Join room
         this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
@@ -25,26 +25,26 @@ export class RequestManager {
                 this._roomKey = resp.roomKey;
                 const clientCount: number = resp.clientCount;
                 this._game.color(parseInt(resp.color, 16));
-                this._game.TextElement(resp.response + ": color: " + resp.color + ", clients: " + clientCount);
+                this._game.textElement(resp.response + ": color: " + resp.color + ", clients: " + clientCount);
             } else if (resp.response === "roomIsFull") {
-                this._game.TextElement(resp.response);
+                this._game.textElement(resp.response);
             }
         });
         // placedtile
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
             const color: number = parseInt(resp.clientColor, 16);
             this._game.placedTile(color, resp.x, resp.y);
-            this._game.TextElement(resp.response);
+            this._game.textElement(resp.response);
         });
         this._socket.on("notYourTurn", (resp: INotYourTurnResponse) => {
-            this._game.TextElement(resp.response);
+            this._game.textElement(resp.response);
         });
         // Start GameManager
         this._socket.on("startGame", (resp: IStartGameResponse) => {
             this._game.createGrid(resp.sizeX, resp.sizeY);
 
             const textMessage: string = resp.response;
-            this._game.TextElement(textMessage);
+            this._game.textElement(textMessage);
         });
 
         this._socket.on("informTurn", (resp: IInformTurnResponse) => {
@@ -53,18 +53,18 @@ export class RequestManager {
         });
     }
 
-    public JoinRoom(roomName: string): void {
+    public joinRoom(roomName: string): void {
         const clientKey = this._roomKey;
         this._socket.emit("joinRoom", {request: "joinRoom", clientKey, roomName});
     }
 
-    public StartGame(sizeX: number, sizeY: number): void {
+    public startGame(sizeX: number, sizeY: number): void {
         const clientKey = this._roomKey;
         const roomKey = this._roomKey;
         this._socket.emit("startGame", {request: "startGame", clientKey, roomKey, sizeX, sizeY});
     }
 
-    public PlaceTile(x: number, y: number): void {
+    public placeTile(x: number, y: number): void {
         const clientKey = this._clientKey;
         const roomKey = this._roomKey;
         this._socket.emit("placeTile" , {request: "placeTile", clientKey, roomKey, x, y});

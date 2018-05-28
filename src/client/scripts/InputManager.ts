@@ -10,15 +10,14 @@ export class InputManager {
 
     }
 
-    public CheckMouse(){
+    public checkMouse(){
 
         if(this._game.input.activePointer.leftButton.onDown){
 
         }
-
     }
 
-    public Debug(): void {
+    public debug(): void {
         this._game.debug.text("Left Button: " +
             this._game.input.activePointer.leftButton.isDown, 0, 150);
         this._game.debug.text("Middle Button: " +
