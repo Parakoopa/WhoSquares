@@ -2,6 +2,7 @@ import {Socket} from "socket.io";
 import {IEvent} from "../../Event";
 import {Client} from "./Client";
 import {Lobby} from "./Lobby";
+import {Utility} from "./Utility";
 
 export class ConnectionManager {
 
@@ -21,7 +22,7 @@ export class ConnectionManager {
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const connectionEvent: IEvent = this.addClient(new Client(socket, this.getGUID()));
+            const connectionEvent: IEvent = this.addClient(new Client(socket, Utility.getGUID()));
             this.emitEvent(connectionEvent);
 
             // Disconnect
@@ -120,21 +121,6 @@ export class ConnectionManager {
             if (client.key() === key) return client;
         }
         return null;
-    }
-
-    /**
-     * Generate Unique Identifier
-     * @returns {string}
-     * @constructor
-     */
-    private getGUID(): string {
-        // src: https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-        return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
     }
 
 }

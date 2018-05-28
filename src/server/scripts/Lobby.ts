@@ -1,6 +1,7 @@
 import {IEvent} from "../../Event";
 import {Client} from "./Client";
 import {Room} from "./Room";
+import {Utility} from "./Utility";
 
 export class Lobby {
 
@@ -92,7 +93,7 @@ export class Lobby {
      * @constructor
      */
     private createRoom(roomName: string): Room {
-        const room: Room = new Room(roomName, this.getGUID(), this._maxRoomSize);
+        const room: Room = new Room(roomName, Utility.getGUID(), this._maxRoomSize);
         this._rooms.push(room);
         return room;
     }
@@ -121,22 +122,6 @@ export class Lobby {
             if (room.key() === roomKey) return room;
         }
         return null;
-    }
-
-    /**
-     * MOVE INTO SOME NEW UTILITY CLASS
-     * Generate Unique Identifier
-     * @returns {string}
-     * @constructor
-     */
-    private getGUID(): string {
-        // src: https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-        return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
     }
 
 }
