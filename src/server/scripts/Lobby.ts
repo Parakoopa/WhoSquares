@@ -34,16 +34,16 @@ export class Lobby {
             const turnColor = client.color;
 
             const clients = room.GetClients();
-            const startArgs: IStartGameResponse =  {response: "startGame", sizeX, sizeY};
-            const startEvent: IEvent = {clients, name: "startGame", args: startArgs};
+            const startResponse =  {response: "startGame", sizeX, sizeY};
+            const startEvent: IEvent = {clients, name: "startGame", response: startResponse};
 
-            const informArgs: IInformTurnResponse =   {response: "informTurn", turnColor};
-            const informEvent: IEvent = {clients, name: "informTurn", args: informArgs};
+            const informResponse =   {response: "informTurn", turnColor};
+            const informEvent: IEvent = {clients, name: "informTurn", response: informResponse};
 
             return [startEvent, informEvent];
         } else {
-            const notOwnerArgs = {response: "notOwner"};
-            const informEvent: IEvent = {clients: [client], name: "startGame", args: notOwnerArgs};
+            const notOwnerResponse = {response: "notOwner"};
+            const informEvent: IEvent = {clients: [client], name: "startGame", response: notOwnerResponse};
             return [informEvent];
         }
     }
@@ -74,16 +74,16 @@ export class Lobby {
         let room: Room = this.roomByName(req.roomName);
         if (room === null)room = this.createRoom(req.roomName);
         else if (room.GetClients.length > room.Size()) {
-            const args: IRoomIsFullResponse = {response: "roomIsFull"};
-            return {clients: [client], name: "roomIsFull", args};
+            const response: IRoomIsFullResponse = {response: "roomIsFull"};
+            return {clients: [client], name: "roomIsFull", response};
         }
 
         if (!room.ContainsClient(client)) {
-            const args: IJoinedResponse = {response: "joinedRoom",
+            const response: IJoinedResponse = {response: "joinedRoom",
                 roomKey: room.key(),
                 clientCount: room.GetClients().length,
                 color: room.AddClient(client)};
-            return {clients: [client], name: "joinedRoom", args};
+            return {clients: [client], name: "joinedRoom", response};
         }
     }
 

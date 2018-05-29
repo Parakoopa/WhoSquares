@@ -131,20 +131,20 @@ export class Room {
 
     private placedEvent(roomKey: string, clientColor: string, x: number, y: number): IEvent[] {
         this._turnManager.setNextClient();
-        const args = {response: "placedTile", roomKey, clientColor, x, y};
-        const placedEvent = {clients: this._clients, name: "placedTile", args};
+        const response = {response: "placedTile", roomKey, clientColor, x, y};
+        const placedEvent: IEvent = {clients: this._clients, name: "placedTile", response};
         return [placedEvent];
     }
 
     private notYourTurnEvent(client: Client, roomKey: string): IEvent[] {
-        const args =  {response: "notYourTurn", roomKey};
-        const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", args};
+        const response =  {response: "notYourTurn", roomKey};
+        const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", response};
         return [notYourTurnEvent];
     }
 
     private winGameEvent(clientColor: string, roomKey: string): IEvent[] {
-        const args =  {response: "winGame", roomKey, clientColor};
-        const notYourTurnEvent: IEvent = {clients: this._clients, name: "winGame", args};
+        const response =  {response: "winGame", roomKey, clientColor};
+        const notYourTurnEvent: IEvent = {clients: this._clients, name: "winGame", response};
         return [notYourTurnEvent];
     }
 
