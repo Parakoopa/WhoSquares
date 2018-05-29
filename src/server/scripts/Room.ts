@@ -118,7 +118,10 @@ export class Room {
         if (client !== this._turnManager.curClient()) return this.notYourTurnEvent(client, roomKey);
 
         if (this._serverGrid.placeTile(client, x, y)) {
-            console.log("Client mission: " + client.mission.check(client, this._serverGrid));
+            if( client.mission.check(client, this._serverGrid)){
+                console.log("Client won his mission: " + client.color);
+                return this.winGameEvent(roomKey, client.color);
+            }
             return this.placedEvent(roomKey, client.color, x, y);
 
         } else {
@@ -136,6 +139,12 @@ export class Room {
     private notYourTurnEvent(client: Client, roomKey: string): IEvent[] {
         const args =  {response: "notYourTurn", roomKey};
         const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", args};
+        return [notYourTurnEvent];
+    }
+
+    private winGameEvent(clientColor: string, roomKey: string): IEvent[] {
+        const args =  {response: "winGame", roomKey, clientColor};
+        const notYourTurnEvent: IEvent = {clients: this._clients, name: "winGame", args};
         return [notYourTurnEvent];
     }
 

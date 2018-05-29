@@ -58,6 +58,7 @@ interface IInformTurnResponse extends IResponse {
 
 interface IWinGameResponse extends IResponse {
     response: "winGame";
+    roomKey: string;
     clientColor: string;
 }
-
+

@@ -47,17 +47,17 @@ export class GameManager {
                 );
                 self._textElement.anchor.setTo(0.5, 0.5);
 
-                //Add client Turn Displayer
+                // Add client Turn Displayer
                 const turnInfoText = game.add.text(
-                    game.world.centerX-80,
-                    game.world.centerY * 0.4 +4,
+                    game.world.centerX - 80,
+                    game.world.centerY * 0.4 + 4,
                     "Turn of:",
                     {font: "20px Arial", fill: "#555555", align: "center"}
                 );
 
                 self._turnInfoSprite = self._game.add.sprite(
                     game.world.centerX,
-                    game.world.centerY*0.4,
+                    game.world.centerY * 0.4,
                     "gridTile");
                 self._turnInfoSprite.tint = 0xcccccc;
             },
@@ -71,7 +71,7 @@ export class GameManager {
 
     }
 
-    public color(color:number):void{
+    public color(color: number): void {
         this._color = color;
     }
 
@@ -84,7 +84,7 @@ export class GameManager {
           this._reqManager.placeTile(x, y);
     }
 
-    public placedTile(color:number, x: number, y: number): void {
+    public placedTile(color: number, x: number, y: number): void {
         this._grid.placedTile(color, x, y);
     }
 
@@ -101,8 +101,12 @@ export class GameManager {
         this._reqManager.startGame(5, 5);
     }
 
-    public turnInfo(color:number):void{
+    public turnInfo(color: number): void {
         this._turnInfoSprite.tint = color;
+    }
+
+    public winGame(color: string): void {
+        this._textMessage = "Winner: " + color;
     }
 
 }
