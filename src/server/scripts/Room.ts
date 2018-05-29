@@ -1,9 +1,9 @@
 import {IEvent} from "../../Event";
 import {Client} from "./Client";
 import {ColorDistributer} from "./ColorDistributer";
+import {MissionDistributer} from "./MissionDistributer";
 import {ServerGrid} from "./ServerGrid";
 import {TurnManager} from "./TurnManager";
-import {MissionDistributer} from "./MissionDistributer";
 
 /**
  * A Room hosts a game for clients
@@ -115,24 +115,28 @@ export class Room {
      */
     public placeTile(client: Client, x: number, y: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
         const roomKey = this._key;
-        if (client === this._turnManager.curClient()) {
-            if (this._serverGrid.placeTile(client, x, y)) {
-                this._turnManager.setNextClient();
-                const clientColor = client.color;
-                const args = {response: "placedTile", roomKey, clientColor, x, y};
-                const placedEvent = {clients: this._clients, name: "placedTile", args};
-                console.log("Client mission: " + client.mission.check(client, this._serverGrid));
-                return [placedEvent];
-            } else {
-                const args =  {response: "notYourTurn", roomKey};
-                const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", args};
-                return [notYourTurnEvent]; // ToDo change to cheat Reponse
-            }
+        if (client !== this._turnManager.curClient()) return this.notYourTurnEvent(client, roomKey);
+
+        if (this._serverGrid.placeTile(client, x, y)) {
+            console.log("Client mission: " + client.mission.check(client, this._serverGrid));
+            return this.placedEvent(roomKey, client.color, x, y);
+
         } else {
-            const args =  {response: "notYourTurn", roomKey};
-            const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", args};
-            return [notYourTurnEvent];
+             return this.notYourTurnEvent(client, roomKey); // ToDo change to cheat Reponse
         }
+    }
+
+    private placedEvent(roomKey: string, clientColor: string, x: number, y: number): IEvent[] {
+        this._turnManager.setNextClient();
+        const args = {response: "placedTile", roomKey, clientColor, x, y};
+        const placedEvent = {clients: this._clients, name: "placedTile", args};
+        return [placedEvent];
+    }
+
+    private notYourTurnEvent(client: Client, roomKey: string): IEvent[] {
+        const args =  {response: "notYourTurn", roomKey};
+        const notYourTurnEvent: IEvent = {clients: [client], name: "notYourTurn", args};
+        return [notYourTurnEvent];
     }
 
 }
