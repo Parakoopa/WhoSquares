@@ -9,5 +9,5 @@ import {Client} from "./server/scripts/Client";
 interface IEvent {
     clients: Client[];
     name: string;
-    args: any;
+    response: IResponse;
 }

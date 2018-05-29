@@ -61,7 +61,7 @@ export class ConnectionManager {
     private emitEvent(event: IEvent): void {
         console.log("Emitted to Clients: " + event.name);
         for (let i = 0; i < event.clients.length; i++) {
-            event.clients[i].Socket().emit(event.name, ...event.args);
+            event.clients[i].Socket().emit(event.name, event.response);
         }
     }
 
@@ -82,8 +82,8 @@ export class ConnectionManager {
      */
     private addClient(client: Client): IEvent {
         this._clients.push(client);
-        const args =  {response: "connected", clientKey: client.key()} as IConnectedResponse;
-        return {clients: [client], name: "connected", args};
+        const response =  {response: "connected", clientKey: client.key()} as IConnectedResponse;
+        return {clients: [client], name: "connected", response};
     }
 
     /**
