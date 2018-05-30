@@ -1,7 +1,7 @@
-import {IEvent} from "../../Event";
 import {Client} from "./Client";
 import {Room} from "./Room";
 import {Utility} from "./Utility";
+import {IEvent} from "../../Event";
 
 export class Lobby {
 
@@ -20,9 +20,9 @@ export class Lobby {
      * @constructor
      */
     public startGame(client: Client, sizeX: number, sizeY: number): IEvent[] {
-        const room: Room = client.Room;
+        const room: Room = client.getRoom();
         if (room.Owner() === client ) {
-            if (room.GetClients().length < this._minimumClientsPerGame) {
+            if (room.getClients().length < this._minimumClientsPerGame) {
                 // ToDo Add NotEnoughPlayer Reponse
                 console.log("NotEnoughPlayer");
             }
@@ -31,9 +31,9 @@ export class Lobby {
             sizeY = sizes[1];
 
             room.createGame(sizeX, sizeY);
-            const turnColor = client.color;
+            const turnColor = client.getColor();
 
-            const clients = room.GetClients();
+            const clients = room.getClients();
             const startResponse =  {response: "startGame", sizeX, sizeY};
             const startEvent: IEvent = {clients, name: "startGame", response: startResponse};
 
@@ -73,15 +73,15 @@ export class Lobby {
     public joinRoom(client: Client, req: IJoinRoomRequest): IEvent {
         let room: Room = this.roomByName(req.roomName);
         if (room === null)room = this.createRoom(req.roomName);
-        else if (room.GetClients.length > room.Size()) {
+        else if (room.getClients().length > room.Size()) {
             const response: IRoomIsFullResponse = {response: "roomIsFull"};
             return {clients: [client], name: "roomIsFull", response};
         }
 
         if (!room.ContainsClient(client)) {
             const response: IJoinedResponse = {response: "joinedRoom",
-                roomKey: room.key(),
-                clientCount: room.GetClients().length,
+                roomKey: room.getKey(),
+                clientCount: room.getClients().length,
                 color: room.AddClient(client)};
             return {clients: [client], name: "joinedRoom", response};
         }
@@ -106,7 +106,7 @@ export class Lobby {
      */
     private roomByName(roomName: string): Room {
         for (const room of this._rooms) {
-            if (room.Name().toString() === roomName) return room;
+            if (room.getName().toString() === roomName) return room;
         }
         return null;
     }
@@ -119,7 +119,7 @@ export class Lobby {
      */
     private roomByKey(roomKey: string): Room {
         for (const room of this._rooms) {
-            if (room.key() === roomKey) return room;
+            if (room.getKey() === roomKey) return room;
         }
         return null;
     }

@@ -1,14 +1,14 @@
 import {Socket} from "socket.io";
-import {Mission} from "./Missions/Mission";
 import {Room} from "./Room";
 
-export class Client {
+export class Client implements IClient {
 
-    private readonly _key: string;
     private readonly _socket: Socket;
+    private readonly _key: string;
+    private _name: string;
     private _room: Room;
     private _color: string;
-    private _mission: Mission;
+    private _mission: IMission;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
@@ -20,36 +20,43 @@ export class Client {
         this._key = key;
     }
 
-    public Socket(): Socket {
+    public getSocket(): Socket {
         return this._socket;
     }
 
-    public key(): string {
+    public getKey(): string {
         return this._key;
     }
 
-    get Room(): Room {
+    public getName(): string {
+        return this._name;
+    }
+
+    public setName(val: string): void {
+    }
+
+    public getRoom(): Room {
         return this._room;
     }
 
-    set Room(value: Room) {
-        this._room = value;
+    public setRoom(val: Room) {
+        this._room = val;
     }
 
-    get color(): string {
+    public getColor(): string {
         return this._color;
     }
 
-    set color(value: string) {
-        this._color = value;
+    public setColor(val: string): void {
+        this._color = val;
     }
 
-    get mission(): Mission {
+    public getMission(): IMission {
         return this._mission;
     }
 
-    set mission(value: Mission) {
-        this._mission = value;
+    public setMission(val: IMission): void {
+        this._mission = val;
     }
 
 }

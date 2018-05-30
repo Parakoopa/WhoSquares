@@ -16,7 +16,7 @@ export class ServerGrid {
         this.createGrid(sizeX, sizeY);
     }
 
-    get grid(): any[][] {
+    get grid(): IClient[][] {
         return this._grid;
     }
 
