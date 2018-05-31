@@ -21,30 +21,18 @@ export class RequestManager {
         });
         // Join room
         this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
-            if (resp.response === "joinedRoom") {
-                this._roomKey = resp.roomKey;
-                const clientCount: number = resp.clientCount;
-                this._gameMan.color(parseInt(resp.color, 16));
-                this._gameMan.textElement(resp.response + ": color: " + resp.color + ", clients: " + clientCount);
-            } else if (resp.response === "roomIsFull") {
-                this._gameMan.textElement(resp.response);
-            }
+            this.joinedRoom(resp);
         });
         // placedtile
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
-            const color: number = parseInt(resp.clientColor, 16);
-            this._gameMan.placedTile(color, resp.x, resp.y);
-            this._gameMan.textElement(resp.response);
+            this.placedTile(resp);
         });
         this._socket.on("notYourTurn", (resp: INotYourTurnResponse) => {
             this._gameMan.textElement(resp.response);
         });
         // Start GameManager
         this._socket.on("startGame", (resp: IStartGameResponse) => {
-            this._gameMan.createGrid(resp.sizeX, resp.sizeY);
-
-            const textMessage: string = resp.response;
-            this._gameMan.textElement(textMessage);
+            this.startedGame(resp);
         });
 
         this._socket.on("informTurn", (resp: IInformTurnResponse) => {
@@ -54,6 +42,33 @@ export class RequestManager {
         this._socket.on("winGame", (resp: IWinGameResponse) => {
             this._gameMan.winGame(resp.clientColor);
         });
+    }
+
+    /**
+     *
+     * @param {IRoomIsFullResponse | IJoinedResponse} resp
+     */
+    private joinedRoom(resp: IRoomIsFullResponse | IJoinedResponse): void {
+        if (resp.response === "joinedRoom") {
+            this._roomKey = resp.roomKey;
+            const clientCount: number = resp.clientCount;
+            this._gameMan.color(parseInt(resp.color, 16));
+            this._gameMan.textElement(resp.response + ": color: " + resp.color + ", clients: " + clientCount);
+        } else if (resp.response === "roomIsFull") {
+            this._gameMan.textElement(resp.response);
+        }
+    }
+
+    private placedTile(resp: IPlacedTileResponse): void {
+        const color: number = parseInt(resp.clientColor, 16);
+        this._gameMan.placedTile(color, resp.x, resp.y);
+        this._gameMan.textElement(resp.response);
+    }
+
+    private startedGame(resp: IStartGameResponse) {
+        this._gameMan.createGrid(resp.sizeX, resp.sizeY);
+        const textMessage: string = resp.response;
+        this._gameMan.textElement(textMessage);
     }
 
     public joinRoom(roomName: string): void {
