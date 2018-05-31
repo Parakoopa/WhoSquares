@@ -19,56 +19,79 @@ export class GameManager {
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
             preload() {
-                // Center GameManager Canvas
-                game.scale.pageAlignHorizontally = true;
-                game.scale.pageAlignVertically = true;
-                game.scale.refresh();
-
-                // Load Images
-                game.load.image("gridTile", "./img/square32_grey.png");
-                game.load.image("startButton", "./img/startButton.png");
-
+              self.centerGame(game);
+              self.loadImages(game);
                 // Manage Input
-                self._inputManager = new InputManager(game);
+              self._inputManager = new InputManager(game);
 
             },
             create() {
-                // Add Start Button
-                const button = game.add.button(
-                    game.world.centerX - 82, 10, "startButton",
-                    () => self.startGame(), this, 2, 1, 0);
-
-                // Add Feedback Text
-                self._textElement = game.add.text(
-                    game.world.centerX,
-                    game.world.centerY * 0.35,
-                    self._textMessage,
-                    {font: "32px Arial", fill: "#ff0044", align: "center"}
-                );
-                self._textElement.anchor.setTo(0.5, 0.5);
-
-                // Add client Turn Displayer
-                const turnInfoText = game.add.text(
-                    game.world.centerX - 80,
-                    game.world.centerY * 0.4 + 4,
-                    "Turn of:",
-                    {font: "20px Arial", fill: "#555555", align: "center"}
-                );
-
-                self._turnInfoSprite = self._game.add.sprite(
-                    game.world.centerX,
-                    game.world.centerY * 0.4,
-                    "gridTile");
-                self._turnInfoSprite.tint = 0xcccccc;
+                self.createButtons(game);
+                self.createTexts(game);
             },
-
             update() {
                 self._textElement.text = self._textMessage;
                 self._inputManager.debug();
                 }
         });
         this._game = game;
+    }
 
+    /**
+     *
+     * @param {Phaser.Game} game
+     */
+    private centerGame(game: Game): void {
+        game.scale.pageAlignHorizontally = true;
+        game.scale.pageAlignVertically = true;
+        game.scale.refresh();
+    }
+
+    /**
+     *
+     * @param {Phaser.Game} game
+     */
+    private loadImages(game: Game): void {
+        game.load.image("gridTile", "./img/square32_grey.png");
+        game.load.image("startButton", "./img/startButton.png");
+
+    }
+
+    /**
+     * f.e. StartButton
+     * @param {Phaser.Game} game
+     */
+    private createButtons(game: Game): void {
+        const button = game.add.button(
+            game.world.centerX - 82, 10, "startButton",
+            () => this.startGame(), this, 2, 1, 0);
+    }
+
+    /**
+     * f.e. feedback text, turn info text +sprite
+     * @param {Phaser.Game} game
+     */
+    private createTexts(game: Game): void {
+        this._textElement = game.add.text(
+            game.world.centerX,
+            game.world.centerY * 0.35,
+            this._textMessage,
+            {font: "32px Arial", fill: "#ff0044", align: "center"}
+        );
+        this._textElement.anchor.setTo(0.5, 0.5);
+
+        const turnInfoText = game.add.text(
+            game.world.centerX - 80,
+            game.world.centerY * 0.4 + 4,
+            "Turn of:",
+            {font: "20px Arial", fill: "#555555", align: "center"}
+        );
+
+        this._turnInfoSprite = this._game.add.sprite(
+            game.world.centerX,
+            game.world.centerY * 0.4,
+            "gridTile");
+        this._turnInfoSprite.tint = 0xcccccc;
     }
 
     public color(color: number): void {

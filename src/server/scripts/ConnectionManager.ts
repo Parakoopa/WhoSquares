@@ -1,8 +1,8 @@
 import {Socket} from "socket.io";
-import {IEvent} from "../../Event";
 import {Client} from "./Client";
 import {Lobby} from "./Lobby";
 import {Utility} from "./Utility";
+import {IEvent} from "../../Event";
 
 export class ConnectionManager {
 
@@ -46,7 +46,7 @@ export class ConnectionManager {
             // A player colors a certain tile
             socket.on("placeTile", (req: IPlaceTileRequest) => {
                 const client: Client = this.clientBySocket(socket);
-                const placeEvents: IEvent[] =  client.Room.placeTile(client, req.x, req.y);
+                const placeEvents: IEvent[] =  client.getRoom().placeTile(client, req.x, req.y);
                 this.emitEvents(placeEvents);
             });
 
@@ -61,7 +61,7 @@ export class ConnectionManager {
     private emitEvent(event: IEvent): void {
         console.log("Emitted to Clients: " + event.name);
         for (let i = 0; i < event.clients.length; i++) {
-            event.clients[i].Socket().emit(event.name, event.response);
+            event.clients[i].getSocket().emit(event.name, event.response);
         }
     }
 
@@ -82,7 +82,7 @@ export class ConnectionManager {
      */
     private addClient(client: Client): IEvent {
         this._clients.push(client);
-        const response =  {response: "connected", clientKey: client.key()} as IConnectedResponse;
+        const response =  {response: "connected", clientKey: client.getKey()} as IConnectedResponse;
         return {clients: [client], name: "connected", response};
     }
 
@@ -105,7 +105,7 @@ export class ConnectionManager {
      */
     private clientBySocket(socket: Socket): Client {
         for (const client of this._clients) {
-            if (client.Socket() === socket) return client;
+            if (client.getSocket() === socket) return client;
         }
         return null;
     }
@@ -118,7 +118,7 @@ export class ConnectionManager {
      */
     private clientByKey(key: string): Client {
         for (const client of this._clients) {
-            if (client.key() === key) return client;
+            if (client.getKey() === key) return client;
         }
         return null;
     }

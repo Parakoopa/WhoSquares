@@ -1,19 +1,19 @@
-import {IEvent} from "../../Event";
 import {Client} from "./Client";
 import {ColorDistributer} from "./ColorDistributer";
 import {MissionDistributer} from "./MissionDistributer";
 import {ServerGrid} from "./ServerGrid";
 import {TurnManager} from "./TurnManager";
+import {IEvent} from "../../Event";
 
 /**
  * A Room hosts a game for clients
  * Each client gets a color assigned
  */
-export class Room {
+export class Room implements IRoom {
 
-    private readonly _name: string;
     private readonly _key: string;
     private readonly _size: number;
+    private _name: string;
     private _owner: Client;
     private readonly _clients: Client[];
     private _serverGrid: ServerGrid;
@@ -31,12 +31,16 @@ export class Room {
         this._turnManager = new TurnManager();
     }
 
-    public Name(): string {
+    public getKey(): string {
+        return this._key;
+    }
+
+    public getName(): string {
         return this._name;
     }
 
-    public key(): string {
-        return this._key;
+    public getClients(): Client[] {
+        return this._clients;
     }
 
     public Size(): number {
@@ -63,7 +67,7 @@ export class Room {
      */
     public AddClient(client: Client): string { // ToDo make string into color enum
         if (!this._owner) this._owner = client;
-        client.Room = this;
+        client.setRoom(this);
         this._clients.push(client);
         this._turnManager.addClient(client);
         this._missionDistr.setMission(client);
@@ -78,7 +82,7 @@ export class Room {
     public RemoveClient(client: Client): void {
         const index: number = this._clients.indexOf(client);
         if (index > -1) this._clients.splice(index, 1);
-        client.Room = null;
+        client.setRoom(null);
         this._missionDistr.resetMission(client);
         this._colorDistr.resetColor(client);
     }
@@ -91,15 +95,6 @@ export class Room {
      */
     public ContainsClient(client: Client) {
         return this._clients.indexOf(client) > -1;
-    }
-
-    /**
-     * Return all clients inside the room
-     * @returns {Array<Client>}
-     * @constructor
-     */
-    public GetClients(): Client[] {
-        return this._clients;
     }
 
     // Grid Interaction
@@ -118,11 +113,11 @@ export class Room {
         if (client !== this._turnManager.curClient()) return this.notYourTurnEvent(client, roomKey);
 
         if (this._serverGrid.placeTile(client, x, y)) {
-            if( client.mission.check(client, this._serverGrid)){
-                console.log("Client won his mission: " + client.color);
-                return this.winGameEvent(roomKey, client.color);
+            if (client.getMission().check(client, this._serverGrid.grid)) {
+                console.log("Client won his mission: " + client.getColor());
+                return this.winGameEvent(roomKey, client.getColor());
             }
-            return this.placedEvent(roomKey, client.color, x, y);
+            return this.placedEvent(roomKey, client.getColor(), x, y);
 
         } else {
              return this.notYourTurnEvent(client, roomKey); // ToDo change to cheat Reponse

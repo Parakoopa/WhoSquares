@@ -32,7 +32,7 @@ export class ColorDistributer {
         for (const color of Array.from(this._clientColorMap.keys())) {
             if (this._clientColorMap.get(color) === null) {
                 this._clientColorMap.set(color, client);
-                client.color = color;
+                client.setColor(color);
                 return color;
             }
         }
@@ -45,8 +45,8 @@ export class ColorDistributer {
      * @constructor
      */
     public resetColor(client: Client): void {
-        const color: string = client.color;
-        client.color = null;
+        const color: string = client.getColor();
+        client.setColor(null);
         this._clientColorMap.set(color, null);
     }
 
