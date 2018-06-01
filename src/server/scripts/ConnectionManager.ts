@@ -1,14 +1,15 @@
 import {Socket} from "socket.io";
 import {Client} from "./Client";
+import {IEvent} from "./Event";
 import {Lobby} from "./Lobby";
 import {Utility} from "./Utility";
-import {IEvent} from "./Event";
 
 export class ConnectionManager {
 
     private _io: SocketIO.Server;
     private readonly _clients: Client[];
     private _lobby: Lobby;
+    private connectionCounter: number = 100;
 
     constructor( io: SocketIO.Server ) {
         this._lobby = new Lobby();
@@ -22,7 +23,7 @@ export class ConnectionManager {
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const connectionEvent: IEvent = this.addClient(new Client(socket, Utility.getGUID()));
+            const connectionEvent: IEvent = this.addClient(new Client(socket, Utility.getGUID(), "" + this.connectionCounter++));
             this.emitEvent(connectionEvent);
 
             // Disconnect
@@ -32,8 +33,8 @@ export class ConnectionManager {
 
             // Client requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
-                const joinEvent: IEvent = this._lobby.joinRoom(this.clientBySocket(socket), req);
-                this.emitEvent(joinEvent);
+                const joinEvents: IEvent[] = this._lobby.joinRoom(this.clientBySocket(socket), req);
+                this.emitEvents(joinEvents);
             });
 
             // Client requests to join specific room
@@ -65,9 +66,8 @@ export class ConnectionManager {
      * @param {IEvent} event
      */
     private emitEvent(event: IEvent): void {
-        console.log("Emitted to Clients: " + event.name + " to: "+ event.clients[0].getKey());
+        console.log("Emitted to Clients: " + event.name + " to: " + event.clients[0].getKey());
         for (let i = 0; i < event.clients.length; i++) {
-            console.log(event.response);
             event.clients[i].getSocket().emit(event.name, event.response);
         }
     }

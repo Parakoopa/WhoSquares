@@ -15,7 +15,8 @@ export class Client implements IClient {
      * @param {NodeJS.Socket} socket
      * @param key
      */
-    constructor(socket: Socket, key: string) {
+    constructor(socket: Socket, key: string, name: string) {
+        this._name = name;
         this._socket = socket;
         this._key = key;
     }

@@ -1,5 +1,3 @@
-import {Client} from "../../../server/scripts/Client";
-
 export class ExpandMission implements IMission {
 
     private _winPercentage: number = 40;
@@ -12,7 +10,7 @@ export class ExpandMission implements IMission {
         return "";
     }
 
-    public check(client: Client, grid: Client[][]): boolean {
+    public check(client: IClient, grid: IClient[][]): boolean {
         let tileCount: number = 0;
 
         for (const row of grid) {

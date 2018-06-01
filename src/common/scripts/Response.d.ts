@@ -20,15 +20,13 @@ interface IRoomIsFullResponse extends IResponse {
 interface IJoinedResponse extends IResponse {
     response: "joinedRoom";
     roomKey: string;
-    clientCount: number;
     color: string;
-    otherClients: Array<{name: string, color: string}>;
+    otherClients: IClient[];
 }
 
 interface IOtherJoinedResponse extends IResponse {
     response: "otherJoinedRoom";
-    name: string;
-    color: string;
+    otherClient: IClient;
 }
 
 interface ILeftResponse extends IResponse {

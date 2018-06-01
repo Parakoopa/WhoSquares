@@ -24,7 +24,6 @@ export class Lobby {
         if (room.Owner() === client ) {
             if (room.getClients().length < this._minimumClientsPerGame) {
                 // ToDo Add NotEnoughPlayer Reponse
-                console.log("NotEnoughPlayer");
             }
             const sizes = this.adjustGameSize(sizeX, sizeY);
             sizeX = sizes[0];
@@ -70,23 +69,29 @@ export class Lobby {
      * @returns {string}
      * @constructor
      */
-    public joinRoom(client: Client, req: IJoinRoomRequest): IEvent {
+    public joinRoom(client: Client, req: IJoinRoomRequest): IEvent[] {
         let room: Room = this.roomByName(req.roomName);
         if (room === null)room = this.createRoom(req.roomName);
+
         else if (room.getClients().length > room.Size()) {
             const response: IRoomIsFullResponse = {response: "roomIsFull"};
-            return {clients: [client], name: "roomIsFull", response};
+            return [{clients: [client], name: "roomIsFull", response}];
         }
 
         if (!room.ContainsClient(client)) {
-            return [this.joinedEvent(client, room), this.otherJoinedEvent(client)];
+            const joinedEvent: IEvent = this.joinedEvent(client, room);
+            const otherJoinedEvent: IEvent = this.otherJoinedEvent(client);
+            return [joinedEvent, otherJoinedEvent];
         }
     }
 
     private joinedEvent(client: Client, room: Room): IEvent {
         const otherClients = Array<IClient>();
         for (const curClient of room.getClients()) {
-            otherClients.push({_name: curClient._name, _color: curClient._color});
+            otherClients.push({
+                _name: curClient.getName(),
+                _color: curClient.getColor()
+            });
         }
         const response: IJoinedResponse = {response: "joinedRoom",
             roomKey: room.getKey(),
@@ -96,9 +101,40 @@ export class Lobby {
     }
 
     private otherJoinedEvent(client: Client): IEvent {
-        const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherClient: {_name: client._name, _color: client._color}};
+        const otherClient = {_name: client.getName(), _color: client.getColor()};
+        const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherClient};
         return {clients: client.getRoom().getClients(), name: "otherJoinedRoom", response};
 
+    }
+
+    public leaveRoom(client: Client, req: ILeaveRoomRequest): IEvent[] {
+        let room: Room = this.roomByName(req.roomName);
+        if (room !== null) room.RemoveClient(client);
+
+        else if (room.getClients().length > room.Size()) {
+            const response: IRoomIsFullResponse = {response: "roomIsFull"};
+            return [{clients: [client], name: "roomIsFull", response}];
+        }
+
+        if (!room.ContainsClient(client)) {
+            return [this.joinedEvent(client, room), this.otherJoinedEvent(client)];
+        }
+    }
+
+
+    private leftEvent(client: Client, room: Room): IEvent {
+        const otherClients = [];
+        for (client of room.getClients()) {
+            otherClients.push({
+                _name: client.getName(),
+                _color: client.getColor()
+            });
+        }
+        const response: IJoinedResponse = {response: "joinedRoom",
+            roomKey: room.getKey(),
+            color: room.AddClient(client),
+            otherClients};
+        return{clients: [client], name: "joinedRoom", response};
     }
 
     public leftRoom(client: Client, req: ILeaveRoomRequest): IEvent {
@@ -106,11 +142,6 @@ export class Lobby {
         if (room === null) return; // ToDo notfiy client that room does not exist
         if (!room.RemoveClient(client)) return; // ToDo Notify client that client is not in this room
         return this.leftEvent(client, room);
-    }
-
-    private leftEvent(client: Client, room: Room): IEvent {
-        const response: IOtherLeftResponse = {response: "otherLeftRoom", name: client.getName()};
-        return{clients: room.getClients(), name: "otherLeftRoom", response};
     }
 
     /**
