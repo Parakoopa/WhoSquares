@@ -79,12 +79,44 @@ export class Lobby {
         }
 
         if (!room.ContainsClient(client)) {
-            const response: IJoinedResponse = {response: "joinedRoom",
-                roomKey: room.getKey(),
-                clientCount: room.getClients().length,
-                color: room.AddClient(client)};
-            return {clients: [client], name: "joinedRoom", response};
+            return [this.joinedEvent(client, room), this.otherJoinedEvent(client)];
         }
+    }
+
+    private joinedEvent(client: Client, room: Room): IEvent {
+        const otherClients = [];
+        for (client of room.getClients()) {
+            otherClients.push({
+                name: client.getName(),
+                color: client.getColor()
+            });
+        }
+        const response: IJoinedResponse = {response: "joinedRoom",
+            roomKey: room.getKey(),
+            clientCount: room.getClients().length,
+            color: room.AddClient(client),
+            otherClients};
+        return{clients: [client], name: "joinedRoom", response};
+    }
+
+    private otherJoinedEvent(client: Client): IEvent {
+        const response: IOtherJoinedResponse = {response: "otherJoinedRoom",
+            name: client.getName(),
+            color: client.getColor()};
+        return {clients: client.getRoom().getClients(), name: "otherJoinedRoom", response};
+
+    }
+
+    public leftRoom(client: Client, req: ILeaveRoomRequest): IEvent {
+        const room: Room = this.roomByName(req.roomName);
+        if (room === null) return; // ToDo notfiy client that room does not exist
+        if (!room.RemoveClient(client)) return; // ToDo Notify client that client is not in this room
+        return this.leftEvent(client, room);
+    }
+
+    private leftEvent(client: Client, room: Room): IEvent {
+        const response: IOtherLeftResponse = {response: "otherLeftRoom", name: client.getName()};
+        return{clients: room.getClients(), name: "otherLeftRoom", response};
     }
 
     /**

@@ -36,6 +36,12 @@ export class ConnectionManager {
                 this.emitEvent(joinEvent);
             });
 
+            // Client requests to join specific room
+            socket.on("leftRoom", (req: ILeaveRoomRequest) => {
+                const leftEvent: IEvent = this._lobby.leftRoom(this.clientBySocket(socket), req);
+                this.emitEvent(leftEvent);
+            });
+
             // Start Game, create Grid, inform Clients
             socket.on("startGame", (req: IStartGameRequest) => {
                 const client: Client = this.clientBySocket(socket);

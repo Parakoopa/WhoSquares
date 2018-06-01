@@ -79,12 +79,14 @@ export class Room implements IRoom {
      * @param {Client} client
      * @constructor
      */
-    public RemoveClient(client: Client): void {
+    public RemoveClient(client: Client): boolean {
         const index: number = this._clients.indexOf(client);
-        if (index > -1) this._clients.splice(index, 1);
+        if (index < 0) return false;
+        this._clients.splice(index, 1);
         client.setRoom(null);
         this._missionDistr.resetMission(client);
         this._colorDistr.resetColor(client);
+        return true;
     }
 
     /**

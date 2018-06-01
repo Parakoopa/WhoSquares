@@ -14,6 +14,13 @@ interface IJoinRoomRequest extends IRequest {
     roomName: string;
 }
 
+interface ILeaveRoomRequest extends IRequest {
+    request: "leaveRoom";
+    clientKey: string;
+    roomName: string;
+}
+
+
 interface IStartGameRequest extends IRequest {
     request: "startGame";
     clientKey: string;
