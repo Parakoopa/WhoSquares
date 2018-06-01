@@ -3,7 +3,7 @@ import {ColorDistributer} from "./ColorDistributer";
 import {MissionDistributer} from "./MissionDistributer";
 import {ServerGrid} from "./ServerGrid";
 import {TurnManager} from "./TurnManager";
-import {IEvent} from "../../Event";
+import {IEvent} from "./Event";
 
 /**
  * A Room hosts a game for clients

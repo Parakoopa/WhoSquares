@@ -2,7 +2,7 @@ import {Socket} from "socket.io";
 import {Client} from "./Client";
 import {Lobby} from "./Lobby";
 import {Utility} from "./Utility";
-import {IEvent} from "../../Event";
+import {IEvent} from "./Event";
 
 export class ConnectionManager {
 

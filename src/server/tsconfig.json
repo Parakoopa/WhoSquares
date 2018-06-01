@@ -12,19 +12,10 @@
     "sourceMap": true,
     "removeComments": true,
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "../../node_modules/*"
-      ]
-    }
+    "baseUrl": "."
   },
-  // Das ist nur für WebStorm. Manchmal versucht es diese tsconfig.json für den Client zu nehmen, und damit gibt es
-  // keine Fehler.
-  "files": [
-    "node_modules/phaser/typescript/phaser.d.ts"
-  ],
   "include": [
-    "src/**/*"
+    "scripts/**/*",
+    "../common/scripts/**/*"
   ]
 }
