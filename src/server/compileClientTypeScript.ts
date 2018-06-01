@@ -1,4 +1,5 @@
 import * as ts from "typescript";
+import * as fs from "fs";
 
 const formatHost: ts.FormatDiagnosticsHost = {
     getCanonicalFileName: path => path,
@@ -12,7 +13,7 @@ const formatHost: ts.FormatDiagnosticsHost = {
 // Wenn man etwas exportieren will nutzt man im neuen JavaScript und auch TypeScript "export" vor dem was man
 // exportieren will statt module.export = ...
 export function compileClientTypeScript() {
-    const configPath = ts.findConfigFile(__dirname + "/client/", ts.sys.fileExists, "tsconfig.json");
+    const configPath = ts.findConfigFile(__dirname + "/../client/", ts.sys.fileExists, "tsconfig.json");
     if (!configPath) {
         throw new Error("Could not find a valid 'tsconfig.json'.");
     }
@@ -41,6 +42,18 @@ export function compileClientTypeScript() {
     host.createProgram = (rootNames: ReadonlyArray<string>, options, host, oldProgram) => {
         console.log("** COMPILING CLIENT **");
         return origCreateProgram(rootNames, options, host, oldProgram);
+    };
+
+    // BY US:
+    // Prevent client/dist/server to be created. Server code should not be created for the client!
+    const origPostProgramCreate = host.afterProgramCreate;
+
+    host.afterProgramCreate = program => {
+        const ret = origPostProgramCreate(program);
+        if (fs.existsSync(__dirname + "/../client/dist/server")) {
+            throw new Error("The client is using server code. Please make sure you don't import server code from client/common.");
+        }
+        return ret;
     };
 
     // `createWatchProgram` creates an initial program, watches files, and updates the program over time.

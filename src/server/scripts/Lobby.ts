@@ -1,7 +1,7 @@
 import {Client} from "./Client";
 import {Room} from "./Room";
 import {Utility} from "./Utility";
-import {IEvent} from "../../Event";
+import {IEvent} from "./Event";
 
 export class Lobby {
 
