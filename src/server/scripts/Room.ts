@@ -99,6 +99,12 @@ export class Room implements IRoom {
         return this._clients.indexOf(client) > -1;
     }
 
+    public GetClientsExcept(client:Client): Client[]{
+        const clients: Client[] = this._clients;
+        const index = clients.indexOf(client);
+        return clients.slice(index);
+    }
+
     // Grid Interaction
 
     public createGame(sizeX: number, sizeY: number) {

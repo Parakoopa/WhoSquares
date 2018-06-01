@@ -84,25 +84,19 @@ export class Lobby {
     }
 
     private joinedEvent(client: Client, room: Room): IEvent {
-        const otherClients = [];
-        for (client of room.getClients()) {
-            otherClients.push({
-                name: client.getName(),
-                color: client.getColor()
-            });
+        const otherClients = Array<IClient>();
+        for (const curClient of room.getClients()) {
+            otherClients.push({_name: curClient._name, _color: curClient._color});
         }
         const response: IJoinedResponse = {response: "joinedRoom",
             roomKey: room.getKey(),
-            clientCount: room.getClients().length,
             color: room.AddClient(client),
             otherClients};
         return{clients: [client], name: "joinedRoom", response};
     }
 
     private otherJoinedEvent(client: Client): IEvent {
-        const response: IOtherJoinedResponse = {response: "otherJoinedRoom",
-            name: client.getName(),
-            color: client.getColor()};
+        const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherClient: {_name: client._name, _color: client._color}};
         return {clients: client.getRoom().getClients(), name: "otherJoinedRoom", response};
 
     }

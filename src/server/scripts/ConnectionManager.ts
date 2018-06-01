@@ -65,8 +65,9 @@ export class ConnectionManager {
      * @param {IEvent} event
      */
     private emitEvent(event: IEvent): void {
-        console.log("Emitted to Clients: " + event.name);
+        console.log("Emitted to Clients: " + event.name + " to: "+ event.clients[0].getKey());
         for (let i = 0; i < event.clients.length; i++) {
+            console.log(event.response);
             event.clients[i].getSocket().emit(event.name, event.response);
         }
     }
