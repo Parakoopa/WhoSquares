@@ -79,12 +79,14 @@ export class Room implements IRoom {
      * @param {Client} client
      * @constructor
      */
-    public RemoveClient(client: Client): void {
+    public RemoveClient(client: Client): boolean {
         const index: number = this._clients.indexOf(client);
-        if (index > -1) this._clients.splice(index, 1);
+        if (index < 0) return false;
+        this._clients.splice(index, 1);
         client.setRoom(null);
         this._missionDistr.resetMission(client);
         this._colorDistr.resetColor(client);
+        return true;
     }
 
     /**
@@ -95,6 +97,12 @@ export class Room implements IRoom {
      */
     public ContainsClient(client: Client) {
         return this._clients.indexOf(client) > -1;
+    }
+
+    public GetClientsExcept(client:Client): Client[]{
+        const clients: Client[] = this._clients;
+        const index = clients.indexOf(client);
+        return clients.slice(index);
     }
 
     // Grid Interaction

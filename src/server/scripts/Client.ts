@@ -5,9 +5,9 @@ export class Client implements IClient {
 
     private readonly _socket: Socket;
     private readonly _key: string;
-    private _name: string;
+    _name: string;
     private _room: Room;
-    private _color: string;
+    _color: string;
     private _mission: IMission;
 
     /**
@@ -15,7 +15,8 @@ export class Client implements IClient {
      * @param {NodeJS.Socket} socket
      * @param key
      */
-    constructor(socket: Socket, key: string) {
+    constructor(socket: Socket, key: string, name: string) {
+        this._name = name;
         this._socket = socket;
         this._key = key;
     }

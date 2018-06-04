@@ -1,5 +1,6 @@
-import {GameManager} from "./GameManager";
 import Socket = SocketIOClient.Socket;
+import {Client} from "./Client";
+import {GameManager} from "./GameManager";
 
 export class RequestManager {
 
@@ -7,6 +8,7 @@ export class RequestManager {
     private _gameMan: GameManager;
     private _clientKey: string;
     private _roomKey: string;
+    private _otherClients: Client[];
 
     constructor(game: GameManager) {
         this._socket = io();
@@ -22,6 +24,9 @@ export class RequestManager {
         // Join room
         this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
             this.joinedRoom(resp);
+        });
+        this._socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
+            this.otherJoinedRoom(resp);
         });
         // placedtile
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
@@ -51,12 +56,40 @@ export class RequestManager {
     private joinedRoom(resp: IRoomIsFullResponse | IJoinedResponse): void {
         if (resp.response === "joinedRoom") {
             this._roomKey = resp.roomKey;
-            const clientCount: number = resp.clientCount;
             this._gameMan.color(parseInt(resp.color, 16));
-            this._gameMan.textElement(resp.response + ": color: " + resp.color + ", clients: " + clientCount);
+            console.log(resp.otherClients);
+            this._gameMan.textElement("you joined as: " + resp.color + " in:" + resp.roomKey);
+            this.addClients(resp.otherClients);
         } else if (resp.response === "roomIsFull") {
             this._gameMan.textElement(resp.response);
         }
+    }
+
+    private otherJoinedRoom(resp: IOtherJoinedResponse): void {
+         this.addClient(resp.otherClient);
+    }
+
+
+    private addClients(clients: IClient[]):void {
+        this._otherClients = []; // Reset on Join Room
+        for (const client of clients) {
+            this._otherClients.push(new Client(client._name, client._color));
+        }
+        this.updateRoomList();
+    }
+
+    private addClient(client: IClient): void {
+        this._otherClients.push(new Client(client._name, client._color));
+        this.updateRoomList();
+    }
+
+    private updateRoomList(): void{
+        let roomList: string = "";
+        for(const client of this._otherClients){
+            roomList += client.getName() + "\n";
+        }
+        this._gameMan.roomList(roomList);
+
     }
 
     private placedTile(resp: IPlacedTileResponse): void {

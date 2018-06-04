@@ -20,8 +20,23 @@ interface IRoomIsFullResponse extends IResponse {
 interface IJoinedResponse extends IResponse {
     response: "joinedRoom";
     roomKey: string;
-    clientCount: number;
     color: string;
+    otherClients: IClient[];
+}
+
+interface IOtherJoinedResponse extends IResponse {
+    response: "otherJoinedRoom";
+    otherClient: IClient;
+}
+
+interface ILeftResponse extends IResponse {
+    response: "leftRoom";
+    roomKey: string;
+}
+
+interface IOtherLeftResponse extends IResponse {
+    response: "otherLeftRoom";
+    name: string;
 }
 
 interface IRoomIsFullResponse extends IResponse {
@@ -61,4 +76,4 @@ interface IWinGameResponse extends IResponse {
     roomKey: string;
     clientColor: string;
 }
-
+

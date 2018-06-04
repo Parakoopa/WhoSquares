@@ -9,6 +9,8 @@ export class GameManager {
     private _game: Game;
     private _textMessage = "warte auf server";
     private _textElement: Phaser.Text = null;
+    private _roomListMessage = "Du bist in keinem Raum";
+    private _roomListElement: Phaser.Text = null;
     private _reqManager: RequestManager;
     private _inputManager: InputManager;
     private _grid: Grid;
@@ -31,6 +33,7 @@ export class GameManager {
             },
             update() {
                 self._textElement.text = self._textMessage;
+                self._roomListElement.text = self._roomListMessage;
                 self._inputManager.debug();
                 }
         });
@@ -72,6 +75,7 @@ export class GameManager {
      * @param {Phaser.Game} game
      */
     private createTexts(game: Game): void {
+        //TextElement
         this._textElement = game.add.text(
             game.world.centerX,
             game.world.centerY * 0.35,
@@ -79,6 +83,15 @@ export class GameManager {
             {font: "32px Arial", fill: "#ff0044", align: "center"}
         );
         this._textElement.anchor.setTo(0.5, 0.5);
+
+        //RoomList
+        this._roomListElement = game.add.text(
+            game.world.centerX * 1.5,
+            game.world.centerY,
+            this._roomListMessage,
+            {font: "32px Arial", fill: "#ff0044", align: "center"}
+        );
+        this._roomListElement.anchor.setTo(0.5, 0.5);
 
         const turnInfoText = game.add.text(
             game.world.centerX - 80,
@@ -117,6 +130,10 @@ export class GameManager {
 
     public textElement(text: string): void {
         this._textMessage = text;
+    }
+
+    public roomList(text: string): void {
+        this._roomListMessage = text;
     }
 
     private startGame() {
