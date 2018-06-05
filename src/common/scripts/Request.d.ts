@@ -17,7 +17,7 @@ interface IJoinRoomRequest extends IRequest {
 interface ILeaveRoomRequest extends IRequest {
     request: "leaveRoom";
     clientKey: string;
-    roomName: string;
+    roomKey: string;
 }
 
 

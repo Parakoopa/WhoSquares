@@ -20,6 +20,7 @@ interface IRoomIsFullResponse extends IResponse {
 interface IJoinedResponse extends IResponse {
     response: "joinedRoom";
     roomKey: string;
+    roomName: string;
     color: string;
     otherClients: IClient[];
 }
@@ -36,6 +37,7 @@ interface ILeftResponse extends IResponse {
 
 interface IOtherLeftResponse extends IResponse {
     response: "otherLeftRoom";
+    roomKey: string;
     name: string;
 }
 

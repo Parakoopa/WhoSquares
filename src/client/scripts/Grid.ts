@@ -63,7 +63,7 @@ export class Grid {
                     xOffset + cellSize * x,
                     yOffset + cellSize * y,
                     imageName);
-            //    sprite.nfsvsame = "tile" + y + "_" + x;
+            //    sprite.name = "tile" + y + "_" + x;
                 sprite.data.x = x;
                 sprite.data.y = y;
                 sprite.tint = 0x555555; // Initially Grey
@@ -77,6 +77,14 @@ export class Grid {
             this._grid[y] = row;
         }
 
+    }
+
+    public destroy(): void{
+        for (let y = 0; y < this._grid.length; y++) {
+            for (let x = 0; x < this._grid[y].length; x++) {
+               this._grid[y][x].destroy(true);
+            }
+        }
     }
 
     /**

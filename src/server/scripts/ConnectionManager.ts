@@ -38,9 +38,9 @@ export class ConnectionManager {
             });
 
             // Client requests to join specific room
-            socket.on("leftRoom", (req: ILeaveRoomRequest) => {
-                const leftEvent: IEvent = this._lobby.leftRoom(this.clientBySocket(socket), req);
-                this.emitEvent(leftEvent);
+            socket.on("leaveRoom", (req: ILeaveRoomRequest) => {
+                const leftEvents: IEvent[] = this._lobby.leaveRoom(this.clientBySocket(socket), req);
+                this.emitEvents(leftEvents);
             });
 
             // Start Game, create Grid, inform Clients
@@ -66,7 +66,7 @@ export class ConnectionManager {
      * @param {IEvent} event
      */
     private emitEvent(event: IEvent): void {
-        console.log("Emitted to Clients: " + event.name + " to: " + event.clients[0].getKey());
+        console.log("Emitted to Clients: " + event.name + " to: " + event.clients);
         for (let i = 0; i < event.clients.length; i++) {
             event.clients[i].getSocket().emit(event.name, event.response);
         }

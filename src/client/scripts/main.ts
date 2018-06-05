@@ -7,6 +7,5 @@ export function main() {
     const reqManager = new RequestManager(game);
     game.reqManager(reqManager);
     reqManager.eventListener();
-    reqManager.joinRoom("TestRoom");
 
 }
