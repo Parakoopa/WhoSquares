@@ -11,6 +11,8 @@ export class GameManager {
     private _textElement: Phaser.Text = null;
     private _roomListMessage = "Du bist in keinem Raum";
     private _roomListElement: Phaser.Text = null;
+    private _roomNameMessage = "";
+    private _roomNameElement: Phaser.Text = null;
     private _reqManager: RequestManager;
     private _inputManager: InputManager;
     private _grid: Grid;
@@ -34,6 +36,7 @@ export class GameManager {
             update() {
                 self._textElement.text = self._textMessage;
                 self._roomListElement.text = self._roomListMessage;
+                self._roomNameElement.text = self._roomNameMessage;
                 self._inputManager.debug();
                 }
         });
@@ -57,6 +60,9 @@ export class GameManager {
     private loadImages(game: Game): void {
         game.load.image("gridTile", "./img/square32_grey.png");
         game.load.image("startButton", "./img/startButton.png");
+        game.load.image("joinRoom01", "./img/joinRoom01.png");
+        game.load.image("joinRoom02", "./img/joinRoom02.png");
+        game.load.image("leaveRoom", "./img/leaveRoom.png");
 
     }
 
@@ -65,9 +71,18 @@ export class GameManager {
      * @param {Phaser.Game} game
      */
     private createButtons(game: Game): void {
-        const button = game.add.button(
+        const startButton = game.add.button(
             game.world.centerX - 82, 10, "startButton",
             () => this.startGame(), this, 2, 1, 0);
+        const joinRoomButton1 = game.add.button(
+            game.world.centerX + 118, 400, "joinRoom01",
+            () => this.joinRoom("room01"), this, 2, 1, 0);
+        const joinRoomButton2 = game.add.button(
+            game.world.centerX + 118,  470, "joinRoom02",
+            () => this.joinRoom("room02"), this, 2, 1, 0);
+        const leaveRoomButton = game.add.button(
+            game.world.centerX + 118,  540, "leaveRoom",
+            () => this.leaveRoom(), this, 2, 1, 0);
     }
 
     /**
@@ -75,7 +90,7 @@ export class GameManager {
      * @param {Phaser.Game} game
      */
     private createTexts(game: Game): void {
-        //TextElement
+        // TextElement
         this._textElement = game.add.text(
             game.world.centerX,
             game.world.centerY * 0.35,
@@ -84,9 +99,18 @@ export class GameManager {
         );
         this._textElement.anchor.setTo(0.5, 0.5);
 
-        //RoomList
+        // RoomName
+        this._roomNameElement = game.add.text(
+            game.world.centerX * 1.6,
+            game.world.centerY - 70,
+            this._roomNameMessage,
+            {font: "32px Arial", fill: "#ff0044", align: "center"}
+        );
+        this._roomNameElement.anchor.setTo(0.5, 0.5);
+
+        // RoomList
         this._roomListElement = game.add.text(
-            game.world.centerX * 1.5,
+            game.world.centerX * 1.6,
             game.world.centerY,
             this._roomListMessage,
             {font: "32px Arial", fill: "#ff0044", align: "center"}
@@ -116,6 +140,11 @@ export class GameManager {
         this._grid.createGrid("gridTile", sizeX, sizeY, 40, this._color);
     }
 
+    public destroyGrid() {
+        this._grid.destroy();
+    }
+
+
     public placeTile(x: number, y: number): void {
           this._reqManager.placeTile(x, y);
     }
@@ -132,8 +161,20 @@ export class GameManager {
         this._textMessage = text;
     }
 
+    public roomName(text: string): void {
+        this._roomNameMessage = "room: " + text;
+    }
+
     public roomList(text: string): void {
         this._roomListMessage = text;
+    }
+
+    private joinRoom(roomName: string): void {
+        this._reqManager.joinRoom(roomName);
+    }
+
+    private leaveRoom(): void {
+        this._reqManager.leaveRoom();
     }
 
     private startGame() {
