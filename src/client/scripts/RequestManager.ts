@@ -114,29 +114,29 @@ export class RequestManager {
     }
 
     private otherJoinedRoom(resp: IOtherJoinedResponse): void {
-        const player: Player = new Player(resp.otherPlayer._name, resp.otherPlayer._color);
+        const player: Player = new Player(resp.otherPlayer.name, resp.otherPlayer.color);
         this.addPlayer(player);
     }
 
     private playerByName(playerName: string): Player {
         console.log(this._otherPlayers.length);
         for (const player of this._otherPlayers) {
-            console.log(player.getName() + "   " + playerName);
-            if (player.getName() === playerName) return player;
+            console.log(player.name + "   " + playerName);
+            if (player.name === playerName) return player;
         }
         return null;
     }
     private addPlayers(players: IPlayer[]): void {
         this._otherPlayers = []; // Reset on Join Room
         for (const player of players) {
-            console.log("add Player: " + player._name);
-            this._otherPlayers.push(new Player(player._name, player._color));
+            console.log("add Player: " + player.name);
+            this._otherPlayers.push(new Player(player.name, player.color));
         }
         this.updateRoomList();
     }
 
     private addPlayer(player: Player): void {
-        this._otherPlayers.push(new Player(player._name, player._color));
+        this._otherPlayers.push(new Player(player.name, player.color));
         this.updateRoomList();
     }
 
@@ -154,7 +154,7 @@ export class RequestManager {
     private updateRoomList(): void {
         let roomList: string = "";
         for (const player of this._otherPlayers) {
-            roomList += player.getName() + "\n";
+            roomList += player.name + "\n";
         }
         this._gameMan.roomList(roomList);
 

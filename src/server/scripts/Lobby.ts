@@ -20,7 +20,7 @@ export class Lobby {
      * @constructor
      */
     public startGame(player: Player, sizeX: number, sizeY: number): IEvent[] {
-        const room: Room = player.getRoom();
+        const room: Room = player.room;
         if(!room) return; //ToDo Not in a room response (hide button)s
         if (room.Owner() === player ) {
             if (room.getPlayers().length < this._minimumPlayersPerGame) {
@@ -31,7 +31,7 @@ export class Lobby {
             sizeY = sizes[1];
 
             room.createGame(sizeX, sizeY);
-            const turnColor = player.getColor();
+            const turnColor = player.color;
 
             const players = room.getPlayers();
             const startResponse =  {response: "startGame", sizeX, sizeY};
@@ -90,8 +90,8 @@ export class Lobby {
         const otherPlayers = Array<IPlayer>();
         for (const curPlayer of room.getPlayers()) {
             otherPlayers.push({
-                _name: curPlayer.getName(),
-                _color: curPlayer.getColor()
+                name: curPlayer.name,
+                color: curPlayer.color
             });
         }
         const response: IJoinedResponse = {response: "joinedRoom",
@@ -103,9 +103,9 @@ export class Lobby {
     }
 
     private otherJoinedEvent(player: Player): IEvent {
-        const otherPlayer = {_name: player.getName(), _color: player.getColor()};
+        const otherPlayer = {name: player.name, color: player.color};
         const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherPlayer};
-        return {players: player.getRoom().getPlayers(), name: "otherJoinedRoom", response};
+        return {players: player.room.getPlayers(), name: "otherJoinedRoom", response};
 
     }
 
@@ -122,7 +122,7 @@ export class Lobby {
 
         const otherLeftresponse: IOtherLeftResponse = {response: "otherLeftRoom",
             roomKey: room.getKey(),
-            name: player.getName()
+            name: player.name
         };
         const otherLeftEvent: IEvent = {players: room.GetPlayersExcept(player), name: "otherLeftRoom", response: otherLeftresponse};
         return[leftEvent, otherLeftEvent];

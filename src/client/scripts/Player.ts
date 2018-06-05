@@ -1,27 +1,22 @@
 export class Player implements IPlayer {
 
-    _name: string;
-    _color: string;
+    constructor(
+        private _name: string,
+        private _color: string) {}
 
-    constructor(name: string, color: string) {
-        this._name = name;
-        this._color = color;
+    public get name(): string {
+        return this._name;
     }
 
-    public getName(): string {
-        return this._name;
+    public get color(): string {
+        return this._color;
+    }
+
+    public set color(val: string) {
+        this._color = val;
     }
 
     public getColorHex(): number {
         return  parseInt(this._color, 16);
     }
-
-    public getColor(): string {
-        return this._color;
-    }
-
-    public setColor(val: string): void {
-        this._color = val;
-    }
-
 }

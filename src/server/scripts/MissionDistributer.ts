@@ -11,11 +11,11 @@ export class MissionDistributer {
     }
 
     public setMission(player: Player): void {
-        player.setMission(this._missions[Math.floor(Math.random() * this._missions.length)]);
+        player.mission = this._missions[Math.floor(Math.random() * this._missions.length)];
     }
 
     public resetMission(player: Player): void {
-        player.setMission(null);
+        player.mission = null;
     }
 
 }

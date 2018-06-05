@@ -3,60 +3,59 @@ import {Room} from "./Room";
 
 export class Player implements IPlayer {
 
-    private readonly _socket: Socket;
-    private readonly _key: string;
-    _name: string;
+    private _color: string;
     private _room: Room;
-    _color: string;
     private _mission: IMission;
 
     /**
      * Players are talked to via socket and identified via unique id guid
-     * @param {NodeJS.Socket} socket
-     * @param key
+     * @param _socket
+     * @param _key
+     * @param _name
      */
-    constructor(socket: Socket, key: string, name: string) {
-        this._name = name;
-        this._socket = socket;
-        this._key = key;
-    }
+    constructor(
+        private _socket: Socket,
+        private _key: string,
+        private _name: string
+    ) {}
 
-    public getSocket(): Socket {
+    public get socket(): Socket {
         return this._socket;
     }
 
-    public getKey(): string {
+    public get key(): string {
         return this._key;
     }
 
-    public getName(): string {
+    public get name(): string {
         return this._name;
     }
 
-    public setName(val: string): void {
+    public set name(val: string) {
+        this._name = val;
     }
 
-    public getRoom(): Room {
-        return this._room;
-    }
-
-    public setRoom(val: Room) {
-        this._room = val;
-    }
-
-    public getColor(): string {
+    public get color(): string {
         return this._color;
     }
 
-    public setColor(val: string): void {
+    public set color(val: string) {
         this._color = val;
     }
 
-    public getMission(): IMission {
+    public get room(): Room {
+        return this._room;
+    }
+
+    public set room(val: Room) {
+        this._room = val;
+    }
+
+    public get mission(): IMission {
         return this._mission;
     }
 
-    public setMission(val: IMission): void {
+    public set mission(val: IMission) {
         this._mission = val;
     }
 

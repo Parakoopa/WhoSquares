@@ -53,7 +53,7 @@ export class ConnectionManager {
             // A player colors a certain tile
             socket.on("placeTile", (req: IPlaceTileRequest) => {
                 const player: Player = this.playerBySocket(socket);
-                const placeEvents: IEvent[] =  player.getRoom().placeTile(player, req.x, req.y);
+                const placeEvents: IEvent[] =  player.room.placeTile(player, req.x, req.y);
                 this.emitEvents(placeEvents);
             });
 
@@ -68,7 +68,7 @@ export class ConnectionManager {
     private emitEvent(event: IEvent): void {
         console.log("Emitted to Players: " + event.name + " to: " + event.players);
         for (let i = 0; i < event.players.length; i++) {
-            event.players[i].getSocket().emit(event.name, event.response);
+            event.players[i].socket.emit(event.name, event.response);
         }
     }
 
@@ -89,7 +89,7 @@ export class ConnectionManager {
      */
     private addPlayer(player: Player): IEvent {
         this._players.push(player);
-        const response =  {response: "connected", playerKey: player.getKey()} as IConnectedResponse;
+        const response =  {response: "connected", playerKey: player.key} as IConnectedResponse;
         return {players: [player], name: "connected", response};
     }
 
@@ -112,7 +112,7 @@ export class ConnectionManager {
      */
     private playerBySocket(socket: Socket): Player {
         for (const player of this._players) {
-            if (player.getSocket() === socket) return player;
+            if (player.socket === socket) return player;
         }
         return null;
     }
@@ -125,7 +125,7 @@ export class ConnectionManager {
      */
     private playerByKey(key: string): Player {
         for (const player of this._players) {
-            if (player.getKey() === key) return player;
+            if (player.key === key) return player;
         }
         return null;
     }

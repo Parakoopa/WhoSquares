@@ -67,7 +67,7 @@ export class Room implements IRoom {
      */
     public AddPlayer(player: Player): string { // ToDo make string into color enum
         if (!this._owner) this._owner = player;
-        player.setRoom(this);
+        player.room = this;
         this._players.push(player);
         this._turnManager.addPlayer(player);
         this._missionDistr.setMission(player);
@@ -83,7 +83,7 @@ export class Room implements IRoom {
         const index: number = this._players.indexOf(player);
         if (index < 0) return false;
         this._players.splice(index, 1);
-        player.setRoom(null);
+        player.room = null;
         this._missionDistr.resetMission(player);
         this._colorDistr.resetColor(player);
         if (this._owner === player) this.assignNewOwner();
@@ -130,11 +130,11 @@ export class Room implements IRoom {
         if (player !== this._turnManager.curPlayer()) return this.notYourTurnEvent(player, roomKey);
 
         if (this._serverGrid.placeTile(player, x, y)) {
-            if (player.getMission().check(player, this._serverGrid.grid)) {
-                console.log("Player won his mission: " + player.getColor());
-                return this.winGameEvent(roomKey, player.getColor());
+            if (player.mission.check(player, this._serverGrid.grid)) {
+                console.log("Player won his mission: " + player.color);
+                return this.winGameEvent(roomKey, player.color);
             }
-            return this.placedEvent(roomKey, player.getColor(), x, y);
+            return this.placedEvent(roomKey, player.color, x, y);
 
         } else {
              return this.notYourTurnEvent(player, roomKey); // ToDo change to cheat Reponse
