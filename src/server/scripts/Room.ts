@@ -1,9 +1,9 @@
 import {Client} from "./Client";
 import {ColorDistributer} from "./ColorDistributer";
+import {IEvent} from "./Event";
 import {MissionDistributer} from "./MissionDistributer";
 import {ServerGrid} from "./ServerGrid";
 import {TurnManager} from "./TurnManager";
-import {IEvent} from "./Event";
 
 /**
  * A Room hosts a game for clients
@@ -86,7 +86,16 @@ export class Room implements IRoom {
         client.setRoom(null);
         this._missionDistr.resetMission(client);
         this._colorDistr.resetColor(client);
+        if (this._owner === client) this.assignNewOwner();
         return true;
+    }
+
+    private assignNewOwner() {
+        if (this._clients.length > 0) {
+            this._owner = this._clients[0];
+        } else {
+            // Todo Destroy room
+        }
     }
 
     /**
@@ -99,7 +108,7 @@ export class Room implements IRoom {
         return this._clients.indexOf(client) > -1;
     }
 
-    public GetClientsExcept(client:Client): Client[]{
+    public GetClientsExcept(client: Client): Client[] {
         const clients: Client[] = this._clients;
         const index = clients.indexOf(client);
         return clients.slice(index);
