@@ -1,15 +1,15 @@
 import Socket = SocketIOClient.Socket;
-import {Client} from "./Client";
+import {Player} from "./Player";
 import {GameManager} from "./GameManager";
 
 export class RequestManager {
 
     private _socket: Socket;
     private _gameMan: GameManager;
-    private _clientKey: string;
+    private _playerKey: string;
     private _roomName: string;
     private _roomKey: string;
-    private _otherClients: Client[];
+    private _otherPlayers: Player[];
 
     constructor(game: GameManager) {
         this._socket = io();
@@ -19,8 +19,8 @@ export class RequestManager {
     public eventListener() {
         // Initial Connection
         this._socket.on("connected", (resp: IConnectedResponse) => {
-            this._clientKey = resp.clientKey;
-            this._gameMan.textElement(resp.response + ":\n" +  resp.clientKey);
+            this._playerKey = resp.playerKey;
+            this._gameMan.textElement(resp.response + ":\n" +  resp.playerKey);
         });
         // Join room
         this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
@@ -53,31 +53,31 @@ export class RequestManager {
             this._gameMan.turnInfo(color);
         });
         this._socket.on("winGame", (resp: IWinGameResponse) => {
-            this._gameMan.winGame(resp.clientColor);
+            this._gameMan.winGame(resp.playerColor);
         });
     }
 
     public joinRoom(roomName: string): void {
-        const clientKey = this._clientKey;
-        this._socket.emit("joinRoom", {request: "joinRoom", clientKey, roomName});
+        const playerKey = this._playerKey;
+        this._socket.emit("joinRoom", {request: "joinRoom", playerKey, roomName});
     }
 
     public leaveRoom(): void {
-        const clientKey = this._clientKey;
+        const playerKey = this._playerKey;
         const roomKey = this._roomKey;
-        this._socket.emit("leaveRoom", {request: "leaveRoom", clientKey, roomKey});
+        this._socket.emit("leaveRoom", {request: "leaveRoom", playerKey, roomKey});
     }
 
     public startGame(sizeX: number, sizeY: number): void {
-        const clientKey = this._roomKey;
+        const playerKey = this._roomKey;
         const roomKey = this._roomKey;
-        this._socket.emit("startGame", {request: "startGame", clientKey, roomKey, sizeX, sizeY});
+        this._socket.emit("startGame", {request: "startGame", playerKey, roomKey, sizeX, sizeY});
     }
 
     public placeTile(x: number, y: number): void {
-        const clientKey = this._clientKey;
+        const playerKey = this._playerKey;
         const roomKey = this._roomKey;
-        this._socket.emit("placeTile" , {request: "placeTile", clientKey, roomKey, x, y});
+        this._socket.emit("placeTile" , {request: "placeTile", playerKey, roomKey, x, y});
     }
 
     /**
@@ -91,7 +91,7 @@ export class RequestManager {
             this._gameMan.color(parseInt(resp.color, 16));
             this._gameMan.textElement("you joined as: " + resp.color + " in:" + resp.roomKey);
             this._gameMan.roomName(resp.roomName);
-            this.addClients(resp.otherClients);
+            this.addPlayers(resp.otherPlayers);
         } else if (resp.response === "roomIsFull") {
             this._gameMan.textElement(resp.response);
         }
@@ -104,64 +104,64 @@ export class RequestManager {
             this._gameMan.textElement("left room");
             this._gameMan.roomName("left room");
             this._gameMan.destroyGrid();
-            this.resetClients();
+            this.resetPlayers();
     }
 
     private otherLeftRoom(resp: IOtherLeftResponse): void {
-        const client: Client = this.clientByName(resp.name);
-        console.log(client);
-        this.removeClient(client);
+        const player: Player = this.playerByName(resp.name);
+        console.log(player);
+        this.removePlayer(player);
     }
 
     private otherJoinedRoom(resp: IOtherJoinedResponse): void {
-        const client: Client = new Client(resp.otherClient._name, resp.otherClient._color);
-        this.addClient(client);
+        const player: Player = new Player(resp.otherPlayer._name, resp.otherPlayer._color);
+        this.addPlayer(player);
     }
 
-    private clientByName(clientName: string): Client {
-        console.log(this._otherClients.length);
-        for (const client of this._otherClients) {
-            console.log(client.getName() + "   " + clientName);
-            if (client.getName() === clientName) return client;
+    private playerByName(playerName: string): Player {
+        console.log(this._otherPlayers.length);
+        for (const player of this._otherPlayers) {
+            console.log(player.getName() + "   " + playerName);
+            if (player.getName() === playerName) return player;
         }
         return null;
     }
-    private addClients(clients: IClient[]): void {
-        this._otherClients = []; // Reset on Join Room
-        for (const client of clients) {
-            console.log("add Client: " + client._name);
-            this._otherClients.push(new Client(client._name, client._color));
+    private addPlayers(players: IPlayer[]): void {
+        this._otherPlayers = []; // Reset on Join Room
+        for (const player of players) {
+            console.log("add Player: " + player._name);
+            this._otherPlayers.push(new Player(player._name, player._color));
         }
         this.updateRoomList();
     }
 
-    private addClient(client: Client): void {
-        this._otherClients.push(new Client(client._name, client._color));
+    private addPlayer(player: Player): void {
+        this._otherPlayers.push(new Player(player._name, player._color));
         this.updateRoomList();
     }
 
-    private removeClient(client: Client): void {
-        const index: number = this._otherClients.indexOf(client);
-        if (index > -1) this._otherClients.splice(index, 1);
+    private removePlayer(player: Player): void {
+        const index: number = this._otherPlayers.indexOf(player);
+        if (index > -1) this._otherPlayers.splice(index, 1);
         this.updateRoomList();
     }
 
-    private resetClients(): void {
-        this._otherClients = [];
+    private resetPlayers(): void {
+        this._otherPlayers = [];
         this.updateRoomList();
     }
 
     private updateRoomList(): void {
         let roomList: string = "";
-        for (const client of this._otherClients) {
-            roomList += client.getName() + "\n";
+        for (const player of this._otherPlayers) {
+            roomList += player.getName() + "\n";
         }
         this._gameMan.roomList(roomList);
 
     }
 
     private placedTile(resp: IPlacedTileResponse): void {
-        const color: number = parseInt(resp.clientColor, 16);
+        const color: number = parseInt(resp.playerColor, 16);
         this._gameMan.placedTile(color, resp.x, resp.y);
         this._gameMan.textElement(resp.response);
     }

@@ -1,4 +1,4 @@
-interface IClient {
+interface IPlayer {
 
     //getKey(): string;
     _name: string;

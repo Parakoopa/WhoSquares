@@ -1,27 +1,27 @@
-import {Client} from "./Client";
+import {Player} from "./Player";
 
 export class TurnManager {
 
     private _index: number = 0;
-    private readonly _clients: Client[];
+    private readonly _players: Player[];
 
     constructor() {
-        this._clients = [];
+        this._players = [];
     }
 
-    public addClient(client: Client): void {
-        this._clients.push(client);
+    public addPlayer(player: Player): void {
+        this._players.push(player);
     }
 
-    public curClient(): Client {
-        return this._clients[this._index];
+    public curPlayer(): Player {
+        return this._players[this._index];
     }
 
-    public setNextClient(): void {
+    public setNextPlayer(): void {
         this._index += 1;
-        if (this._index >= this._clients.length) this._index = 0;
+        if (this._index >= this._players.length) this._index = 0;
     }
 
-    // ToDo Add removeClient(client:Client)...
+    // ToDo Add removePlayer(player:Player)...
 
 }

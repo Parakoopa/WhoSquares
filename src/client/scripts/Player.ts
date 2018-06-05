@@ -1,4 +1,4 @@
-export class Client implements IClient {
+export class Player implements IPlayer {
 
     _name: string;
     _color: string;

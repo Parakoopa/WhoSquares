@@ -1,7 +1,7 @@
 import {Socket} from "socket.io";
 import {Room} from "./Room";
 
-export class Client implements IClient {
+export class Player implements IPlayer {
 
     private readonly _socket: Socket;
     private readonly _key: string;
@@ -11,7 +11,7 @@ export class Client implements IClient {
     private _mission: IMission;
 
     /**
-     * Clients are talked to via socket and identified via unique id guid
+     * Players are talked to via socket and identified via unique id guid
      * @param {NodeJS.Socket} socket
      * @param key
      */

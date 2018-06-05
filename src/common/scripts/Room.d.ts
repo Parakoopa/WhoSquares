@@ -2,5 +2,5 @@ interface IRoom {
 
     getKey(): string;
     getName(): string;
-    getClients(): IClient[];
+    getPlayers(): IPlayer[];
 }

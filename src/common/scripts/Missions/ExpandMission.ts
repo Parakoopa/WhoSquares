@@ -10,12 +10,12 @@ export class ExpandMission implements IMission {
         return "";
     }
 
-    public check(client: IClient, grid: IClient[][]): boolean {
+    public check(player: IPlayer, grid: IPlayer[][]): boolean {
         let tileCount: number = 0;
 
         for (const row of grid) {
-            for (const tileClient of row) {
-                if (tileClient === client) tileCount++;
+            for (const tilePlayer of row) {
+                if (tilePlayer === player) tileCount++;
             }
         }
         const gridSize = grid.length * grid[0].length;

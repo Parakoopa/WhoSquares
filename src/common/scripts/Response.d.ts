@@ -1,16 +1,16 @@
 /**
- * Data format that gets send to client
+ * Data format that gets send to player
  */
-// ToDo Maybe Make Client add his secretkey to all requests
+// ToDo Maybe Make Player add his secretkey to all requests
 // ToDo Maybe Make Server respond to joinRoom with room secret key
-// ToDo Maybe Make Client add his room secretkey to all room interactions
+// ToDo Maybe Make Player add his room secretkey to all room interactions
 interface IResponse {
     response: string;
 }
 
 interface IConnectedResponse extends IResponse {
     response: "connected";
-    clientKey: string;
+    playerKey: string;
 }
 
 interface IRoomIsFullResponse extends IResponse {
@@ -22,12 +22,12 @@ interface IJoinedResponse extends IResponse {
     roomKey: string;
     roomName: string;
     color: string;
-    otherClients: IClient[];
+    otherPlayers: IPlayer[];
 }
 
 interface IOtherJoinedResponse extends IResponse {
     response: "otherJoinedRoom";
-    otherClient: IClient;
+    otherPlayer: IPlayer;
 }
 
 interface ILeftResponse extends IResponse {
@@ -58,7 +58,7 @@ interface INotOwnerResponse extends IResponse {
 interface IPlacedTileResponse extends IResponse {
     response: "placedTile";
     roomKey: string;
-    clientColor: string;
+    playerColor: string;
     x: number;
     y: number;
 }
@@ -76,6 +76,6 @@ interface IInformTurnResponse extends IResponse {
 interface IWinGameResponse extends IResponse {
     response: "winGame";
     roomKey: string;
-    clientColor: string;
+    playerColor: string;
 }
 

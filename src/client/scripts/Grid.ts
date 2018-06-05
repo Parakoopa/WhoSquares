@@ -12,7 +12,7 @@ export class Grid {
     private _overColor: number;
 
     /**
-     * Clients are talked to via socket and identified via unique id guid
+     * Players are talked to via socket and identified via unique id guid
      * @param gameManager
      * @param game
      */

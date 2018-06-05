@@ -1,8 +1,8 @@
 /**
- * A Room hosts a game for clients
- * Each client gets a color assigned
+ * A Room hosts a game for players
+ * Each player gets a color assigned
  */
-import {Client} from "./Client";
+import {Player} from "./Player";
 
 export class ServerGrid {
 
@@ -16,7 +16,7 @@ export class ServerGrid {
         this.createGrid(sizeX, sizeY);
     }
 
-    get grid(): IClient[][] {
+    get grid(): IPlayer[][] {
         return this._grid;
     }
 
@@ -25,21 +25,21 @@ export class ServerGrid {
     }
 
     private createGrid(sizeX: number, sizeY: number): void {
-        const client: Client = null; // default Value
+        const player: Player = null; // default Value
         const grid = [];
         for (let y = 0; y < sizeY; y++) {
-            const row: Client[] = [];
+            const row: Player[] = [];
             for (let x = 0; x < sizeX; x++) {
-                row[x] = client;
+                row[x] = player;
             }
             grid[y] = row;
         }
         this._grid = grid;
     }
 
-    public placeTile(client: Client, x: number, y: number): boolean {
+    public placeTile(player: Player, x: number, y: number): boolean {
         if (x < this._sizeX && y < this._sizeY) {
-            this._grid[x][y] = client;
+            this._grid[x][y] = player;
             return true;
         } else return false; // ToDo Someone is cheating
     }

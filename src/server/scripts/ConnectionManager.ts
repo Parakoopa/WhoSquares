@@ -1,5 +1,5 @@
 import {Socket} from "socket.io";
-import {Client} from "./Client";
+import {Player} from "./Player";
 import {IEvent} from "./Event";
 import {Lobby} from "./Lobby";
 import {Utility} from "./Utility";
@@ -7,13 +7,13 @@ import {Utility} from "./Utility";
 export class ConnectionManager {
 
     private _io: SocketIO.Server;
-    private readonly _clients: Client[];
+    private readonly _players: Player[];
     private _lobby: Lobby;
     private connectionCounter: number = 100;
 
     constructor( io: SocketIO.Server ) {
         this._lobby = new Lobby();
-        this._clients = [];
+        this._players = [];
         this._io = io;
     }
 
@@ -23,37 +23,37 @@ export class ConnectionManager {
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const connectionEvent: IEvent = this.addClient(new Client(socket, Utility.getGUID(), "" + this.connectionCounter++));
+            const connectionEvent: IEvent = this.addPlayer(new Player(socket, Utility.getGUID(), "" + this.connectionCounter++));
             this.emitEvent(connectionEvent);
 
             // Disconnect
             socket.on("disconnect", () => {
-                this.removeClient(socket);
+                this.removePlayer(socket);
             });
 
-            // Client requests to join specific room
+            // Player requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
-                const joinEvents: IEvent[] = this._lobby.joinRoom(this.clientBySocket(socket), req);
+                const joinEvents: IEvent[] = this._lobby.joinRoom(this.playerBySocket(socket), req);
                 this.emitEvents(joinEvents);
             });
 
-            // Client requests to join specific room
+            // Player requests to join specific room
             socket.on("leaveRoom", (req: ILeaveRoomRequest) => {
-                const leftEvents: IEvent[] = this._lobby.leaveRoom(this.clientBySocket(socket), req);
+                const leftEvents: IEvent[] = this._lobby.leaveRoom(this.playerBySocket(socket), req);
                 this.emitEvents(leftEvents);
             });
 
-            // Start Game, create Grid, inform Clients
+            // Start Game, create Grid, inform Players
             socket.on("startGame", (req: IStartGameRequest) => {
-                const client: Client = this.clientBySocket(socket);
-                const startEvents: IEvent[] = this._lobby.startGame(client, req.sizeX, req.sizeY);
+                const player: Player = this.playerBySocket(socket);
+                const startEvents: IEvent[] = this._lobby.startGame(player, req.sizeX, req.sizeY);
                 this.emitEvents(startEvents);
             });
 
             // A player colors a certain tile
             socket.on("placeTile", (req: IPlaceTileRequest) => {
-                const client: Client = this.clientBySocket(socket);
-                const placeEvents: IEvent[] =  client.getRoom().placeTile(client, req.x, req.y);
+                const player: Player = this.playerBySocket(socket);
+                const placeEvents: IEvent[] =  player.getRoom().placeTile(player, req.x, req.y);
                 this.emitEvents(placeEvents);
             });
 
@@ -62,18 +62,18 @@ export class ConnectionManager {
     }
 
     /**
-     * Emits a Response to all clients listed in IEvent
+     * Emits a Response to all players listed in IEvent
      * @param {IEvent} event
      */
     private emitEvent(event: IEvent): void {
-        console.log("Emitted to Clients: " + event.name + " to: " + event.clients);
-        for (let i = 0; i < event.clients.length; i++) {
-            event.clients[i].getSocket().emit(event.name, event.response);
+        console.log("Emitted to Players: " + event.name + " to: " + event.players);
+        for (let i = 0; i < event.players.length; i++) {
+            event.players[i].getSocket().emit(event.name, event.response);
         }
     }
 
     /**
-     * Emits Multiple Events made of Responses to multiple Clients
+     * Emits Multiple Events made of Responses to multiple Players
      * @param {IEvent[]} events
      */
     private emitEvents(events: IEvent[]): void {
@@ -84,48 +84,48 @@ export class ConnectionManager {
 
     /**
      * Save
-     * @param {Client} client
+     * @param {Player} player
      * @returns {IEvent}
      */
-    private addClient(client: Client): IEvent {
-        this._clients.push(client);
-        const response =  {response: "connected", clientKey: client.getKey()} as IConnectedResponse;
-        return {clients: [client], name: "connected", response};
+    private addPlayer(player: Player): IEvent {
+        this._players.push(player);
+        const response =  {response: "connected", playerKey: player.getKey()} as IConnectedResponse;
+        return {players: [player], name: "connected", response};
     }
 
     /**
-     * Removes Client from List of connected clients
+     * Removes Player from List of connected players
      * @param {SocketIO.Socket} socket
      * @constructor
      */
-    private removeClient(socket: Socket): void {
-        const client: Client = this.clientBySocket(socket);
-        const index: number = this._clients.indexOf(client);
-        if (index > -1) this._clients.splice(index, 1);
+    private removePlayer(socket: Socket): void {
+        const player: Player = this.playerBySocket(socket);
+        const index: number = this._players.indexOf(player);
+        if (index > -1) this._players.splice(index, 1);
     }
 
     /**
-     * Return client of this specific socket
+     * Return player of this specific socket
      * @param {SocketIO.Socket} socket
-     * @returns {Client}
+     * @returns {Player}
      * @constructor
      */
-    private clientBySocket(socket: Socket): Client {
-        for (const client of this._clients) {
-            if (client.getSocket() === socket) return client;
+    private playerBySocket(socket: Socket): Player {
+        for (const player of this._players) {
+            if (player.getSocket() === socket) return player;
         }
         return null;
     }
 
     /**
-     * Return Client based on key
+     * Return Player based on key
      * @param {string} key
-     * @returns {Client}
+     * @returns {Player}
      * @constructor
      */
-    private clientByKey(key: string): Client {
-        for (const client of this._clients) {
-            if (client.getKey() === key) return client;
+    private playerByKey(key: string): Player {
+        for (const player of this._players) {
+            if (player.getKey() === key) return player;
         }
         return null;
     }
