@@ -1,11 +1,11 @@
-import {Player} from "./Player";
+import {Client} from "./Client/Client";
 import {IEvent} from "./Event";
-import {Room} from "./Room";
+import {Room} from "./Room/Room";
 import {Utility} from "./Utility";
 
 export class Lobby {
 
-    private _minimumPlayersPerGame: number = 1;
+    private _minimumClientsPerGame: number = 1;
     private readonly _rooms: Room[];
     private _maxRoomSize: number = 10;
 
@@ -16,34 +16,34 @@ export class Lobby {
         this._rooms = [];
     }
     /**
-     * Tell all Players to start GameManager
+     * Tell all Clients to start GameManager
      * @constructor
      */
-    public startGame(player: Player, sizeX: number, sizeY: number): IEvent[] {
-        const room: Room = player.room;
+    public startGame(client: Client, sizeX: number, sizeY: number): IEvent[] {
+        const room: Room = client.room;
         if(!room) return; //ToDo Not in a room response (hide button)s
-        if (room.Owner() === player ) {
-            if (room.players.length < this._minimumPlayersPerGame) {
-                // ToDo Add NotEnoughPlayer Reponse
+        if (room.Owner() === client ) {
+            if (room.clients.length < this._minimumClientsPerGame) {
+                // ToDo Add NotEnoughClient Reponse
             }
             const sizes = this.adjustGameSize(sizeX, sizeY);
             sizeX = sizes[0];
             sizeY = sizes[1];
 
             room.createGame(sizeX, sizeY);
-            const turnColor = player.color;
+            const turnColor = client.color;
 
-            const players = room.players;
+            const clients = room.clients;
             const startResponse =  {response: "startGame", sizeX, sizeY};
-            const startEvent: IEvent = {players, name: "startGame", response: startResponse};
+            const startEvent: IEvent = {clients, name: "startGame", response: startResponse};
 
             const informResponse =   {response: "informTurn", turnColor};
-            const informEvent: IEvent = {players, name: "informTurn", response: informResponse};
+            const informEvent: IEvent = {clients, name: "informTurn", response: informResponse};
 
             return [startEvent, informEvent];
         } else {
             const notOwnerResponse = {response: "notOwner"};
-            const informEvent: IEvent = {players: [player], name: "startGame", response: notOwnerResponse};
+            const informEvent: IEvent = {clients: [client], name: "startGame", response: notOwnerResponse};
             return [informEvent];
         }
     }
@@ -64,67 +64,59 @@ export class Lobby {
 
     /**
      * Create Room if necessary
-     * Return responses: RoomIsFull or JoinedRoom + playerCount
-     * @param {Player} player
+     * Return responses: RoomIsFull or JoinedRoom + clientCount
+     * @param {Client} client
      * @param req
      * @returns {string}
      * @constructor
      */
-    public joinRoom(player: Player, req: IJoinRoomRequest): IEvent[] {
+    public joinRoom(client: Client, req: IJoinRoomRequest): IEvent[] {
         let room: Room = this.roomByName(req.roomName);
         if (room === null)room = this.createRoom(req.roomName);
 
-        else if (room.players.length > room.size) {
+        else if (room.clients.length > room.size) {
             const response: IRoomIsFullResponse = {response: "roomIsFull"};
-            return [{players: [player], name: "roomIsFull", response}];
+            return [{clients: [client], name: "roomIsFull", response}];
         }
 
-        if (!room.ContainsPlayer(player)) {
-            const joinedEvent: IEvent = this.joinedEvent(player, room);
-            const otherJoinedEvent: IEvent = this.otherJoinedEvent(player);
+        if (!room.ContainsClient(client)) {
+            const joinedEvent: IEvent = this.joinedEvent(client, room);
+            const otherJoinedEvent: IEvent = this.otherJoinedEvent(client);
             return [joinedEvent, otherJoinedEvent];
         }
     }
 
-    private joinedEvent(player: Player, room: Room): IEvent {
-        const otherPlayers = Array<IPlayer>();
-        for (const curPlayer of room.players) {
-            otherPlayers.push({
-                name: curPlayer.name,
-                color: curPlayer.color
-            });
-        }
+    private joinedEvent(client: Client, room: Room): IEvent {
         const response: IJoinedResponse = {response: "joinedRoom",
             roomName: room.name,
             roomKey: room.key,
-            color: room.AddPlayer(player),
-            otherPlayers};
-        return{players: [player], name: "joinedRoom", response};
+            color: room.AddClient(client),
+            otherPlayers: room.players};
+        return{clients: [client], name: "joinedRoom", response};
     }
 
-    private otherJoinedEvent(player: Player): IEvent {
-        const otherPlayer = {name: player.name, color: player.color};
-        const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherPlayer};
-        return {players: player.room.players, name: "otherJoinedRoom", response};
+    private otherJoinedEvent(client: Client): IEvent {
+        const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherPlayer: client.player};
+        return {clients: client.room.clients, name: "otherJoinedRoom", response};
 
     }
 
-    public leaveRoom(player: Player, req: ILeaveRoomRequest): IEvent[] {
+    public leaveRoom(client: Client, req: ILeaveRoomRequest): IEvent[] {
         const room: Room = this.roomByKey(req.roomKey);
-        if (room === null) return; // ToDo notfiy player that room does not exist
-        if (!room.RemovePlayer(player)) return; // ToDo Notify player that player is not in this room
-        return this.leaveEvent(player, room);
+        if (room === null) return; // ToDo notfiy client that room does not exist
+        if (!room.RemoveClient(client)) return; // ToDo Notify client that client is not in this room
+        return this.leaveEvent(client, room);
     }
 
-    private leaveEvent(player: Player, room: Room): IEvent[] {
+    private leaveEvent(client: Client, room: Room): IEvent[] {
         const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.key};
-        const leftEvent: IEvent = {players: [player], name: "leftRoom", response: leftResponse};
+        const leftEvent: IEvent = {clients: [client], name: "leftRoom", response: leftResponse};
 
         const otherLeftresponse: IOtherLeftResponse = {response: "otherLeftRoom",
             roomKey: room.key,
-            name: player.name
+            name: client.name
         };
-        const otherLeftEvent: IEvent = {players: room.GetPlayersExcept(player), name: "otherLeftRoom", response: otherLeftresponse};
+        const otherLeftEvent: IEvent = {clients: room.GetClientsExcept(client), name: "otherLeftRoom", response: otherLeftresponse};
         return[leftEvent, otherLeftEvent];
     }
 
