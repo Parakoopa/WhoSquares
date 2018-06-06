@@ -24,21 +24,17 @@ export class GameManager {
     private _responseReceiver: ResponseReceiver;
 
     constructor() {
-        this._socket = io();
-        this._responseReceiver = new ResponseReceiver(this, this._socket);
 
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
             preload() {
               self.centerGame(game);
               self.loadImages(game);
-                // Manage Input
               self._inputManager = new InputManager(game);
-
             },
             create() {
-                self.createButtons(game);
                 self.createTexts(game);
+                self.createButtons(game);
             },
             update() {
                 self._textElement.text = self._textMessage;
@@ -48,6 +44,8 @@ export class GameManager {
                 }
         });
         this._game = game;
+        this._socket = io();
+        this._responseReceiver = new ResponseReceiver(this, this._socket);
     }
 
     /**
@@ -80,16 +78,16 @@ export class GameManager {
     private createButtons(game: Game): void {
         const startButton = game.add.button(
             game.world.centerX - 82, 10, "startButton",
-            () => this.startGame(), this, 2, 1, 0);
+            () => this._inputManager.startGame(), this, 2, 1, 0);
         const joinRoomButton1 = game.add.button(
             game.world.centerX + 118, 400, "joinRoom01",
-            () => this.joinRoom("room01"), this, 2, 1, 0);
+            () => this._inputManager.joinRoom("room01"), this, 2, 1, 0);
         const joinRoomButton2 = game.add.button(
             game.world.centerX + 118,  470, "joinRoom02",
-            () => this.joinRoom("room02"), this, 2, 1, 0);
+            () => this._inputManager.joinRoom("room02"), this, 2, 1, 0);
         const leaveRoomButton = game.add.button(
             game.world.centerX + 118,  540, "leaveRoom",
-            () => this.leaveRoom(), this, 2, 1, 0);
+            () => this._inputManager.leaveRoom(), this, 2, 1, 0);
     }
 
     /**
@@ -140,6 +138,11 @@ export class GameManager {
 
     public RequestEmitter(localPlayer: LocalPlayer) {
         this._requestEmitter = new RequestEmitter(this._socket, localPlayer);
+        this._inputManager.requestEmitter = this._requestEmitter;
+    }
+
+    public roomList(text: string): void {
+        this._roomListMessage = text;
     }
 
     public color(color: number): void {
@@ -147,17 +150,13 @@ export class GameManager {
     }
 
     public createGrid(sizeX: number, sizeY: number, color: number) {
-        this._grid = new Grid(this, this._game);
+        this._grid = new Grid(this._game, this._inputManager);
         this._grid.createGrid("gridTile", sizeX, sizeY, 40, color);
     }
 
     public destroyGrid() {
         if (!this._grid) return; // Game has not yet started
         this._grid.destroy();
-    }
-
-    public placeTile(x: number, y: number): void {
-          this._requestEmitter.placeTile(x, y);
     }
 
     public placedTile(color: number, x: number, y: number): void {
@@ -170,23 +169,6 @@ export class GameManager {
 
     public roomName(text: string): void {
         this._roomNameMessage = "room: " + text;
-    }
-
-    public roomList(text: string): void {
-        this._roomListMessage = text;
-    }
-
-    private joinRoom(roomName: string): void {
-        this._requestEmitter.joinRoom(roomName);
-    }
-
-    private leaveRoom(): void {
-        this._requestEmitter.leaveRoom();
-    }
-
-    private startGame() {
-        // ToDo Add InputFields to set sizeX & sizeY
-        this._requestEmitter.startGame(5, 5);
     }
 
     public turnInfo(color: number): void {

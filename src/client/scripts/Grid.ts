@@ -1,26 +1,21 @@
 import Sprite = Phaser.Sprite;
 import {GameManager} from "./GameManager";
 import Game = Phaser.Game;
+import {InputManager} from "./InputManager";
 
 export class Grid {
 
     private _grid: Sprite[][];
     private _sizeX: number;
     private _sizeY: number;
-    private readonly _gameManager: GameManager;
-    private _game: Phaser.Game;
     private _overColor: number;
 
     /**
      * Players are talked to via socket and identified via unique id guid
-     * @param gameManager
-     * @param game
+     * @param _game
+     * @param _inputManager
      */
-    constructor(gameManager: GameManager, game: Game) {
-        this._gameManager = gameManager;
-        this._game = game;
-
-    }
+    constructor(private _game: Game, private _inputManager: InputManager) {}
 
     public sizeX(): number {
         return this._sizeX;
@@ -110,6 +105,6 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     public onDown(sprite: Sprite) {
-        this._gameManager.placeTile(sprite.data.x, sprite.data.y);
+        this._inputManager.placeTile(sprite.data.x, sprite.data.y);
     }
 }
