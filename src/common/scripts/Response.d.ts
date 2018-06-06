@@ -10,7 +10,8 @@ interface IResponse {
 
 interface IConnectedResponse extends IResponse {
     response: "connected";
-    playerKey: string;
+    player: IPlayer;
+    key: string;
 }
 
 interface IRoomIsFullResponse extends IResponse {

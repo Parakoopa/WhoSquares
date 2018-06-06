@@ -1,5 +1,6 @@
 import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
+import {LocalPlayer} from "./LocalPlayer";
 import Game = Phaser.Game;
 import Sprite = Phaser.Sprite;
 import {RequestEmitter} from "./RequestEmitter";
@@ -25,7 +26,6 @@ export class GameManager {
     constructor() {
         this._socket = io();
         this._responseReceiver = new ResponseReceiver(this, this._socket);
-        this._requestEmitter = new RequestEmitter(this, this._socket);
 
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
@@ -138,16 +138,21 @@ export class GameManager {
         this._turnInfoSprite.tint = 0xcccccc;
     }
 
+    public RequestEmitter(localPlayer: LocalPlayer) {
+        this._requestEmitter = new RequestEmitter(this._socket, localPlayer);
+    }
+
     public color(color: number): void {
         this._color = color;
     }
 
-    public createGrid(sizeX: number, sizeY: number) {
+    public createGrid(sizeX: number, sizeY: number, color: number) {
         this._grid = new Grid(this, this._game);
-        this._grid.createGrid("gridTile", sizeX, sizeY, 40, this._color);
+        this._grid.createGrid("gridTile", sizeX, sizeY, 40, color);
     }
 
     public destroyGrid() {
+        if (!this._grid) return; // Game has not yet started
         this._grid.destroy();
     }
 
