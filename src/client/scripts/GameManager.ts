@@ -9,13 +9,12 @@ import {UiManager} from "./UiManager";
 export class GameManager {
 
     private _game: Game;
+    private _socket: SocketIOClient.Socket;
     private _inputManager: InputManager;
     private _uiManager: UiManager;
-    private _grid: Grid;
-    private _color: number = 0xffffff;
-    private _socket: SocketIOClient.Socket;
     private _requestEmitter: RequestEmitter;
     private _responseReceiver: ResponseReceiver;
+    private _grid: Grid;
 
     constructor() {
 
@@ -26,18 +25,19 @@ export class GameManager {
               self.loadImages(game);
               self._inputManager = new InputManager(game);
               self._uiManager = new UiManager(game, self._inputManager);
+              console.log(self._uiManager);
             },
             create() {
                 self._uiManager.createUi();
+                self._game = game;
+                self._socket = io();
+                self._responseReceiver = new ResponseReceiver(self, self._socket, self._uiManager);
             },
             update() {
                 self._uiManager.update();
                 self._inputManager.debug();
-                }
+            }
         });
-        this._game = game;
-        this._socket = io();
-        this._responseReceiver = new ResponseReceiver(this, this._socket);
     }
 
     /**
@@ -68,22 +68,6 @@ export class GameManager {
         this._inputManager.requestEmitter = this._requestEmitter;
     }
 
-    public textElement(text: string): void {
-        this._uiManager.textElement(text);
-    }
-
-    public roomName(text: string): void {
-        this._uiManager.roomName(text);
-    }
-
-    public roomList(text: string): void {
-        this._uiManager.roomList(text);
-    }
-
-    public color(color: number): void {
-        this._color = color;
-    }
-
     public createGrid(sizeX: number, sizeY: number, color: number) {
         this._grid = new Grid(this._game, this._inputManager);
         this._grid.createGrid("gridTile", sizeX, sizeY, 40, color);
@@ -96,14 +80,6 @@ export class GameManager {
 
     public placedTile(color: number, x: number, y: number): void {
         this._grid.placedTile(color, x, y);
-    }
-
-    public turnInfo(color: number): void {
-        this._uiManager.turnInfo(color);
-    }
-
-    public winGame(color: string): void {
-        this._uiManager.winGame(color);
     }
 
 }

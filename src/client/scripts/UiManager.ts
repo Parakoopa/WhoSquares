@@ -5,10 +5,7 @@ import Sprite = Phaser.Sprite;
 export class UiManager {
 
     private _textElement: Phaser.Text = null;
-    private _textMessage = "";
-    private _roomListMessage = "Du bist in keinem Raum";
     private _roomListElement: Phaser.Text = null;
-    private _roomNameMessage = "";
     private _roomNameElement: Phaser.Text = null;
 
     private _turnInfoSprite: Sprite;
@@ -21,9 +18,7 @@ export class UiManager {
     }
 
     public update() {
-        this._textElement.text = this._textMessage;
-        this._roomListElement.text = this._roomListMessage;
-        this._roomNameElement.text = this._roomNameMessage;
+        // All Updates are currently event based - Woho!
     }
     /**
      * f.e. StartButton
@@ -53,7 +48,7 @@ export class UiManager {
         this._textElement = game.add.text(
             game.world.centerX,
             game.world.centerY * 0.35,
-            this._textMessage,
+            "Bla",
             {font: "32px Arial", fill: "#ff0044", align: "center"}
         );
         this._textElement.anchor.setTo(0.5, 0.5);
@@ -62,7 +57,7 @@ export class UiManager {
         this._roomNameElement = game.add.text(
             game.world.centerX * 1.6,
             game.world.centerY - 70,
-            this._roomNameMessage,
+            "Raumname",
             {font: "32px Arial", fill: "#ff0044", align: "center"}
         );
         this._roomNameElement.anchor.setTo(0.5, 0.5);
@@ -71,7 +66,7 @@ export class UiManager {
         this._roomListElement = game.add.text(
             game.world.centerX * 1.6,
             game.world.centerY,
-            this._roomListMessage,
+            "Du bist in keinem Raum",
             {font: "32px Arial", fill: "#ff0044", align: "center"}
         );
         this._roomListElement.anchor.setTo(0.5, 0.5);
@@ -91,15 +86,15 @@ export class UiManager {
     }
 
     public textElement(text: string): void {
-        this._textMessage = text;
+        this._textElement.text = text;
     }
 
     public roomName(text: string): void {
-        this._roomNameMessage = "room: " + text;
+        this._roomNameElement.text = "room: " + text;
     }
 
     public roomList(text: string): void {
-        this._roomListMessage = text;
+        this._roomListElement.text = text;
     }
 
     public turnInfo(color: number): void {
@@ -107,7 +102,7 @@ export class UiManager {
     }
 
     public winGame(color: string): void {
-        this._textMessage = "Winner: " + color;
+        this._textElement.text = "Winner: " + color;
     }
 
 }

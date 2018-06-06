@@ -1,6 +1,7 @@
 import {GameManager} from "./GameManager";
 import {LocalPlayer} from "./LocalPlayer";
 import {OtherPlayer} from "./OtherPlayer";
+import {UiManager} from "./UiManager";
 
 export class Room {
 
@@ -9,11 +10,12 @@ export class Room {
         private _roomKey: string,
         private _roomName: string,
         private _gameMan: GameManager,
+        private _uiManager: UiManager,
         private _otherPlayers: OtherPlayer[]
     ) {
        // this._gameMan.color(parseInt(resp.color, 16));
-        this._gameMan.textElement("you joined as: " + _localPlayer.color + " in:" + _roomKey);
-        this._gameMan.roomName(_roomName);
+        this._uiManager.textElement("you joined as: " + _localPlayer.color + " in:" + _roomKey);
+        this._uiManager.roomName(_roomName);
     }
 
     public get key(): string {
@@ -24,8 +26,8 @@ export class Room {
         this._roomName = null;
         this._roomKey = null;
         // ToDo reset color: this._gameMan.color(parseInt(resp.color, 16));
-        this._gameMan.textElement("left room");
-        this._gameMan.roomName("left room");
+        this._uiManager.textElement("left room");
+        this._uiManager.roomName("left room");
         this._gameMan.destroyGrid();
         this.resetPlayers();
     }
@@ -43,13 +45,13 @@ export class Room {
     public placedTile(resp: IPlacedTileResponse): void {
         const color: number = parseInt(resp.playerColor, 16);
         this._gameMan.placedTile(color, resp.x, resp.y);
-        this._gameMan.textElement(resp.response);
+        this._uiManager.textElement(resp.response);
     }
 
     public startedGame(resp: IStartGameResponse) {
         this._gameMan.createGrid(resp.sizeX, resp.sizeY, this._localPlayer.getColorHex());
         const textMessage: string = resp.response;
-        this._gameMan.textElement(textMessage);
+        this._uiManager.textElement(textMessage);
     }
 
     private playerByName(playerName: string): OtherPlayer {
@@ -87,7 +89,7 @@ export class Room {
         for (const player of this._otherPlayers) {
             roomList += player.name + "\n";
         }
-        this._gameMan.roomList(roomList);
+        this._uiManager.roomList(roomList);
 
     }
 

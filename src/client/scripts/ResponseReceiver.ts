@@ -3,12 +3,13 @@ import {GameManager} from "./GameManager";
 import {LocalPlayer} from "./LocalPlayer";
 import {OtherPlayer} from "./OtherPlayer";
 import {Room} from "./Room";
+import {UiManager} from "./UiManager";
 
 export class ResponseReceiver {
 
     private _localPlayer: LocalPlayer;
 
-    constructor(private _gameMan: GameManager, private _socket: Socket) {
+    constructor(private _gameMan: GameManager, private _socket: Socket, private _uiManager: UiManager) {
         this.eventListener();
     }
 
@@ -16,7 +17,7 @@ export class ResponseReceiver {
         // Initial Connection
         this._socket.on("connected", (resp: IConnectedResponse) => {
             this.addLocalPlayer(resp);
-            this._gameMan.textElement(resp.response + ":\n" +  this._localPlayer.name);
+            this._uiManager.textElement(resp.response + ":\n" +  this._localPlayer.name);
         });
         // Join room
         this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
@@ -36,7 +37,7 @@ export class ResponseReceiver {
             this._localPlayer.room.placedTile(resp);
         });
         this._socket.on("notYourTurn", (resp: INotYourTurnResponse) => {
-            this._gameMan.textElement(resp.response);
+            this._uiManager.textElement(resp.response);
         });
         // Start GameManager
         this._socket.on("startGame", (resp: IStartGameResponse) => {
@@ -45,10 +46,10 @@ export class ResponseReceiver {
 
         this._socket.on("informTurn", (resp: IInformTurnResponse) => {
             const color: number = parseInt(resp.turnColor, 16);
-            this._gameMan.turnInfo(color);
+            this._uiManager.turnInfo(color);
         });
         this._socket.on("winGame", (resp: IWinGameResponse) => {
-            this._gameMan.winGame(resp.playerColor);
+            this._uiManager.winGame(resp.playerColor);
         });
     }
 
@@ -63,12 +64,13 @@ export class ResponseReceiver {
                 resp.roomKey,
                 resp.roomName,
                 this._gameMan,
+                this._uiManager,
                 this.toOtherPlayer(resp.otherPlayers
                 ));
             this._localPlayer.color = resp.color;
             this._localPlayer.room = room;
         } else if (resp.response === "roomIsFull") {
-            this._gameMan.textElement(resp.response);
+            this._uiManager.textElement(resp.response);
         }
     }
 

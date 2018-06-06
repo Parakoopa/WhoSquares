@@ -7,8 +7,6 @@ export class InputManager {
         _game.input.mouse.capture = true;
     }
 
-
-
     public set requestEmitter(val: RequestEmitter) {
         this._requestEmitter = val;
     }
