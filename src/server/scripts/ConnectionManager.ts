@@ -1,9 +1,9 @@
 import {Socket} from "socket.io";
 import {Client} from "./Client/Client";
+import {Player} from "./Client/Player";
 import {IEvent} from "./Event";
 import {Lobby} from "./Lobby";
 import {Utility} from "./Utility";
-import {Player} from "./Client/Player";
 
 export class ConnectionManager {
 
@@ -24,8 +24,7 @@ export class ConnectionManager {
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const client: Client = new Client(socket, Utility.getGUID(), new Player("" + this.connectionCounter++));
-            const connectionEvent: IEvent = this.addClient(client);
+            const connectionEvent: IEvent = this.addClient(socket);
             this.emitEvent(connectionEvent);
 
             // Disconnect
@@ -86,12 +85,15 @@ export class ConnectionManager {
 
     /**
      * Save
-     * @param {Player} client
      * @returns {IEvent}
+     * @param socket
      */
-    private addClient(client: Client): IEvent {
+    private addClient(socket: Socket): IEvent {
+        const key = Utility.getGUID();
+        const player: IPlayer = new Player("" + this.connectionCounter++);
+        const client: Client = new Client(socket, key, player);
         this._clients.push(client);
-        const response =  {response: "connected", playerKey: client.key} as IConnectedResponse;
+        const response =  {response: "connected", player, key} as IConnectedResponse;
         return {clients: [client], name: "connected", response};
     }
 

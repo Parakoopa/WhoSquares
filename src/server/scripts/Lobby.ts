@@ -103,8 +103,8 @@ export class Lobby {
 
     public leaveRoom(client: Client, req: ILeaveRoomRequest): IEvent[] {
         const room: Room = this.roomByKey(req.roomKey);
-        if (room === null) return; // ToDo notfiy client that room does not exist
-        if (!room.RemoveClient(client)) return; // ToDo Notify client that client is not in this room
+        if (room === null) return []; // ToDo notfiy client that room does not exist
+        if (!room.RemoveClient(client)) return []; // ToDo Notify client that client is not in this room
         return this.leaveEvent(client, room);
     }
 
