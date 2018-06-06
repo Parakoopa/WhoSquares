@@ -1,6 +1,6 @@
 import Socket = SocketIOClient.Socket;
-import {Player} from "./Player";
 import {GameManager} from "./GameManager";
+import {OtherPlayer} from "./OtherPlayer";
 
 export class RequestManager {
 
@@ -9,7 +9,7 @@ export class RequestManager {
     private _playerKey: string;
     private _roomName: string;
     private _roomKey: string;
-    private _otherPlayers: Player[];
+    private _otherPlayers: OtherPlayer[];
 
     constructor(game: GameManager) {
         this._socket = io();
@@ -30,7 +30,6 @@ export class RequestManager {
             this.leftRoom(resp);
         });
         this._socket.on("otherLeftRoom", (resp: IOtherLeftResponse) => {
-            console.log("workssss");
             this.otherLeftRoom(resp);
         });
         this._socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
@@ -108,20 +107,17 @@ export class RequestManager {
     }
 
     private otherLeftRoom(resp: IOtherLeftResponse): void {
-        const player: Player = this.playerByName(resp.name);
-        console.log(player);
+        const player: OtherPlayer = this.playerByName(resp.name);
         this.removePlayer(player);
     }
 
     private otherJoinedRoom(resp: IOtherJoinedResponse): void {
-        const player: Player = new Player(resp.otherPlayer.name, resp.otherPlayer.color);
+        const player: OtherPlayer = new OtherPlayer(resp.otherPlayer);
         this.addPlayer(player);
     }
 
-    private playerByName(playerName: string): Player {
-        console.log(this._otherPlayers.length);
+    private playerByName(playerName: string): OtherPlayer {
         for (const player of this._otherPlayers) {
-            console.log(player.name + "   " + playerName);
             if (player.name === playerName) return player;
         }
         return null;
@@ -129,18 +125,17 @@ export class RequestManager {
     private addPlayers(players: IPlayer[]): void {
         this._otherPlayers = []; // Reset on Join Room
         for (const player of players) {
-            console.log("add Player: " + player.name);
-            this._otherPlayers.push(new Player(player.name, player.color));
+            this._otherPlayers.push(new OtherPlayer(player));
         }
         this.updateRoomList();
     }
 
-    private addPlayer(player: Player): void {
-        this._otherPlayers.push(new Player(player.name, player.color));
+    private addPlayer(player: OtherPlayer): void {
+        this._otherPlayers.push(player);
         this.updateRoomList();
     }
 
-    private removePlayer(player: Player): void {
+    private removePlayer(player: OtherPlayer): void {
         const index: number = this._otherPlayers.indexOf(player);
         if (index > -1) this._otherPlayers.splice(index, 1);
         this.updateRoomList();
