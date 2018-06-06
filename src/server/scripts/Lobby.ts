@@ -23,7 +23,7 @@ export class Lobby {
         const room: Room = player.room;
         if(!room) return; //ToDo Not in a room response (hide button)s
         if (room.Owner() === player ) {
-            if (room.getPlayers().length < this._minimumPlayersPerGame) {
+            if (room.players.length < this._minimumPlayersPerGame) {
                 // ToDo Add NotEnoughPlayer Reponse
             }
             const sizes = this.adjustGameSize(sizeX, sizeY);
@@ -33,7 +33,7 @@ export class Lobby {
             room.createGame(sizeX, sizeY);
             const turnColor = player.color;
 
-            const players = room.getPlayers();
+            const players = room.players;
             const startResponse =  {response: "startGame", sizeX, sizeY};
             const startEvent: IEvent = {players, name: "startGame", response: startResponse};
 
@@ -74,7 +74,7 @@ export class Lobby {
         let room: Room = this.roomByName(req.roomName);
         if (room === null)room = this.createRoom(req.roomName);
 
-        else if (room.getPlayers().length > room.Size()) {
+        else if (room.players.length > room.size) {
             const response: IRoomIsFullResponse = {response: "roomIsFull"};
             return [{players: [player], name: "roomIsFull", response}];
         }
@@ -88,15 +88,15 @@ export class Lobby {
 
     private joinedEvent(player: Player, room: Room): IEvent {
         const otherPlayers = Array<IPlayer>();
-        for (const curPlayer of room.getPlayers()) {
+        for (const curPlayer of room.players) {
             otherPlayers.push({
                 name: curPlayer.name,
                 color: curPlayer.color
             });
         }
         const response: IJoinedResponse = {response: "joinedRoom",
-            roomName: room.getName(),
-            roomKey: room.getKey(),
+            roomName: room.name,
+            roomKey: room.key,
             color: room.AddPlayer(player),
             otherPlayers};
         return{players: [player], name: "joinedRoom", response};
@@ -105,7 +105,7 @@ export class Lobby {
     private otherJoinedEvent(player: Player): IEvent {
         const otherPlayer = {name: player.name, color: player.color};
         const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherPlayer};
-        return {players: player.room.getPlayers(), name: "otherJoinedRoom", response};
+        return {players: player.room.players, name: "otherJoinedRoom", response};
 
     }
 
@@ -117,11 +117,11 @@ export class Lobby {
     }
 
     private leaveEvent(player: Player, room: Room): IEvent[] {
-        const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.getKey()};
+        const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.key};
         const leftEvent: IEvent = {players: [player], name: "leftRoom", response: leftResponse};
 
         const otherLeftresponse: IOtherLeftResponse = {response: "otherLeftRoom",
-            roomKey: room.getKey(),
+            roomKey: room.key,
             name: player.name
         };
         const otherLeftEvent: IEvent = {players: room.GetPlayersExcept(player), name: "otherLeftRoom", response: otherLeftresponse};
@@ -147,7 +147,7 @@ export class Lobby {
      */
     private roomByName(roomName: string): Room {
         for (const room of this._rooms) {
-            if (room.getName().toString() === roomName) return room;
+            if (room.name.toString() === roomName) return room;
         }
         return null;
     }
@@ -160,7 +160,7 @@ export class Lobby {
      */
     private roomByKey(roomKey: string): Room {
         for (const room of this._rooms) {
-            if (room.getKey() === roomKey) return room;
+            if (room.key === roomKey) return room;
         }
         return null;
     }

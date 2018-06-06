@@ -11,9 +11,6 @@ import {TurnManager} from "./TurnManager";
  */
 export class Room implements IRoom {
 
-    private readonly _key: string;
-    private readonly _size: number;
-    private _name: string;
     private _owner: Player;
     private readonly _players: Player[];
     private _serverGrid: ServerGrid;
@@ -21,29 +18,26 @@ export class Room implements IRoom {
     private _missionDistr: MissionDistributer;
     private _turnManager: TurnManager;
 
-    constructor(name: string, key: string, size: number) {
+    constructor(private _name: string, private _key: string, private _size: number) {
         this._players = [];
-        this._name = name;
-        this._key = key;
-        this._size = size;
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
         this._turnManager = new TurnManager();
     }
 
-    public getKey(): string {
-        return this._key;
-    }
-
-    public getName(): string {
+    public get name(): string {
         return this._name;
     }
 
-    public getPlayers(): Player[] {
+    public get key(): string {
+        return this._key;
+    }
+
+    public get players(): Player[] {
         return this._players;
     }
 
-    public Size(): number {
+    public get size(): number {
         return this._size;
     }
 
