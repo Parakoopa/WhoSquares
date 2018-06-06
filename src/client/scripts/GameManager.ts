@@ -1,8 +1,9 @@
 import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
-import {RequestManager} from "./RequestManager";
 import Game = Phaser.Game;
 import Sprite = Phaser.Sprite;
+import {RequestEmitter} from "./RequestEmitter";
+import {ResponseReceiver} from "./ResponseReceiver";
 
 export class GameManager {
 
@@ -13,13 +14,19 @@ export class GameManager {
     private _roomListElement: Phaser.Text = null;
     private _roomNameMessage = "";
     private _roomNameElement: Phaser.Text = null;
-    private _reqManager: RequestManager;
     private _inputManager: InputManager;
     private _grid: Grid;
     private _color: number = 0xffffff;
     private _turnInfoSprite: Sprite;
+    private _socket: SocketIOClient.Socket;
+    private _requestEmitter: RequestEmitter;
+    private _responseReceiver: ResponseReceiver;
 
     constructor() {
+        this._socket = io();
+        this._responseReceiver = new ResponseReceiver(this, this._socket);
+        this._requestEmitter = new RequestEmitter(this, this._socket);
+
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
             preload() {
@@ -144,17 +151,12 @@ export class GameManager {
         this._grid.destroy();
     }
 
-
     public placeTile(x: number, y: number): void {
-          this._reqManager.placeTile(x, y);
+          this._requestEmitter.placeTile(x, y);
     }
 
     public placedTile(color: number, x: number, y: number): void {
         this._grid.placedTile(color, x, y);
-    }
-
-    public reqManager(reqManager: RequestManager) {
-        this._reqManager = reqManager;
     }
 
     public textElement(text: string): void {
@@ -170,16 +172,16 @@ export class GameManager {
     }
 
     private joinRoom(roomName: string): void {
-        this._reqManager.joinRoom(roomName);
+        this._requestEmitter.joinRoom(roomName);
     }
 
     private leaveRoom(): void {
-        this._reqManager.leaveRoom();
+        this._requestEmitter.leaveRoom();
     }
 
     private startGame() {
         // ToDo Add InputFields to set sizeX & sizeY
-        this._reqManager.startGame(5, 5);
+        this._requestEmitter.startGame(5, 5);
     }
 
     public turnInfo(color: number): void {

@@ -2,21 +2,18 @@ import Socket = SocketIOClient.Socket;
 import {GameManager} from "./GameManager";
 import {OtherPlayer} from "./OtherPlayer";
 
-export class RequestManager {
+export class ResponseReceiver {
 
-    private _socket: Socket;
-    private _gameMan: GameManager;
     private _playerKey: string;
     private _roomName: string;
     private _roomKey: string;
     private _otherPlayers: OtherPlayer[];
 
-    constructor(game: GameManager) {
-        this._socket = io();
-        this._gameMan = game;
+    constructor(private _gameMan: GameManager, private _socket: Socket) {
+        this.eventListener();
     }
 
-    public eventListener() {
+    private eventListener() {
         // Initial Connection
         this._socket.on("connected", (resp: IConnectedResponse) => {
             this._playerKey = resp.playerKey;
