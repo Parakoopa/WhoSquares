@@ -158,10 +158,10 @@ export class Room implements IRoom {
         return [notYourTurnEvent];
     }
 
-    private winGameEvent(clientColor: string, roomKey: string): IEvent[] {
-        const response =  {response: "winGame", roomKey, clientColor};
-        const notYourTurnEvent: IEvent = {clients: this._clients, name: "winGame", response};
-        return [notYourTurnEvent];
+    private winGameEvent(roomKey: string, playerColor: string): IEvent[] {
+        const response: IWinGameResponse =  {response: "winGame", roomKey, playerColor};
+        const winGameEvent: IEvent = {clients: this._clients, name: "winGame", response};
+        return [winGameEvent];
     }
 
 }
