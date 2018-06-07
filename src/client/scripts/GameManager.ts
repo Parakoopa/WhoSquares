@@ -67,6 +67,8 @@ export class GameManager {
             this._uiManager.textElement(resp.response);
         } else {
             this._localPlayer.joinedRoom(resp);
+            this._uiManager.textElement("joined Room - Color: " + resp.color);
+            this._uiManager.roomName(resp.roomName);
         }
         this.updateRoomList();
     }

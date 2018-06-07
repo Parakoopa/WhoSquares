@@ -42,6 +42,14 @@ export class Room implements IRoom {
         return players;
     }
 
+    public getPlayersExcept(client: IPlayer): IPlayer[] {
+        const players: IPlayer[] = [];
+        for (const curClient of this.clients) {
+            if (client !== curClient) players.push(curClient.player);
+        }
+        return players;
+    }
+
     public get clients(): Client[] {
         return this._clients;
     }
@@ -107,14 +115,16 @@ export class Room implements IRoom {
      * @returns {boolean}
      * @constructor
      */
-    public ContainsClient(client: Client) {
+    public containsClient(client: Client) {
         return this._clients.indexOf(client) > -1;
     }
 
-    public GetClientsExcept(client: Client): Client[] {
-        const clients: Client[] = this._clients;
-        const index = clients.indexOf(client);
-        return clients.slice(index);
+    public getClientsExcept(client: Client): Client[] {
+        const clients: Client[] = [];
+        for (const curClient of this.clients) {
+            if (client !== curClient) clients.push(curClient);
+        }
+        return clients;
     }
 
     // Grid Interaction

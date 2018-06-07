@@ -17,6 +17,8 @@ export class RequestEmitter {
     }
 
     public startGame(sizeX: number, sizeY: number): void {
+        if (!this._localPlayer.room) return; // ToDo display not in a room message
+        console.log(this._localPlayer);
         const playerKey = this._localPlayer.key;
         const roomKey = this._localPlayer.room.key;
         this._socket.emit("startGame", {request: "startGame", playerKey, roomKey, sizeX, sizeY});

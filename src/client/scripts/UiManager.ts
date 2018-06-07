@@ -66,7 +66,7 @@ export class UiManager {
         // RoomName
         this._roomNameElement = game.add.text(
             game.world.centerX * 1.6,
-            game.world.centerY - 70,
+            game.world.centerY - 130,
             "Raumname",
             {font: "32px Arial", fill: "#ff0044", align: "center"}
         );

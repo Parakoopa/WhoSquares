@@ -34,13 +34,18 @@ export class ConnectionManager {
 
             // Client requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
-                const joinEvents: IEvent[] = this._lobby.joinRoom(this.clientBySocket(socket), req);
+                const client: Client = this.clientBySocket(socket);
+                if (client.room) { // leave existing room
+                    const leaveEvent: IEvent[] = this._lobby.leaveRoom(client, client.room.key);
+                    this.emitEvents(leaveEvent); // ToDo maybe make SwitchRoomResponse to be safe
+                }
+                const joinEvents: IEvent[] = this._lobby.joinRoom(client, req);
                 this.emitEvents(joinEvents);
             });
 
             // Player requests to join specific room
             socket.on("leaveRoom", (req: ILeaveRoomRequest) => {
-                const leftEvents: IEvent[] = this._lobby.leaveRoom(this.clientBySocket(socket), req);
+                const leftEvents: IEvent[] = this._lobby.leaveRoom(this.clientBySocket(socket), req.roomKey);
                 this.emitEvents(leftEvents);
             });
 
@@ -69,6 +74,7 @@ export class ConnectionManager {
     private emitEvent(event: IEvent): void {
         console.log("Emitted to Players: " + event.name + " to: " + event.clients);
         for (let i = 0; i < event.clients.length; i++) {
+            console.log("bla");
             event.clients[i].socket.emit(event.name, event.response);
         }
     }

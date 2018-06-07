@@ -21,7 +21,7 @@ export class Lobby {
      */
     public startGame(client: Client, sizeX: number, sizeY: number): IEvent[] {
         const room: Room = client.room;
-        if(!room) return; //ToDo Not in a room response (hide button)s
+        if (!room) return []; // ToDo Not in a room response (hide button)s
         if (room.Owner() === client ) {
             if (room.clients.length < this._minimumClientsPerGame) {
                 // ToDo Add NotEnoughClient Reponse
@@ -73,36 +73,35 @@ export class Lobby {
     public joinRoom(client: Client, req: IJoinRoomRequest): IEvent[] {
         let room: Room = this.roomByName(req.roomName);
         if (room === null)room = this.createRoom(req.roomName);
-
         else if (room.clients.length > room.size) {
             const response: IRoomIsFullResponse = {response: "roomIsFull"};
             return [{clients: [client], name: "roomIsFull", response}];
         }
 
-        if (!room.ContainsClient(client)) {
-            const joinedEvent: IEvent = this.joinedEvent(client, room);
-            const otherJoinedEvent: IEvent = this.otherJoinedEvent(client);
-            return [joinedEvent, otherJoinedEvent];
-        }
+        if (room.containsClient(client)) return []; // ToDo tellclient h already is in this room
+        const joinedEvent: IEvent = this.joinedEvent(client, room);
+        const otherJoinedEvent: IEvent = this.otherJoinedEvent(client); // This first as client is not in room yet
+        return [joinedEvent, otherJoinedEvent];
     }
 
     private joinedEvent(client: Client, room: Room): IEvent {
-        const response: IJoinedResponse = {response: "joinedRoom",
+        const response: IJoinedResponse = {
+            response: "joinedRoom",
             roomName: room.name,
             roomKey: room.key,
             color: room.AddClient(client),
-            otherPlayers: room.players};
+            otherPlayers: room.getPlayersExcept(client)};
         return{clients: [client], name: "joinedRoom", response};
     }
 
     private otherJoinedEvent(client: Client): IEvent {
         const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherPlayer: client.player};
-        return {clients: client.room.clients, name: "otherJoinedRoom", response};
+        return {clients: client.room.getClientsExcept(client), name: "otherJoinedRoom", response};
 
     }
 
-    public leaveRoom(client: Client, req: ILeaveRoomRequest): IEvent[] {
-        const room: Room = this.roomByKey(req.roomKey);
+    public leaveRoom(client: Client, roomKey: string): IEvent[] {
+        const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
         if (!room.RemoveClient(client)) return []; // ToDo Notify client that client is not in this room
         return this.leaveEvent(client, room);
@@ -112,11 +111,11 @@ export class Lobby {
         const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.key};
         const leftEvent: IEvent = {clients: [client], name: "leftRoom", response: leftResponse};
 
-        const otherLeftresponse: IOtherLeftResponse = {response: "otherLeftRoom",
+        const otherLeftResponse: IOtherLeftResponse = {response: "otherLeftRoom",
             roomKey: room.key,
             name: client.name
         };
-        const otherLeftEvent: IEvent = {clients: room.GetClientsExcept(client), name: "otherLeftRoom", response: otherLeftresponse};
+        const otherLeftEvent: IEvent = {clients: room.getClientsExcept(client), name: "otherLeftRoom", response: otherLeftResponse};
         return[leftEvent, otherLeftEvent];
     }
 
