@@ -1,57 +1,55 @@
-import {GameManager} from "./GameManager";
-import {LocalPlayer} from "./LocalPlayer";
+import {Grid} from "./Grid";
 import {OtherPlayer} from "./OtherPlayer";
-import {UiManager} from "./UiManager";
 
 export class Room {
 
+    private _otherPlayers: OtherPlayer[];
+    private _grid: Grid;
+
     constructor(
-        private _localPlayer: LocalPlayer,
         private _roomKey: string,
         private _roomName: string,
-        private _gameMan: GameManager,
-        private _uiManager: UiManager,
-        private _otherPlayers: OtherPlayer[]
+        otherPlayers: IPlayer[]
     ) {
-       // this._gameMan.color(parseInt(resp.color, 16));
-        this._uiManager.textElement("you joined as: " + _localPlayer.color + " in:" + _roomKey);
-        this._uiManager.roomName(_roomName);
+        this._otherPlayers = this.toOtherPlayer(otherPlayers);
     }
 
     public get key(): string {
         return this._roomKey;
     }
 
-    public leftRoom(resp: ILeftResponse): void {
-        this._roomName = null;
-        this._roomKey = null;
-        // ToDo reset color: this._gameMan.color(parseInt(resp.color, 16));
-        this._uiManager.textElement("left room");
-        this._uiManager.roomName("left room");
-        this._gameMan.destroyGrid();
-        this.resetPlayers();
+    public get name(): string {
+        return this._roomName;
     }
 
-    public otherLeftRoom(resp: IOtherLeftResponse): void {
-        const player: OtherPlayer = this.playerByName(resp.name);
+    public get otherPlayers(): OtherPlayer[] {
+        return this._otherPlayers;
+    }
+
+
+    public leftRoom(): void {
+        this._roomName = null;
+        this._roomKey = null;
+        this.resetPlayers();
+        if (this._grid) this._grid.destroy();
+    }
+
+    public otherLeftRoom(name: string): void {
+        const player: OtherPlayer = this.playerByName(name);
         this.removePlayer(player);
     }
 
-    public otherJoinedRoom(resp: IOtherJoinedResponse): void {
-        const player: OtherPlayer = new OtherPlayer(resp.otherPlayer);
+    public otherJoinedRoom(otherPlayer: IPlayer): void {
+        const player: OtherPlayer = new OtherPlayer(otherPlayer);
         this.addPlayer(player);
     }
 
-    public placedTile(resp: IPlacedTileResponse): void {
-        const color: number = parseInt(resp.playerColor, 16);
-        this._gameMan.placedTile(color, resp.x, resp.y);
-        this._uiManager.textElement(resp.response);
+    public placedTile(x: number, y: number, color: number): void {
+        this._grid.placedTile(color, x, y);
     }
 
-    public startedGame(resp: IStartGameResponse) {
-        this._gameMan.createGrid(resp.sizeX, resp.sizeY, this._localPlayer.getColorHex());
-        const textMessage: string = resp.response;
-        this._uiManager.textElement(textMessage);
+    public startedGame(grid: Grid) {
+        this._grid = grid;
     }
 
     private playerByName(playerName: string): OtherPlayer {
@@ -65,32 +63,27 @@ export class Room {
         for (const player of players) {
             this._otherPlayers.push(new OtherPlayer(player));
         }
-        this.updateRoomList();
     }
 
     private addPlayer(player: OtherPlayer): void {
         this._otherPlayers.push(player);
-        this.updateRoomList();
     }
 
     private removePlayer(player: OtherPlayer): void {
         const index: number = this._otherPlayers.indexOf(player);
         if (index > -1) this._otherPlayers.splice(index, 1);
-        this.updateRoomList();
     }
 
     private resetPlayers(): void {
         this._otherPlayers = [];
-        this.updateRoomList();
     }
 
-    private updateRoomList(): void {
-        let roomList: string = "";
-        for (const player of this._otherPlayers) {
-            roomList += player.name + "\n";
+    private toOtherPlayer(players: IPlayer[]): OtherPlayer[] {
+        const otherPlayers = []; // Reset on Join Room
+        for (const player of players) {
+            otherPlayers.push(new OtherPlayer(player));
         }
-        this._uiManager.roomList(roomList);
-
+        return otherPlayers;
     }
 
 }

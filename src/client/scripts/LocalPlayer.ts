@@ -45,9 +45,21 @@ export class LocalPlayer implements IPlayer {
         this._room = val;
     }
 
-
     public getColorHex(): number {
         console.log("color: "+ this._player.color);
         return  parseInt(this._player.color, 16);
+    }
+
+    /**
+     *
+     * @param {IRoomIsFullResponse | IJoinedResponse} resp
+     */
+    public joinedRoom(resp: IJoinedResponse): void {
+        this.room = new Room(
+            resp.roomKey,
+            resp.roomName,
+            resp.otherPlayers
+        );
+        this.color = resp.color;
     }
 }

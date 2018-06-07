@@ -3,7 +3,7 @@ import {LocalPlayer} from "./LocalPlayer";
 
 export class RequestEmitter {
 
-    constructor(private _socket: Socket, private _localPlayer: LocalPlayer) {}
+    constructor(private _socket: Socket, private _localPlayer: LocalPlayer = null) {}
 
     public joinRoom(roomName: string): void {
         const playerKey = this._localPlayer.key;

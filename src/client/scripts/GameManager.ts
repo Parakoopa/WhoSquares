@@ -1,20 +1,13 @@
-import {Grid} from "./Grid";
-import {InputManager} from "./InputManager";
-import {LocalPlayer} from "./LocalPlayer";
 import Game = Phaser.Game;
-import {RequestEmitter} from "./RequestEmitter";
-import {ResponseReceiver} from "./ResponseReceiver";
+import {LocalPlayer} from "./LocalPlayer";
 import {UiManager} from "./UiManager";
 
 export class GameManager {
 
     private _game: Game;
     private _socket: SocketIOClient.Socket;
-    private _inputManager: InputManager;
     private _uiManager: UiManager;
-    private _requestEmitter: RequestEmitter;
-    private _responseReceiver: ResponseReceiver;
-    private _grid: Grid;
+    private _localPlayer: LocalPlayer;
 
     constructor() {
 
@@ -23,19 +16,16 @@ export class GameManager {
             preload() {
               self.centerGame(game);
               self.loadImages(game);
-              self._inputManager = new InputManager(game);
-              self._uiManager = new UiManager(game, self._inputManager);
+              self._uiManager = new UiManager(game);
               console.log(self._uiManager);
             },
             create() {
                 self._uiManager.createUi();
                 self._game = game;
                 self._socket = io();
-                self._responseReceiver = new ResponseReceiver(self, self._socket, self._uiManager);
             },
             update() {
                 self._uiManager.update();
-                self._inputManager.debug();
             }
         });
     }
@@ -63,23 +53,56 @@ export class GameManager {
 
     }
 
-    public RequestEmitter(localPlayer: LocalPlayer) {
-        this._requestEmitter = new RequestEmitter(this._socket, localPlayer);
-        this._inputManager.requestEmitter = this._requestEmitter;
+    public addLocalPlayer(player: IPlayer, key: string): void {
+        this._localPlayer = new LocalPlayer(player, key);
+        this._uiManager.inputManager.createRequestEmitter(this._socket, this._localPlayer);
+        this._uiManager.textElement("LocalPlayer: " +  this._localPlayer.name);
     }
 
-    public createGrid(sizeX: number, sizeY: number, color: number) {
-        this._grid = new Grid(this._game, this._inputManager);
-        this._grid.createGrid("gridTile", sizeX, sizeY, 40, color);
+    public joinedRoom(resp: IRoomIsFullResponse | IJoinedResponse) {
+        if (resp.response === "roomIsFull") {
+            this._uiManager.textElement(resp.response);
+        } else {
+            this._localPlayer.joinedRoom(resp);
+        }
+        this.updateRoomList();
     }
 
-    public destroyGrid() {
-        if (!this._grid) return; // Game has not yet started
-        this._grid.destroy();
+
+    public leftRoom(): void {
+        this._localPlayer.room.leftRoom();
+        this._uiManager.textElement("left room");
+        this._uiManager.roomName("left room");
+        this.updateRoomList();
     }
 
-    public placedTile(color: number, x: number, y: number): void {
-        this._grid.placedTile(color, x, y);
+    public otherJoinedRoom(otherPlayer: IPlayer): void {
+        this._localPlayer.room.otherJoinedRoom(otherPlayer);
+        this.updateRoomList();
+    }
+
+    public otherLeftRoom(name: string): void {
+        this._localPlayer.room.otherLeftRoom(name);
+        this.updateRoomList();
+    }
+
+    public startedGame(sizeX: number, sizeY: number): void {
+        this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX,sizeY, this._localPlayer.getColorHex()));
+        this._uiManager.textElement("Started game");
+    }
+
+    public placedTile(x: number, y: number, color: number): void {
+        this._localPlayer.room.placedTile(x, y, color);
+        this._uiManager.textElement(color + " played tile on:" + x + "|" + y);
+    }
+
+    private updateRoomList(): void {
+        let roomList: string = "";
+        for (const player of this._localPlayer.room.otherPlayers) {
+            roomList += player.name + "\n";
+        }
+        this._uiManager.roomList(roomList);
+
     }
 
 }

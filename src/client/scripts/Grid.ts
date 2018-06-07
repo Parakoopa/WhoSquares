@@ -1,5 +1,4 @@
 import Sprite = Phaser.Sprite;
-import {GameManager} from "./GameManager";
 import Game = Phaser.Game;
 import {InputManager} from "./InputManager";
 

@@ -1,6 +1,7 @@
 import Game = Phaser.Game;
-import {InputManager} from "./InputManager";
 import Sprite = Phaser.Sprite;
+import {Grid} from "./Grid";
+import {InputManager} from "./InputManager";
 
 export class UiManager {
 
@@ -9,8 +10,11 @@ export class UiManager {
     private _roomNameElement: Phaser.Text = null;
 
     private _turnInfoSprite: Sprite;
+    private _inputManager: InputManager;
 
-    constructor(private _game: Game, private _inputManager: InputManager) {    }
+    constructor(private _game: Game) {
+        this._inputManager = new InputManager(_game);
+    }
 
     public createUi(): void {
         this.createButtons(this._game);
@@ -19,10 +23,16 @@ export class UiManager {
 
     public update() {
         // All Updates are currently event based - Woho!
+        this._inputManager.debug();
     }
+
+    public get inputManager(): InputManager { //todo get rid of
+        return this._inputManager;
+    }
+
     /**
      * f.e. StartButton
-     * @param {Phaser.Game} this._game
+     * @param {Phaser.Game} game
      */
     private createButtons(game: Game): void {
         const startButton = game.add.button(
@@ -83,6 +93,12 @@ export class UiManager {
             game.world.centerY * 0.4,
             "gridTile");
         this._turnInfoSprite.tint = 0xcccccc;
+    }
+
+    public createGrid(sizeX: number, sizeY: number, color: number): Grid {
+        const grid = new Grid(this._game, this._inputManager);
+        grid.createGrid("gridTile", sizeX, sizeY, 40, color);
+        return grid;
     }
 
     public textElement(text: string): void {

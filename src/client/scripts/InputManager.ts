@@ -1,5 +1,7 @@
 import Game = Phaser.Game;
 import {RequestEmitter} from "./RequestEmitter";
+import Socket = SocketIOClient.Socket;
+import {LocalPlayer} from "./LocalPlayer";
 
 export class InputManager {
 
@@ -7,8 +9,8 @@ export class InputManager {
         _game.input.mouse.capture = true;
     }
 
-    public set requestEmitter(val: RequestEmitter) {
-        this._requestEmitter = val;
+    public createRequestEmitter(socket:Socket, localPlayer: LocalPlayer) {
+        this._requestEmitter = new RequestEmitter(socket, localPlayer);
     }
 
     public checkMouse() {
