@@ -11,6 +11,7 @@ export class InputManager {
 
     public createRequestEmitter(socket:Socket, localPlayer: LocalPlayer) {
         this._requestEmitter = new RequestEmitter(socket, localPlayer);
+        console.log("works");
     }
 
     public checkMouse() {

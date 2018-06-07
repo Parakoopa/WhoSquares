@@ -1,5 +1,6 @@
 import Game = Phaser.Game;
 import {LocalPlayer} from "./LocalPlayer";
+import {ResponseReceiver} from "./ResponseReceiver";
 import {UiManager} from "./UiManager";
 
 export class GameManager {
@@ -7,6 +8,7 @@ export class GameManager {
     private _game: Game;
     private _socket: SocketIOClient.Socket;
     private _uiManager: UiManager;
+    private _responseReceiver: ResponseReceiver;
     private _localPlayer: LocalPlayer;
 
     constructor() {
@@ -23,6 +25,7 @@ export class GameManager {
                 self._uiManager.createUi();
                 self._game = game;
                 self._socket = io();
+                self._responseReceiver = new ResponseReceiver(self, self._socket, self._uiManager);
             },
             update() {
                 self._uiManager.update();
