@@ -1,5 +1,4 @@
 import {Client} from "../Client/Client";
-import {Player} from "../Client/Player";
 import {IEvent} from "../Event";
 import {ColorDistributer} from "./Game/ColorDistributer";
 import {MissionDistributer} from "./Game/MissionDistributer";
@@ -147,19 +146,24 @@ export class Room implements IRoom {
                 console.log("Client won his mission: " + client.color);
                 return this.winGameEvent(roomKey, client.color);
             }
-
-            return this.placedEvent(roomKey, client.color, x, y);
-
+            const placedEvent: IEvent = this.placedEvent(roomKey, client.color, x, y); // Also sets next client
+            const informTurnEvent = this.informTurnEvent(client.room.clients, this._turnManager.curClient().color); // inform for next player color
+            return [placedEvent, informTurnEvent];
         } else {
              return this.notYourTurnEvent(client, roomKey); // ToDo change to cheat Reponse
         }
     }
 
-    private placedEvent(roomKey: string, playerColor: string, x: number, y: number): IEvent[] {
+    public informTurnEvent(clients: Client[], turnColor: string): IEvent {
+        const informResponse =   {response: "informTurn", turnColor};
+        return {clients, name: "informTurn", response: informResponse};
+    }
+
+    private placedEvent(roomKey: string, playerColor: string, x: number, y: number): IEvent {
         this._turnManager.setNextClient();
         const response: IPlacedTileResponse = {response: "placedTile", roomKey, playerColor, x, y};
         const placedEvent: IEvent = {clients: this._clients, name: "placedTile", response};
-        return [placedEvent];
+        return placedEvent;
     }
 
     private notYourTurnEvent(client: Client, roomKey: string): IEvent[] {

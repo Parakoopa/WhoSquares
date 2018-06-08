@@ -21,31 +21,33 @@ export class Lobby {
      */
     public startGame(client: Client, sizeX: number, sizeY: number): IEvent[] {
         const room: Room = client.room;
-        if (!room) return []; // ToDo Not in a room response (hide button)s
+        if (!room) return []; // ToDo Not in a room response (hide Start button)
         if (room.Owner() === client ) {
             if (room.clients.length < this._minimumClientsPerGame) {
-                // ToDo Add NotEnoughClient Reponse
+                // ToDo Add NotEnoughClients  Reponse
             }
             const sizes = this.adjustGameSize(sizeX, sizeY);
             sizeX = sizes[0];
             sizeY = sizes[1];
 
             room.createGame(sizeX, sizeY);
-            const turnColor = client.color;
 
-            const clients = room.clients;
-            const startResponse =  {response: "startGame", sizeX, sizeY};
-            const startEvent: IEvent = {clients, name: "startGame", response: startResponse};
-
-            const informResponse =   {response: "informTurn", turnColor};
-            const informEvent: IEvent = {clients, name: "informTurn", response: informResponse};
-
-            return [startEvent, informEvent];
+            const startEvent: IEvent = this.startEvent(room.clients, sizeX, sizeY);
+            const informTurnEvent: IEvent = room.informTurnEvent(room.clients,  client.color);
+            return [startEvent, informTurnEvent];
         } else {
-            const notOwnerResponse = {response: "notOwner"};
-            const informEvent: IEvent = {clients: [client], name: "startGame", response: notOwnerResponse};
-            return [informEvent];
+           return [this.notOwnerEvent(client)];
         }
+    }
+
+    private startEvent(clients: Client[], sizeX: number, sizeY: number): IEvent {
+        const startResponse =  {response: "startGame", sizeX, sizeY};
+        return {clients, name: "startGame", response: startResponse};
+    }
+
+    private notOwnerEvent(client: Client): IEvent {
+        const notOwnerResponse = {response: "notOwner"};
+        return {clients: [client], name: "startGame", response: notOwnerResponse};
     }
 
     /**

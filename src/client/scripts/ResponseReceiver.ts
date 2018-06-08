@@ -42,6 +42,7 @@ export class ResponseReceiver {
         });
         this._socket.on("informTurn", (resp: IInformTurnResponse) => {
             const color: number = parseInt(resp.turnColor, 16);
+            console.log(color);
             this._uiManager.turnInfo(color);
         });
         this._socket.on("winGame", (resp: IWinGameResponse) => {
