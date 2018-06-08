@@ -26,7 +26,7 @@ export class UiManager {
         this._inputManager.debug();
     }
 
-    public get inputManager(): InputManager { //todo get rid of
+    public get inputManager(): InputManager { // todo get rid of
         return this._inputManager;
     }
 

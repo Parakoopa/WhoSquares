@@ -11,15 +11,18 @@ export class RequestEmitter {
     }
 
     public leaveRoom(): void {
+        if (!this._localPlayer.room) return;
         const playerKey = this._localPlayer.key;
         const roomKey = this._localPlayer.room.key;
         this._socket.emit("leaveRoom", {request: "leaveRoom", playerKey, roomKey});
     }
 
     public startGame(sizeX: number, sizeY: number): void {
-        if (!this._localPlayer.room) return; // ToDo display not in a room message
-        console.log(this._localPlayer);
         const playerKey = this._localPlayer.key;
+        if (!this._localPlayer.room) { // ToDo replace with uiManager message instead of redundantly asking server
+             this._socket.emit("startGame", {request: "startGame", playerKey, roomKey: null, sizeX, sizeY});
+             return;
+         }
         const roomKey = this._localPlayer.room.key;
         this._socket.emit("startGame", {request: "startGame", playerKey, roomKey, sizeX, sizeY});
     }

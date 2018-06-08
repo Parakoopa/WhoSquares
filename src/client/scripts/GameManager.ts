@@ -73,9 +73,8 @@ export class GameManager {
         this.updateRoomList();
     }
 
-
     public leftRoom(): void {
-        this._localPlayer.room.leftRoom();
+        this._localPlayer.leftRoom();
         this._uiManager.textElement("left room");
         this._uiManager.roomName("left room");
         this.updateRoomList();
@@ -92,7 +91,7 @@ export class GameManager {
     }
 
     public startedGame(sizeX: number, sizeY: number): void {
-        this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX,sizeY, this._localPlayer.getColorHex()));
+        this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.getColorHex()));
         this._uiManager.textElement("Started game");
     }
 
@@ -103,8 +102,10 @@ export class GameManager {
 
     private updateRoomList(): void {
         let roomList: string = "";
-        for (const player of this._localPlayer.room.otherPlayers) {
-            roomList += player.name + "\n";
+        if (this._localPlayer.room) { // check if room exists
+            for (const player of this._localPlayer.room.otherPlayers) {
+                roomList += player.name + "\n";
+            }
         }
         this._uiManager.roomList(roomList);
 

@@ -21,23 +21,21 @@ export class Lobby {
      */
     public startGame(client: Client, sizeX: number, sizeY: number): IEvent[] {
         const room: Room = client.room;
-        if (!room) return []; // ToDo Not in a room response (hide Start button)
-        if (room.Owner() === client ) {
-            if (room.clients.length < this._minimumClientsPerGame) {
-                // ToDo Add NotEnoughClients  Reponse
-            }
-            const sizes = this.adjustGameSize(sizeX, sizeY);
-            sizeX = sizes[0];
-            sizeY = sizes[1];
+        if (!room) return [this.notInRoomEvent(client)];
+        if (room.Owner() !== client ) return [this.notOwnerEvent(client)];
 
-            room.createGame(sizeX, sizeY);
-
-            const startEvent: IEvent = this.startEvent(room.clients, sizeX, sizeY);
-            const informTurnEvent: IEvent = room.informTurnEvent(room.clients,  client.color);
-            return [startEvent, informTurnEvent];
-        } else {
-           return [this.notOwnerEvent(client)];
+        if (room.clients.length < this._minimumClientsPerGame) {
+            // ToDo Add NotEnoughClients  Response
         }
+        const sizes = this.adjustGameSize(sizeX, sizeY);
+        sizeX = sizes[0];
+        sizeY = sizes[1];
+
+        room.createGame(sizeX, sizeY);
+
+        const startEvent: IEvent = this.startEvent(room.clients, sizeX, sizeY);
+        const informTurnEvent: IEvent = room.informTurnEvent(room.clients,  client.color);
+        return [startEvent, informTurnEvent];
     }
 
     private startEvent(clients: Client[], sizeX: number, sizeY: number): IEvent {
@@ -45,9 +43,12 @@ export class Lobby {
         return {clients, name: "startGame", response: startResponse};
     }
 
+    private notInRoomEvent(client: Client): IEvent {
+        return {clients: [client], name: "notInRoom", response: null};
+    }
+
     private notOwnerEvent(client: Client): IEvent {
-        const notOwnerResponse = {response: "notOwner"};
-        return {clients: [client], name: "startGame", response: notOwnerResponse};
+        return {clients: [client], name: "notOwner", response: null};
     }
 
     /**
@@ -75,12 +76,12 @@ export class Lobby {
     public joinRoom(client: Client, req: IJoinRoomRequest): IEvent[] {
         let room: Room = this.roomByName(req.roomName);
         if (room === null)room = this.createRoom(req.roomName);
-        else if (room.clients.length > room.size) {
+        else if (room.clients.length > room.maxSize) {
             const response: IRoomIsFullResponse = {response: "roomIsFull"};
             return [{clients: [client], name: "roomIsFull", response}];
         }
 
-        if (room.containsClient(client)) return []; // ToDo tellclient h already is in this room
+        if (room.containsClient(client)) return []; // ToDo tell client h already is in this room
         const joinedEvent: IEvent = this.joinedEvent(client, room);
         const otherJoinedEvent: IEvent = this.otherJoinedEvent(client); // This first as client is not in room yet
         return [joinedEvent, otherJoinedEvent];
@@ -112,7 +113,11 @@ export class Lobby {
     private leaveEvent(client: Client, room: Room): IEvent[] {
         const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.key};
         const leftEvent: IEvent = {clients: [client], name: "leftRoom", response: leftResponse};
-
+        if (room.clients.length === 0) {
+            this.removeRoom(room);
+            return [leftEvent]; // no one else in room to notify
+        }
+        // There are still player in this room
         const otherLeftResponse: IOtherLeftResponse = {response: "otherLeftRoom",
             roomKey: room.key,
             name: client.name
@@ -130,6 +135,13 @@ export class Lobby {
         const room: Room = new Room(roomName, Utility.getGUID(), this._maxRoomSize);
         this._rooms.push(room);
         return room;
+    }
+
+    private removeRoom(room: Room): void {
+        const index: number = this._rooms.indexOf(room);
+        if (index < 0) return;
+        this._rooms.splice(index, 1);
+        console.log("roomCount:" + this._rooms.length);
     }
 
     /**

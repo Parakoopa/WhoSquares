@@ -74,7 +74,6 @@ export class ConnectionManager {
     private emitEvent(event: IEvent): void {
         console.log("Emitted to Players: " + event.name + " to: " + event.clients);
         for (let i = 0; i < event.clients.length; i++) {
-            console.log("bla");
             event.clients[i].socket.emit(event.name, event.response);
         }
     }

@@ -18,7 +18,7 @@ export class Room implements IRoom {
     private _missionDistr: MissionDistributer;
     private _turnManager: TurnManager;
 
-    constructor(private _name: string, private _key: string, private _size: number) {
+    constructor(private _name: string, private _key: string, private _maxSize: number) {
         this._clients = [];
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
@@ -53,8 +53,8 @@ export class Room implements IRoom {
         return this._clients;
     }
 
-    public get size(): number {
-        return this._size;
+    public get maxSize(): number {
+        return this._maxSize;
     }
 
     public Owner(): Client {
@@ -92,7 +92,10 @@ export class Room implements IRoom {
     public RemoveClient(client: Client): boolean {
         const index: number = this._clients.indexOf(client);
         if (index < 0) return false;
+        console.log("index: " + index);
+        console.log("beforte splice" + this._clients.length);
         this._clients.splice(index, 1);
+        console.log("After splice: " + this._clients.length);
         client.room = null;
         this._missionDistr.resetMission(client);
         this._colorDistr.resetColor(client);
@@ -102,6 +105,8 @@ export class Room implements IRoom {
 
     private assignNewOwner() {
         if (this._clients.length > 0) {
+            console.log(this._owner.name);
+            console.log(this._clients[0].name);
             this._owner = this._clients[0];
         } else {
             // Todo Destroy room
@@ -129,6 +134,7 @@ export class Room implements IRoom {
     // Grid Interaction
 
     public createGame(sizeX: number, sizeY: number) {
+        this._turnManager.reset();
         this._serverGrid = new ServerGrid(sizeX, sizeY);
     }
     /**

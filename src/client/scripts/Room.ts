@@ -26,14 +26,6 @@ export class Room {
         return this._otherPlayers;
     }
 
-
-    public leftRoom(): void {
-        this._roomName = null;
-        this._roomKey = null;
-        this.resetPlayers();
-        if (this._grid) this._grid.destroy();
-    }
-
     public otherLeftRoom(name: string): void {
         const player: OtherPlayer = this.playerByName(name);
         this.removePlayer(player);
@@ -49,7 +41,13 @@ export class Room {
     }
 
     public startedGame(grid: Grid) {
+        this.destroyGrid(); // Destroy previous grid;
         this._grid = grid;
+    }
+
+    public destroyGrid(): void {
+        if (!this._grid) return;
+        this._grid.destroy();
     }
 
     private playerByName(playerName: string): OtherPlayer {
@@ -58,6 +56,7 @@ export class Room {
         }
         return null;
     }
+
     private addPlayers(players: IPlayer[]): void {
         this._otherPlayers = []; // Reset on Join Room
         for (const player of players) {
@@ -72,10 +71,6 @@ export class Room {
     private removePlayer(player: OtherPlayer): void {
         const index: number = this._otherPlayers.indexOf(player);
         if (index > -1) this._otherPlayers.splice(index, 1);
-    }
-
-    private resetPlayers(): void {
-        this._otherPlayers = [];
     }
 
     private toOtherPlayer(players: IPlayer[]): OtherPlayer[] {

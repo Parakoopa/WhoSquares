@@ -55,11 +55,16 @@ export class LocalPlayer implements IPlayer {
      * @param {IRoomIsFullResponse | IJoinedResponse} resp
      */
     public joinedRoom(resp: IJoinedResponse): void {
-        this.room = new Room(
+        this._room = new Room(
             resp.roomKey,
             resp.roomName,
             resp.otherPlayers
         );
         this.color = resp.color;
+    }
+
+    public leftRoom(): void {
+        this._room.destroyGrid();
+        this._room = null;
     }
 }
