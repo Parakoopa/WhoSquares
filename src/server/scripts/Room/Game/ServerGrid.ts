@@ -2,7 +2,7 @@
  * A Room hosts a game for clients
  * Each client gets a color assigned
  */
-import {Client} from "./Client";
+import {Client} from "../../Client/Client";
 
 export class ServerGrid {
 
@@ -16,7 +16,7 @@ export class ServerGrid {
         this.createGrid(sizeX, sizeY);
     }
 
-    get grid(): IClient[][] {
+    get grid(): Client[][] {
         return this._grid;
     }
 

@@ -1,20 +1,39 @@
 import Game = Phaser.Game;
+import {RequestEmitter} from "./RequestEmitter";
+import Socket = SocketIOClient.Socket;
+import {LocalPlayer} from "./LocalPlayer";
 
 export class InputManager {
 
-    private _game: Game;
-
-    constructor(game: Game) {
-        this._game = game;
-        game.input.mouse.capture = true;
-
+    constructor(private _game: Game, private _requestEmitter: RequestEmitter = null) {
+        _game.input.mouse.capture = true;
     }
 
-    public checkMouse(){
+    public createRequestEmitter(socket:Socket, localPlayer: LocalPlayer) {
+        this._requestEmitter = new RequestEmitter(socket, localPlayer);
+    }
 
-        if(this._game.input.activePointer.leftButton.onDown){
-
+    public checkMouse() {
+        if (this._game.input.activePointer.leftButton.onDown) {
+            // example
         }
+    }
+
+    public joinRoom(roomName: string): void {
+        this._requestEmitter.joinRoom(roomName);
+    }
+
+    public leaveRoom(): void {
+        this._requestEmitter.leaveRoom();
+    }
+
+    public startGame() {
+        // ToDo Add InputFields to set sizeX & sizeY
+        this._requestEmitter.startGame(5, 5);
+    }
+
+    public placeTile(x: number, y: number): void {
+        this._requestEmitter.placeTile(x, y);
     }
 
     public debug(): void {

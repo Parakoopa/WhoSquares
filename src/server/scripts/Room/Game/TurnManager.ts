@@ -1,4 +1,4 @@
-import {Client} from "./Client";
+import {Client} from "../../Client/Client";
 
 export class TurnManager {
 
@@ -9,8 +9,19 @@ export class TurnManager {
         this._clients = [];
     }
 
+    public reset(): void {
+        this._index = 0;
+    }
+
     public addClient(client: Client): void {
         this._clients.push(client);
+    }
+
+    public removeClient(client: Client): void {
+        const index: number = this._clients.indexOf(client);
+        if (index < 0) return;
+        this._clients.splice(index, 1);
+        if (this._index >= this._clients.length) this._index = 0;
     }
 
     public curClient(): Client {

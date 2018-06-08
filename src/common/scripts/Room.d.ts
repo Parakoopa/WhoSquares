@@ -1,6 +1,6 @@
 interface IRoom {
 
-    getKey(): string;
-    getName(): string;
-    getClients(): IClient[];
+key: string;
+name: string;
+players: IPlayer[];
 }
