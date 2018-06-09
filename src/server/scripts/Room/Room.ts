@@ -61,12 +61,9 @@ export class Room implements IRoom {
         return this._owner;
     }
 
-    get grid(): ServerGrid {
-        return this._serverGrid;
-    }
-
-    set grid(value: ServerGrid) {
-        this._serverGrid = value;
+    get gridInfo(): IPlayer[][] {
+        if (!this._serverGrid) return null;
+        return this._serverGrid.gridInfo;
     }
 
     /**
@@ -75,7 +72,7 @@ export class Room implements IRoom {
      * @returns {string}
      * @constructor
      */
-    public AddClient(client: Client): string { // ToDo make string into color enum
+    public AddClient(client: Client): number { // ToDo make string into color enum
         if (!this._owner) this._owner = client;
         client.room = this;
         this._clients.push(client);
@@ -132,11 +129,11 @@ export class Room implements IRoom {
     }
 
     // Grid Interaction
-
     public createGame(sizeX: number, sizeY: number) {
         this._turnManager.reset();
         this._serverGrid = new ServerGrid(sizeX, sizeY);
     }
+
     /**
      * Place Clients instead of Colors as grids not displayed anyway
      * @param {Client} client
@@ -148,26 +145,26 @@ export class Room implements IRoom {
         if (client !== this._turnManager.curClient()) return this.notYourTurnEvent(client, roomKey);
 
         if (this._serverGrid.placeTile(client, x, y)) {
-            if (client.mission.check(client, this._serverGrid.grid)) {
+            if (client.mission.check(client, this._serverGrid.gridInfo)) {
                 console.log("Client won his mission: " + client.color);
-                return this.winGameEvent(roomKey, client.color);
+                return this.winGameEvent(roomKey, client.player);
             }
-            const placedEvent: IEvent = this.placedEvent(roomKey, client.color, x, y); // Also sets next client
-            const informTurnEvent = this.informTurnEvent(client.room.clients, this._turnManager.curClient().color); // inform for next player color
+            const placedEvent: IEvent = this.placedEvent(roomKey, client.player, x, y); // Also sets next client
+            const informTurnEvent = this.informTurnEvent(client.room.clients, this._turnManager.curClient().player); // inform for next player color
             return [placedEvent, informTurnEvent];
         } else {
              return this.notYourTurnEvent(client, roomKey); // ToDo change to cheat Reponse
         }
     }
 
-    public informTurnEvent(clients: Client[], turnColor: string): IEvent {
-        const informResponse =   {response: "informTurn", turnColor};
+    public informTurnEvent(clients: Client[], player: IPlayer): IEvent {
+        const informResponse =   {response: "informTurn", player};
         return {clients, name: "informTurn", response: informResponse};
     }
 
-    private placedEvent(roomKey: string, playerColor: string, x: number, y: number): IEvent {
+    private placedEvent(roomKey: string, player: IPlayer, x: number, y: number): IEvent {
         this._turnManager.setNextClient();
-        const response: IPlacedTileResponse = {response: "placedTile", roomKey, playerColor, x, y};
+        const response: IPlacedTileResponse = {response: "placedTile", roomKey, player, x, y};
         const placedEvent: IEvent = {clients: this._clients, name: "placedTile", response};
         return placedEvent;
     }
@@ -178,8 +175,8 @@ export class Room implements IRoom {
         return [notYourTurnEvent];
     }
 
-    private winGameEvent(roomKey: string, playerColor: string): IEvent[] {
-        const response: IWinGameResponse =  {response: "winGame", roomKey, playerColor};
+    private winGameEvent(roomKey: string, player: IPlayer): IEvent[] {
+        const response: IWinGameResponse =  {response: "winGame", roomKey, player};
         const winGameEvent: IEvent = {clients: this._clients, name: "winGame", response};
         return [winGameEvent];
     }

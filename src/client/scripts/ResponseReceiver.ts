@@ -27,19 +27,17 @@ export class ResponseReceiver {
             this._gameMan.otherJoinedRoom(resp.otherPlayer);
         });
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
-            const color: number = parseInt(resp.playerColor, 16);
-            this._gameMan.placedTile(resp.x, resp.y, color);
+            this._gameMan.placedTile(resp.x, resp.y, resp.player);
         });
         this._socket.on("startGame", (resp: IStartGameResponse) => {
             this._gameMan.startedGame(resp.sizeX, resp.sizeY);
         });
         // Game Events
         this._socket.on("winGame", (resp: IWinGameResponse) => {
-            this._uiManager.winGame(resp.playerColor);
+            this._uiManager.winGame(resp.player.name);
         });
         this._socket.on("informTurn", (resp: IInformTurnResponse) => {
-            const color: number = parseInt(resp.turnColor, 16);
-            this._uiManager.turnInfo(color);
+            this._uiManager.turnInfo(resp.player.color);
         });
 
         // Error Feedback

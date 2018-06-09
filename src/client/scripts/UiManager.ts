@@ -101,6 +101,12 @@ export class UiManager {
         return grid;
     }
 
+    public createGridByInfo(gridInfo: IPlayer[][], color: number): Grid {
+        const grid = this.createGrid(gridInfo[0].length, gridInfo.length, color);
+        grid.placedTiles(gridInfo);
+        return grid;
+    }
+
     public textElement(text: string): void {
         this._textElement.text = text;
     }
@@ -117,8 +123,8 @@ export class UiManager {
         this._turnInfoSprite.tint = color;
     }
 
-    public winGame(color: string): void {
-        this._textElement.text = "Winner: " + color;
+    public winGame(name: string): void {
+        this._textElement.text = "Winner: " + name;
     }
 
 }

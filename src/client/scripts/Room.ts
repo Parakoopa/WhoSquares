@@ -36,8 +36,8 @@ export class Room {
         this.addPlayer(player);
     }
 
-    public placedTile(x: number, y: number, color: number): void {
-        this._grid.placedTile(color, x, y);
+    public placedTile(x: number, y: number, player: IPlayer): void {
+        this._grid.placedTile(player, x, y);
     }
 
     public startedGame(grid: Grid) {

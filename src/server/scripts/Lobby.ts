@@ -34,7 +34,7 @@ export class Lobby {
         room.createGame(sizeX, sizeY);
 
         const startEvent: IEvent = this.startEvent(room.clients, sizeX, sizeY);
-        const informTurnEvent: IEvent = room.informTurnEvent(room.clients,  client.color);
+        const informTurnEvent: IEvent = room.informTurnEvent(room.clients,  client.player);
         return [startEvent, informTurnEvent];
     }
 
@@ -93,7 +93,9 @@ export class Lobby {
             roomName: room.name,
             roomKey: room.key,
             color: room.AddClient(client),
-            otherPlayers: room.getPlayersExcept(client)};
+            otherPlayers: room.getPlayersExcept(client),
+            gridInfo: room.gridInfo
+        };
         return{clients: [client], name: "joinedRoom", response};
     }
 

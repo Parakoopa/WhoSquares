@@ -24,10 +24,19 @@ export class Grid {
         return this._sizeY;
     }
 
-    public placedTile(color: number, x: number, y: number) {
-       const sprite: Sprite =  this._grid[y][x];
-       sprite.data.color = color; // save color on object as it is overwritten f.e. onOver
-       this._grid[y][x].tint = color;
+    public placedTile(player: IPlayer, x: number, y: number) {
+        if (!player) return; // tile is not owned by any player
+        const sprite: Sprite =  this._grid[y][x];
+        sprite.data.color = player.color; // save color on object as it is overwritten f.e. onOver
+        this._grid[y][x].tint = player.color;
+    }
+
+    public placedTiles(gridInfo: IPlayer[][]) {
+        for (let y = 0; y < gridInfo.length; y++) {
+            for (let x = 0; x < gridInfo[y].length; x++) {
+                this.placedTile(gridInfo[y][x], x, y);
+            }
+        }
     }
 
     /**
@@ -73,7 +82,7 @@ export class Grid {
 
     }
 
-    public destroy(): void{
+    public destroy(): void {
         for (let y = 0; y < this._grid.length; y++) {
             for (let x = 0; x < this._grid[y].length; x++) {
                this._grid[y][x].destroy(true);

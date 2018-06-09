@@ -25,11 +25,11 @@ export class LocalPlayer implements IPlayer {
         this._player.name = val;
     }
 
-    public get color(): string {
+    public get color(): number {
         return this._player.color;
     }
 
-    public set color(val: string) {
+    public set color(val: number) {
         this._player.color = val;
     }
 
@@ -43,11 +43,6 @@ export class LocalPlayer implements IPlayer {
 
     public set room(val: Room){
         this._room = val;
-    }
-
-    public getColorHex(): number {
-        console.log("color: "+ this._player.color);
-        return  parseInt(this._player.color, 16);
     }
 
     /**

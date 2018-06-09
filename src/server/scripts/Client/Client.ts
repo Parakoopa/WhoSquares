@@ -1,6 +1,5 @@
-import {Room} from "../Room/Room";
 import {Socket} from "socket.io";
-
+import {Room} from "../Room/Room";
 
 /**
  * A Room hosts a game for clients
@@ -43,11 +42,11 @@ export class Client implements IPlayer {
         this._player.name = val;
     }
 
-    public get color(): string {
+    public get color(): number {
         return this._player.color;
     }
 
-    public set color(val: string) {
+    public set color(val: number) {
         this._player.color = val;
     }
 

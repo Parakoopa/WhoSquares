@@ -8,7 +8,7 @@ export class ServerGrid {
 
     private readonly _sizeX: number;
     private readonly _sizeY: number;
-    private _grid: any[][];
+    private _grid: IPlayer[][];
 
     constructor(sizeX: number, sizeY: number) {
         this._sizeX = sizeX;
@@ -16,7 +16,7 @@ export class ServerGrid {
         this.createGrid(sizeX, sizeY);
     }
 
-    get grid(): Client[][] {
+    get gridInfo(): IPlayer[][] {
         return this._grid;
     }
 
@@ -39,7 +39,7 @@ export class ServerGrid {
 
     public placeTile(client: Client, x: number, y: number): boolean {
         if (x < this._sizeX && y < this._sizeY) {
-            this._grid[x][y] = client;
+            this._grid[x][y] = client.player; //client;
             return true;
         } else return false; // ToDo Someone is cheating
     }

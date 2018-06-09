@@ -1,6 +1,6 @@
 interface IPlayer {
     name: string;
-    color: string;
+    color: number;
 }
 
 interface ILocalPlayer extends IPlayer {

@@ -2,6 +2,7 @@ import Game = Phaser.Game;
 import {LocalPlayer} from "./LocalPlayer";
 import {ResponseReceiver} from "./ResponseReceiver";
 import {UiManager} from "./UiManager";
+import {Grid} from "./Grid";
 
 export class GameManager {
 
@@ -67,6 +68,12 @@ export class GameManager {
             this._uiManager.textElement(resp.response);
         } else {
             this._localPlayer.joinedRoom(resp);
+            // If game already started, recreate grid
+            if (resp.gridInfo) {
+                console.log("color: " + this._localPlayer.color);
+                const grid: Grid = this._uiManager.createGridByInfo(resp.gridInfo, this._localPlayer.color);
+                this._localPlayer.room.startedGame(grid);
+            }
             this._uiManager.textElement("joined Room - Color: " + resp.color);
             this._uiManager.roomName(resp.roomName);
         }
@@ -91,13 +98,13 @@ export class GameManager {
     }
 
     public startedGame(sizeX: number, sizeY: number): void {
-        this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.getColorHex()));
+        this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.color));
         this._uiManager.textElement("Started game");
     }
 
-    public placedTile(x: number, y: number, color: number): void {
-        this._localPlayer.room.placedTile(x, y, color);
-        this._uiManager.textElement(color + " played tile on:" + x + "|" + y);
+    public placedTile(x: number, y: number, player: IPlayer): void {
+        this._localPlayer.room.placedTile(x, y, player);
+        this._uiManager.textElement(player + " played tile on:" + x + "|" + y);
     }
 
     private updateRoomList(): void {

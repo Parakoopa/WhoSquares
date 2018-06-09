@@ -17,15 +17,12 @@ export class OtherPlayer implements IPlayer {
         this._player.name = val;
     }
 
-    public get color(): string {
+    public get color(): number {
         return this._player.color;
     }
 
-    public set color(val: string) {
+    public set color(val: number) {
         this._player.color = val;
     }
 
-    public getColorHex(): number {
-        return  parseInt(this._player.color, 16);
-    }
 }
