@@ -1,6 +1,6 @@
 import {Room} from "./Room";
 
-export class LocalPlayer implements IPlayer {
+export class LocalPlayer {
 
     /**
      * @param _player

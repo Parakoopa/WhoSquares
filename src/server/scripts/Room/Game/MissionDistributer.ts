@@ -1,5 +1,4 @@
 import {ExpandMission} from "../../../../common/scripts/Missions/ExpandMission";
-import {Client} from "../../Client/Client";
 
 export class MissionDistributer {
 
@@ -10,12 +9,9 @@ export class MissionDistributer {
         this._missions.push(new ExpandMission());
     }
 
-    public setMission(client: Client): void {
-        client.mission = this._missions[Math.floor(Math.random() * this._missions.length)];
+    public getMission(): IMission {
+        return this._missions[Math.floor(Math.random() * this._missions.length)];
     }
 
-    public resetMission(client: Client): void {
-        client.mission = null;
-    }
 
 }

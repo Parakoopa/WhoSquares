@@ -35,10 +35,14 @@ export class ConnectionManager {
             // Client requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
                 const client: Client = this.clientBySocket(socket);
-                if (client.room) { // leave existing room
-                    const leaveEvent: IEvent[] = this._lobby.leaveRoom(client, client.room.key);
-                    this.emitEvents(leaveEvent); // ToDo maybe make SwitchRoomResponse to be safe
+
+                if (client.roomCount() > 0) { // leave existing room
+                    const response: IAlreadyInRoomResponse = {response: "alreadyInRoom"};
+                    const event = {clients: [client], name: "alreadyInRoom", response};
+                    this.emitEvent(event); // ToDo maybe make SwitchRoomResponse to be safe
+                    return;
                 }
+
                 const joinEvents: IEvent[] = this._lobby.joinRoom(client, req);
                 this.emitEvents(joinEvents);
             });
@@ -52,14 +56,17 @@ export class ConnectionManager {
             // Start Game, create Grid, inform Players
             socket.on("startGame", (req: IStartGameRequest) => {
                 const client: Client = this.clientBySocket(socket);
-                const startEvents: IEvent[] = this._lobby.startGame(client, req.sizeX, req.sizeY);
+                const room = this._lobby.roomByKey(req.roomKey);
+                const startEvents: IEvent[] = this._lobby.startGame(client, room, req.sizeX, req.sizeY);
                 this.emitEvents(startEvents);
             });
 
             // A client colors a certain tile
             socket.on("placeTile", (req: IPlaceTileRequest) => {
                 const client: Client = this.clientBySocket(socket);
-                const placeEvents: IEvent[] =  client.room.placeTile(client, req.x, req.y);
+                const room = this._lobby.roomByKey(req.roomKey);
+                if (!room) return; // Todo return invalid roomkey response
+                const placeEvents: IEvent[] =  room.placeTile(client, req.x, req.y);
                 this.emitEvents(placeEvents);
             });
 
@@ -96,7 +103,7 @@ export class ConnectionManager {
     private addClient(socket: Socket): IEvent {
         const key = Utility.getGUID();
         const player: IPlayer = new Player("" + this.connectionCounter++);
-        const client: Client = new Client(socket, key, player);
+        const client: Client = new Client(socket, key, key); //Todo make key -> name
         this._clients.push(client);
         const response =  {response: "connected", player, key} as IConnectedResponse;
         return {clients: [client], name: "connected", response};

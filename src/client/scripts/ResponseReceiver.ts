@@ -24,6 +24,7 @@ export class ResponseReceiver {
             this._gameMan.otherLeftRoom(resp.name);
         });
         this._socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
+
             this._gameMan.otherJoinedRoom(resp.otherPlayer);
         });
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
@@ -41,11 +42,17 @@ export class ResponseReceiver {
         });
 
         // Error Feedback
+        this._socket.on("observer", () => {
+            this._uiManager.textElement("Observers to not play!");
+        });
         this._socket.on("notYourTurn", (resp: INotYourTurnResponse) => {
-            this._uiManager.textElement(resp.response);
+            this._uiManager.textElement("It is not your turn!");
         });
         this._socket.on("notInRoom", () => {
             this._uiManager.textElement("You are not in a room!");
+        });
+        this._socket.on("alreadyInRoom", () => {
+            this._uiManager.textElement("You are already in a room!");
         });
         this._socket.on("notOwner", () => {
             this._uiManager.textElement("You are not the room owner!");

@@ -1,4 +1,6 @@
 import {Client} from "../Client/Client";
+import {LocalPlayer} from "../Client/LocalPlayer";
+import {Player} from "../Client/Player";
 import {IEvent} from "../Event";
 import {ColorDistributer} from "./Game/ColorDistributer";
 import {MissionDistributer} from "./Game/MissionDistributer";
@@ -12,14 +14,15 @@ import {TurnManager} from "./Game/TurnManager";
 export class Room implements IRoom {
 
     private _owner: Client;
-    private readonly _clients: Client[];
+    private _clientMap: Map<Client, LocalPlayer>;
     private _serverGrid: ServerGrid;
     private _colorDistr: ColorDistributer;
     private _missionDistr: MissionDistributer;
     private _turnManager: TurnManager;
+    private _discconnectCount: number = 0;
 
     constructor(private _name: string, private _key: string, private _maxSize: number) {
-        this._clients = [];
+        this._clientMap = new Map<Client, LocalPlayer>();
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
         this._turnManager = new TurnManager();
@@ -35,22 +38,28 @@ export class Room implements IRoom {
 
     public get players(): IPlayer[] {
         const players: IPlayer[] = [];
-        for (const client of this._clients) {
-            players.push(client.player);
+        for (const localPlayer of this.localPlayers()) {
+            players.push(localPlayer.player);
         }
         return players;
     }
 
-    public getPlayersExcept(client: IPlayer): IPlayer[] {
+    public getPlayersExcept(player: LocalPlayer): IPlayer[] {
         const players: IPlayer[] = [];
-        for (const curClient of this.clients) {
-            if (client !== curClient) players.push(curClient.player);
+        for (const curPlayer of  this.localPlayers()) {
+            if (curPlayer !== player) {
+                players.push(curPlayer.player);
+            }
         }
         return players;
     }
 
     public get clients(): Client[] {
-        return this._clients;
+        return Array.from(this._clientMap.keys());
+    }
+
+    private localPlayers(): LocalPlayer[] {
+        return Array.from(this._clientMap.values());
     }
 
     public get maxSize(): number {
@@ -72,52 +81,82 @@ export class Room implements IRoom {
      * @returns {string}
      * @constructor
      */
-    public AddClient(client: Client): number { // ToDo make string into color enum
+    public AddClient(client: Client): IEvent[] { // ToDo make string into color enum
         if (!this._owner) this._owner = client;
-        client.room = this;
-        this._clients.push(client);
-        this._turnManager.addClient(client);
-        this._missionDistr.setMission(client);
-        return this._colorDistr.setClientColor(client);
+        let localPlayer: LocalPlayer = this._clientMap.get(client);
+        if (localPlayer) this._discconnectCount--; // Return reconnected player
+        else if (this._serverGrid) {
+            localPlayer = this.createObserver(client);
+        } else {
+            localPlayer = this.createPlayer(client);
+        }
+        const joinedEvent: IEvent = this.joinedEvent(client, localPlayer);
+        const otherJoinedEvent: IEvent = this.otherJoinedEvent(client, localPlayer);
+        return [joinedEvent, otherJoinedEvent];
     }
 
+    private createObserver(client: Client): LocalPlayer {
+        // ToDo Observers do not need game colors or missions
+        const color = this._colorDistr.getFreeColor();
+        const mission = this._missionDistr.getMission();
+        const player: Player = new Player(client.name, color);
+        const localPlayer = new LocalPlayer(player, this, mission);
+        localPlayer.player.isObserver = true;
+        this._clientMap.set(client, localPlayer);
+        return localPlayer;
+    }
+
+    private createPlayer(client: Client): LocalPlayer {
+        const color = this._colorDistr.getFreeColor();
+        const mission = this._missionDistr.getMission();
+        const player: Player = new Player(client.name, color);
+        const localPlayer = new LocalPlayer(player, this, mission);
+        this._clientMap.set(client, localPlayer);
+        this._turnManager.addClient(localPlayer);
+        return localPlayer;
+    }
+
+    private joinedEvent(client: Client, localPlayer: LocalPlayer): IEvent {
+        const response: IJoinedResponse = {
+            response: "joinedRoom",
+            roomName: this._name,
+            roomKey: this._key,
+            color: localPlayer.player.color,
+            otherPlayers: this.getPlayersExcept(localPlayer),
+            gridInfo: this.gridInfo
+        };
+        return{clients: [client], name: "joinedRoom", response};
+    }
+
+    private otherJoinedEvent(client: Client, localPlayer: LocalPlayer): IEvent {
+        const response: IOtherJoinedResponse = {response: "otherJoinedRoom", otherPlayer: localPlayer.player};
+        return {clients: this.getClientsExcept(client), name: "otherJoinedRoom", response};
+
+    }
     /**
      * Remove Client from room & make its color available
      * @param {Client} client
      * @constructor
      */
     public RemoveClient(client: Client): boolean {
-        const index: number = this._clients.indexOf(client);
-        if (index < 0) return false;
-        console.log("index: " + index);
-        console.log("beforte splice" + this._clients.length);
-        this._clients.splice(index, 1);
-        console.log("After splice: " + this._clients.length);
-        client.room = null;
-        this._missionDistr.resetMission(client);
-        this._colorDistr.resetColor(client);
+        const isContained: boolean = this._clientMap.get(client) !== undefined; // todo think of spectators
         if (this._owner === client) this.assignNewOwner();
-        return true;
+        this._discconnectCount++;
+        // player may rejoin a room at any time, so valuesdo not get reset
+        // this._colorDistr.resetColor(client);
+        // this._clientMap.set(client, null);
+        return isContained;
     }
 
+    public isEmpty(): boolean {
+        return this.size() <= this._discconnectCount;
+    }
     private assignNewOwner() {
-        if (this._clients.length > 0) {
-            console.log(this._owner.name);
-            console.log(this._clients[0].name);
-            this._owner = this._clients[0];
+        if (this.size() > 0) {
+            this._owner = this.clients[0]; // Todo find better way to select new owner
         } else {
             // Todo Destroy room
         }
-    }
-
-    /**
-     * Check if room containts specific client
-     * @param {Client} client
-     * @returns {boolean}
-     * @constructor
-     */
-    public containsClient(client: Client) {
-        return this._clients.indexOf(client) > -1;
     }
 
     public getClientsExcept(client: Client): Client[] {
@@ -131,7 +170,15 @@ export class Room implements IRoom {
     // Grid Interaction
     public createGame(sizeX: number, sizeY: number) {
         this._turnManager.reset();
+        this.observerToPlayer();
         this._serverGrid = new ServerGrid(sizeX, sizeY);
+    }
+
+    private observerToPlayer(): void {
+        for (const localPlayer of this.localPlayers()) {
+            localPlayer.player.isObserver = false;
+            this._turnManager.addClient(localPlayer);
+        }
     }
 
     /**
@@ -142,30 +189,40 @@ export class Room implements IRoom {
      */
     public placeTile(client: Client, x: number, y: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
         const roomKey = this._key;
-        if (client !== this._turnManager.curClient()) return this.notYourTurnEvent(client, roomKey);
-
-        if (this._serverGrid.placeTile(client, x, y)) {
-            if (client.mission.check(client, this._serverGrid.gridInfo)) {
-                console.log("Client won his mission: " + client.color);
-                return this.winGameEvent(roomKey, client.player);
+        const localPlayer: LocalPlayer = this._clientMap.get(client);
+        if (localPlayer.player.isObserver) {
+            return this.observerEvent(client);
+        }
+        if (localPlayer !== this._turnManager.curClient()) {
+            return this.notYourTurnEvent(client, roomKey);
+        }
+        if (this._serverGrid.placeTile(localPlayer.player, x, y)) {
+            if (localPlayer.mission.check(localPlayer.player, this._serverGrid.gridInfo)) {
+                console.log("Client won his mission: " + localPlayer.player.color);
+                return this.winGameEvent(roomKey, localPlayer.player);
             }
-            const placedEvent: IEvent = this.placedEvent(roomKey, client.player, x, y); // Also sets next client
-            const informTurnEvent = this.informTurnEvent(client.room.clients, this._turnManager.curClient().player); // inform for next player color
+            const placedEvent: IEvent = this.placedEvent(roomKey, localPlayer.player, x, y); // Also sets next client
+            const informTurnEvent = this.informTurnEvent(); // inform for next player color
             return [placedEvent, informTurnEvent];
         } else {
              return this.notYourTurnEvent(client, roomKey); // ToDo change to cheat Reponse
         }
     }
 
-    public informTurnEvent(clients: Client[], player: IPlayer): IEvent {
-        const informResponse =   {response: "informTurn", player};
-        return {clients, name: "informTurn", response: informResponse};
+    public observerEvent(client: Client): IEvent[] {
+        const observerResponse: IObserverResponse = {response: "observer"};
+        return [{clients: [client], name: "observer", response: observerResponse}];
+    }
+
+    public informTurnEvent(): IEvent {
+        const informResponse =   {response: "informTurn", player: this._turnManager.curClient().player};
+        return {clients: this.clients, name: "informTurn", response: informResponse};
     }
 
     private placedEvent(roomKey: string, player: IPlayer, x: number, y: number): IEvent {
         this._turnManager.setNextClient();
         const response: IPlacedTileResponse = {response: "placedTile", roomKey, player, x, y};
-        const placedEvent: IEvent = {clients: this._clients, name: "placedTile", response};
+        const placedEvent: IEvent = {clients: this.clients, name: "placedTile", response};
         return placedEvent;
     }
 
@@ -177,8 +234,12 @@ export class Room implements IRoom {
 
     private winGameEvent(roomKey: string, player: IPlayer): IEvent[] {
         const response: IWinGameResponse =  {response: "winGame", roomKey, player};
-        const winGameEvent: IEvent = {clients: this._clients, name: "winGame", response};
+        const winGameEvent: IEvent = {clients: this.clients, name: "winGame", response};
         return [winGameEvent];
+    }
+
+    private size(): number {
+        return Array.from(this._clientMap.keys()).length;
     }
 
 }

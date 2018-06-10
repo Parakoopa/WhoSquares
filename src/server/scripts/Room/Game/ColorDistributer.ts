@@ -1,8 +1,7 @@
-import {Client} from "../../Client/Client";
 
 export class ColorDistributer {
 
-    private _clientColorMap: Map<number, Client>;
+    private _clientColorMap: Map<number, boolean>;
     private readonly _colors: number[] = [
            parseInt("FF3333", 16), // red
            parseInt("FF9933", 16), // orange
@@ -28,7 +27,7 @@ export class ColorDistributer {
      */
     private setColors(): void {
         for (const color of this._colors) {
-            this._clientColorMap.set(color, null);
+            this._clientColorMap.set(color, false);
         }
     }
 
@@ -37,11 +36,10 @@ export class ColorDistributer {
      * @returns {string}
      * @constructor
      */
-    public setClientColor(client: Client): number {
+    public getFreeColor(): number {
         for (const color of Array.from(this._clientColorMap.keys())) {
-            if (this._clientColorMap.get(color) === null) {
-                this._clientColorMap.set(color, client);
-                client.color = color;
+            if (!this._clientColorMap.get(color)) {
+                this._clientColorMap.set(color, true);
                 return color;
             }
         }
@@ -50,12 +48,10 @@ export class ColorDistributer {
 
     /**
      * Makes a color available again
-     * @param {Client} client
      * @constructor
+     * @param color
      */
-    public resetColor(client: Client): void {
-        const color: number = client.color;
-        client.color = null;
+    public resetColor(color: number): void {
         this._clientColorMap.set(color, null);
     }
 

@@ -1,4 +1,4 @@
-export class OtherPlayer implements IPlayer {
+export class OtherPlayer {
 
     /**
      * @param _player

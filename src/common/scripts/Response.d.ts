@@ -24,7 +24,7 @@ interface IJoinedResponse extends IResponse {
     roomName: string;
     color: number;
     otherPlayers: IPlayer[];
-    gridInfo: IPlayer[][]; //ToDo limit to colored tiles?
+    gridInfo: IPlayer[][];
 }
 
 interface IOtherJoinedResponse extends IResponse {
@@ -68,6 +68,14 @@ interface IPlacedTileResponse extends IResponse {
 interface INotYourTurnResponse extends IResponse {
     response: "notYourTurn";
     roomKey: string;
+}
+
+interface IAlreadyInRoomResponse extends IResponse {
+    response: "alreadyInRoom";
+}
+
+interface IObserverResponse extends IResponse {
+    response: "observer";
 }
 
 interface IInformTurnResponse extends IResponse {
