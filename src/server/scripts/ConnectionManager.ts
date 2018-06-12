@@ -42,7 +42,6 @@ export class ConnectionManager {
                     this.emitEvent(event); // ToDo maybe make SwitchRoomResponse to be safe
                     return;
                 }
-
                 const joinEvents: IEvent[] = this._lobby.joinRoom(client, req);
                 this.emitEvents(joinEvents);
             });

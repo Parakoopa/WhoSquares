@@ -65,7 +65,7 @@ export class GameManager {
 
     public joinedRoom(resp: IRoomIsFullResponse | IJoinedResponse) {
         if(this._localPlayer.room) {
-            this._uiManager.textElement("You are already in a room. Leave first!");
+            this._uiManager.textElement("You are already in a room. Leave first!"); //Todo redundant due to server response
         }
         else if (resp.response === "roomIsFull") {
             this._uiManager.textElement(resp.response);

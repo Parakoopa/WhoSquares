@@ -82,6 +82,7 @@ export class Room implements IRoom {
      * @constructor
      */
     public AddClient(client: Client): IEvent[] { // ToDo make string into color enum
+        client.addRoom(this);
         if (!this._owner) this._owner = client;
         let localPlayer: LocalPlayer = this._clientMap.get(client);
         if (localPlayer) this._discconnectCount--; // Return reconnected player
@@ -149,6 +150,7 @@ export class Room implements IRoom {
     }
 
     public isEmpty(): boolean {
+        //console.log("player: " + this.size() + " - disconnects: " + this._discconnectCount);
         return this.size() <= this._discconnectCount;
     }
     private assignNewOwner() {
