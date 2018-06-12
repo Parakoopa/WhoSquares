@@ -3,6 +3,9 @@ import {Room} from "./Room";
 export class LocalPlayer {
 
     /**
+     * Represents the Client in rooms & games
+     * Locally the player can only be in one room at a time
+     * IPlayer is located in /common directory
      * @param _player
      * @param _key
      * @param _room
@@ -41,13 +44,13 @@ export class LocalPlayer {
         return this._room;
     }
 
-    public set room(val: Room){
+    public set room(val: Room) {
         this._room = val;
     }
 
     /**
-     *
-     * @param {IRoomIsFullResponse | IJoinedResponse} resp
+     * Create new local Room and assign it to player
+     * @param {IJoinedResponse} resp
      */
     public joinedRoom(resp: IJoinedResponse): void {
         this._room = new Room(
@@ -58,6 +61,9 @@ export class LocalPlayer {
         this.color = resp.color;
     }
 
+    /**
+     * Tell room do destroy grid and delete room
+     */
     public leftRoom(): void {
         this._room.destroyGrid();
         this._room = null;

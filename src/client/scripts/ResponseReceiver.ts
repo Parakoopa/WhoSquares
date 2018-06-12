@@ -4,6 +4,14 @@ import {UiManager} from "./UiManager";
 
 export class ResponseReceiver {
 
+    /**
+     * Needs GameManagr to execute Server Responses
+     * Needs UiManager to display error messages & Feedback that does nto influence game
+     * Needs Socket to listen on for Responses(Responses are listed in /common directory)
+     * @param {GameManager} _gameMan
+     * @param {SocketIOClient.Socket} _socket
+     * @param {UiManager} _uiManager
+     */
     constructor(private _gameMan: GameManager, private _socket: Socket, private _uiManager: UiManager) {
         this.eventListener();
     }
@@ -15,7 +23,9 @@ export class ResponseReceiver {
         });
         // Actions
         this._socket.on("joinedRoom", (resp: IRoomIsFullResponse | IJoinedResponse) => {
-            this._gameMan.joinedRoom(resp);
+            if (resp.response === "roomIsFull") { // todo make own socket.on
+                this._uiManager.textElement(resp.response);
+            } else this._gameMan.joinedRoom(resp);
         });
         this._socket.on("leftRoom", (resp: ILeftResponse) => {
             this._gameMan.leftRoom();

@@ -1,41 +1,74 @@
 import Game = Phaser.Game;
-import {RequestEmitter} from "./RequestEmitter";
 import Socket = SocketIOClient.Socket;
 import {LocalPlayer} from "./LocalPlayer";
+import {RequestEmitter} from "./RequestEmitter";
 
 export class InputManager {
 
+    /**
+     * Player input may effect game and/or start a Request on Server
+     * @param {Phaser.Game} _game
+     * @param {RequestEmitter} _requestEmitter
+     */
     constructor(private _game: Game, private _requestEmitter: RequestEmitter = null) {
         _game.input.mouse.capture = true;
     }
 
-    public createRequestEmitter(socket:Socket, localPlayer: LocalPlayer) {
+    /**
+     * InputManager exists before RequestEmitter,
+     * thus has to be assigned afterwards
+     * @param {SocketIOClient.Socket} socket
+     * @param {LocalPlayer} localPlayer
+     */
+    public createRequestEmitter(socket: Socket, localPlayer: LocalPlayer) {
         this._requestEmitter = new RequestEmitter(socket, localPlayer);
     }
 
+    /**
+     * Check Mouse: OnLeftButtonDown
+     */
     public checkMouse() {
         if (this._game.input.activePointer.leftButton.onDown) {
             // example
         }
     }
 
+    /**
+     * Tell RequestEmitter to join given room
+     * @param {string} roomName
+     */
     public joinRoom(roomName: string): void {
         this._requestEmitter.joinRoom(roomName);
     }
 
+    /**
+     * Tell RequestEmitter to leave given room
+     */
     public leaveRoom(): void {
         this._requestEmitter.leaveRoom();
     }
 
+    /**
+     * Tell RequestEmitter to start given Game with given sizes
+     * ToDo: Connect Sizes to InputFields
+     */
     public startGame() {
-        // ToDo Add InputFields to set sizeX & sizeY
         this._requestEmitter.startGame(5, 5);
     }
 
+    /**
+     * Tell RequestEmitter to place Tile by ths player
+     * @param {number} x
+     * @param {number} y
+     */
     public placeTile(x: number, y: number): void {
         this._requestEmitter.placeTile(x, y);
     }
 
+    /**
+     * Debug
+     * Display weather a certain mouse button is clicked
+     */
     public debug(): void {
         this._game.debug.text("Left Button: " +
             this._game.input.activePointer.leftButton.isDown, 0, 150);

@@ -1,8 +1,8 @@
 import Game = Phaser.Game;
+import {Grid} from "./Grid";
 import {LocalPlayer} from "./LocalPlayer";
 import {ResponseReceiver} from "./ResponseReceiver";
 import {UiManager} from "./UiManager";
-import {Grid} from "./Grid";
 
 export class GameManager {
 
@@ -12,13 +12,17 @@ export class GameManager {
     private _responseReceiver: ResponseReceiver;
     private _localPlayer: LocalPlayer;
 
+    /**
+     * Create Game, Layout Game, Load Images
+     * Initialize UiManager
+     * Initialize ResponseReceiver
+     * Start UpdateLoop (Client only Updates UI & Logic stuff only by Server Events)
+     */
     constructor() {
-
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
             preload() {
               self.centerGame(game);
-              self.loadImages(game);
               self._uiManager = new UiManager(game);
               console.log(self._uiManager);
             },
@@ -35,7 +39,7 @@ export class GameManager {
     }
 
     /**
-     *
+     * Center the game inside the window
      * @param {Phaser.Game} game
      */
     private centerGame(game: Game): void {
@@ -45,44 +49,42 @@ export class GameManager {
     }
 
     /**
-     *
-     * @param {Phaser.Game} game
+     * Create a single local Player which represents the Client in rooms/games
+     * Create RequestEmitter, as requests always involve a connected local player
+     * @param {IPlayer} player
+     * @param {string} key
      */
-    private loadImages(game: Game): void {
-        game.load.image("gridTile", "./img/square32_grey.png");
-        game.load.image("startButton", "./img/startButton.png");
-        game.load.image("joinRoom01", "./img/joinRoom01.png");
-        game.load.image("joinRoom02", "./img/joinRoom02.png");
-        game.load.image("leaveRoom", "./img/leaveRoom.png");
-
-    }
-
     public addLocalPlayer(player: IPlayer, key: string): void {
         this._localPlayer = new LocalPlayer(player, key);
         this._uiManager.inputManager.createRequestEmitter(this._socket, this._localPlayer);
         this._uiManager.textElement("LocalPlayer: " +  this._localPlayer.name);
     }
 
-    public joinedRoom(resp: IRoomIsFullResponse | IJoinedResponse) {
-        if(this._localPlayer.room) {
-            this._uiManager.textElement("You are already in a room. Leave first!"); //Todo redundant due to server response
+    /**
+     * Tell room that localPlayer joined
+     * If it contains a grid (running game) so create the grid
+     * ToDo display client his role (player/observer)
+     * @param {IJoinedResponse} resp
+     */
+    public joinedRoom(resp: IJoinedResponse) {
+    // if(this._localPlayer.room) { seems to be redundant as server checks
+    //    this._uiManager.textElement("You are already in a room. Leave first!");
+    // }
+        this._localPlayer.joinedRoom(resp);
+        // If game already started, recreate grid
+        if (resp.gridInfo) {
+            console.log("color: " + this._localPlayer.color);
+            const grid: Grid = this._uiManager.createGridByInfo(resp.gridInfo, this._localPlayer.color);
+            this._localPlayer.room.startedGame(grid);
         }
-        else if (resp.response === "roomIsFull") {
-            this._uiManager.textElement(resp.response);
-        } else {
-            this._localPlayer.joinedRoom(resp);
-            // If game already started, recreate grid
-            if (resp.gridInfo) {
-                console.log("color: " + this._localPlayer.color);
-                const grid: Grid = this._uiManager.createGridByInfo(resp.gridInfo, this._localPlayer.color);
-                this._localPlayer.room.startedGame(grid);
-            }
-            this._uiManager.textElement("joined Room - Color: " + resp.color);
-            this._uiManager.roomName(resp.roomName);
-        }
+        this._uiManager.textElement("joined Room - Color: " + resp.color);
+        this._uiManager.roomName(resp.roomName);
         this.updateRoomList();
     }
 
+    /**
+     * Tell room that localPlayer left & update Ui
+     */
     public leftRoom(): void {
         this._localPlayer.leftRoom();
         this._uiManager.textElement("left room");
@@ -90,26 +92,49 @@ export class GameManager {
         this.updateRoomList();
     }
 
+    /**
+     * Tell room that Otherplayer joined & update Ui
+     * @param {IPlayer} otherPlayer
+     */
     public otherJoinedRoom(otherPlayer: IPlayer): void {
         this._localPlayer.room.otherJoinedRoom(otherPlayer);
         this.updateRoomList();
     }
 
+    /**
+     * Tell room that otherPlayer left & update Ui
+     * @param {string} name
+     */
     public otherLeftRoom(name: string): void {
         this._localPlayer.room.otherLeftRoom(name);
         this.updateRoomList();
     }
 
+    /**
+     * Tell room to create game with given sizes & update Ui
+     * @param {number} sizeX
+     * @param {number} sizeY
+     */
     public startedGame(sizeX: number, sizeY: number): void {
         this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.color));
         this._uiManager.textElement("Started game");
     }
 
+    /**
+     * Tell room to place Tile & updateUi
+     * @param {number} x
+     * @param {number} y
+     * @param {IPlayer} player
+     */
     public placedTile(x: number, y: number, player: IPlayer): void {
         this._localPlayer.room.placedTile(x, y, player);
         this._uiManager.textElement(player + " played tile on:" + x + "|" + y);
     }
 
+    /**
+     * Create a string OtherPlayers in room
+     * Tell UiManager to display it
+     */
     private updateRoomList(): void {
         let roomList: string = "";
         if (this._localPlayer.room) { // check if room exists

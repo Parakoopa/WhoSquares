@@ -1,6 +1,9 @@
 export class OtherPlayer {
 
     /**
+     * Represents every other player
+     * Values are used to interact with Otherplayers via Requests
+     * IPlayer is located in /common directory
      * @param _player
      */
     constructor(private _player: IPlayer) {}
