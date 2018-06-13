@@ -22,7 +22,7 @@ export class Lobby {
      */
     public startGame(client: Client, room: Room, sizeX: number, sizeY: number): IEvent[] {
         if (!room) return [this.notInRoomEvent(client)];
-        if (room.Owner() !== client ) return [this.notOwnerEvent(client)];
+        if (room.Owner() !== client ) return [this.notOwnerEvent(client, room.name)];
 
         if (room.clients.length < this._minimumClientsPerGame) {
             // ToDo Add NotEnoughClients  Response
@@ -36,19 +36,6 @@ export class Lobby {
         const startEvent: IEvent = this.startEvent(room.clients, sizeX, sizeY);
         const informTurnEvent: IEvent = room.informTurnEvent();
         return [startEvent, informTurnEvent];
-    }
-
-    private startEvent(clients: Client[], sizeX: number, sizeY: number): IEvent {
-        const startResponse =  {response: "startGame", sizeX, sizeY};
-        return {clients, name: "startGame", response: startResponse};
-    }
-
-    private notInRoomEvent(client: Client): IEvent {
-        return {clients: [client], name: "notInRoom", response: null};
-    }
-
-    private notOwnerEvent(client: Client): IEvent {
-        return {clients: [client], name: "notOwner", response: null};
     }
 
     /**
@@ -77,8 +64,7 @@ export class Lobby {
         let room: Room = this.roomByName(req.roomName);
         if (room === null) room = this.createRoom(req.roomName);
         else if (room.clients.length > room.maxSize) {
-            const response: IRoomIsFullResponse = {response: "roomIsFull"};
-            return [{clients: [client], name: "roomIsFull", response}];
+            return [this.roomIsFullEvent(client, room.name)];
         }
         return room.AddClient(client);
     }
@@ -92,23 +78,6 @@ export class Lobby {
         if (room.isEmpty()) this.removeRoom(room);
         const otherLeftEvent: IEvent = this.otherLeftEvent(client, room);
         return [leftEvent, otherLeftEvent];
-    }
-
-    private leftEvent(client: Client, room: Room): IEvent{
-        const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.key};
-        return {clients: [client], name: "leftRoom", response: leftResponse}; // no one else in room to notify
-    }
-
-    private otherLeftEvent(client: Client, room: Room): IEvent {
-        const otherLeftResponse: IOtherLeftResponse = {response: "otherLeftRoom",
-            roomKey: room.key,
-            name: client.name
-        };
-        return {
-            clients: room.getClientsExcept(client),
-            name: "otherLeftRoom",
-            response: otherLeftResponse
-        };
     }
 
     /**
@@ -152,6 +121,44 @@ export class Lobby {
             if (room.key === roomKey) return room;
         }
         return null;
+    }
+
+    // EVENTS
+    private roomIsFullEvent(client: Client, roomName: string): IEvent {
+        const response: IRoomIsFullResponse = {response: "roomIsFull", roomName};
+        return {clients: [client], name: "roomIsFull", response};
+    }
+
+    private notOwnerEvent(client: Client, roomName: string): IEvent {
+        const response: INotOwnerResponse = {response: "notOwner", roomName};
+        return {clients: [client], name: "notOwner", response};
+    }
+
+    private notInRoomEvent(client: Client): IEvent {
+        const response: INotInRoomResponse = {response: "notInRoom"};
+        return {clients: [client], name: "notInRoom", response};
+    }
+
+    private startEvent(clients: Client[], sizeX: number, sizeY: number): IEvent {
+        const startResponse: IStartGameResponse = {response: "startGame", sizeX, sizeY};
+        return {clients, name: "startGame", response: startResponse};
+    }
+
+    private leftEvent(client: Client, room: Room): IEvent {
+        const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.key};
+        return {clients: [client], name: "leftRoom", response: leftResponse}; // no one else in room to notify
+    }
+
+    private otherLeftEvent(client: Client, room: Room): IEvent {
+        const otherLeftResponse: IOtherLeftResponse = {response: "otherLeftRoom",
+            roomKey: room.key,
+            name: client.name
+        };
+        return {
+            clients: room.getClientsExcept(client),
+            name: "otherLeftRoom",
+            response: otherLeftResponse
+        };
     }
 
 }
