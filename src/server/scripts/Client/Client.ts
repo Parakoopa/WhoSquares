@@ -1,27 +1,27 @@
-import {Room} from "../Room/Room";
 import {Socket} from "socket.io";
-
+import {Room} from "../Room/Room";
 
 /**
  * A Room hosts a game for clients
  * Each client gets a color assigned
  */
-export class Client implements IPlayer {
+export class Client  {
 
-    private _room: Room;
-    private _mission: IMission;
+    private _rooms: Room[];
 
     /**
      * Clients are talked to via socket and identified via unique id guid
      * @param _socket
      * @param _key
-     * @param _player
+     * @param _name
      */
     constructor(
         private _socket: Socket,
         private _key: string,
-        private _player: IPlayer
-    ) {}
+        private _name: string
+    ) {
+        this._rooms = [];
+    }
 
     public get socket(): Socket {
         return this._socket;
@@ -31,40 +31,25 @@ export class Client implements IPlayer {
         return this._key;
     }
 
-    public get player(): IPlayer {
-        return this._player;
-    }
-
     public get name(): string {
-        return this._player.name;
+        return this._name;
     }
 
     public set name(val: string) {
-        this._player.name = val;
+        this._name = val;
     }
 
-    public get color(): string {
-        return this._player.color;
+    public addRoom(room: Room): void {
+        this._rooms.push(room);
     }
 
-    public set color(val: string) {
-        this._player.color = val;
+    public removeRoom(room: Room): void {
+        const index = this._rooms.indexOf(room);
+        if (index > -1) this._rooms.splice(index, 1);
     }
 
-    public get room(): Room {
-        return this._room;
-    }
-
-    public set room(val: Room) {
-        this._room = val;
-    }
-
-    public get mission(): IMission {
-        return this._mission;
-    }
-
-    public set mission(val: IMission) {
-        this._mission = val;
+    public roomCount(): number {
+        return this._rooms.length;
     }
 
 }

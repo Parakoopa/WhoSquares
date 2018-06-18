@@ -1,11 +1,19 @@
-import {Client} from "../../Client/Client";
 
 export class ColorDistributer {
 
-    private _clientColorMap: Map<string, Client>;
-    private readonly _colors: string[] =
-        ["FF3333", "FF9933", "FFFF33", "00FF00", "33FFFF", "9933FF", "FF33FF", "FF3399", "FF33FF"];
-        // ["red", "orange", "yellow", "green", "lightblue", "darkblue", "purple", "pink", ToDo "grey", "black", "white"];
+    private _clientColorMap: Map<number, boolean>;
+    private readonly _colors: number[] = [
+           parseInt("FF3333", 16), // red
+           parseInt("FF9933", 16), // orange
+           parseInt("FFFF33", 16), // yellow
+           parseInt("00FF00", 16), // green
+           parseInt("33FFFF", 16), // lightblue
+           parseInt("9933FF", 16), // darkblue
+           parseInt("FF33FF", 16), // purple
+           parseInt("FF3399", 16), // pink
+           parseInt("FF33FF", 16), // grey?
+            // Todo grey, black, white
+        ];
 
     constructor() {
         this._clientColorMap = new Map();
@@ -19,7 +27,7 @@ export class ColorDistributer {
      */
     private setColors(): void {
         for (const color of this._colors) {
-            this._clientColorMap.set(color, null);
+            this._clientColorMap.set(color, false);
         }
     }
 
@@ -28,11 +36,10 @@ export class ColorDistributer {
      * @returns {string}
      * @constructor
      */
-    public setClientColor(client: Client): string {
+    public getFreeColor(): number {
         for (const color of Array.from(this._clientColorMap.keys())) {
-            if (this._clientColorMap.get(color) === null) {
-                this._clientColorMap.set(color, client);
-                client.color = color;
+            if (!this._clientColorMap.get(color)) {
+                this._clientColorMap.set(color, true);
                 return color;
             }
         }
@@ -41,12 +48,10 @@ export class ColorDistributer {
 
     /**
      * Makes a color available again
-     * @param {Client} client
      * @constructor
+     * @param color
      */
-    public resetColor(client: Client): void {
-        const color: string = client.color;
-        client.color = null;
+    public resetColor(color: number): void {
         this._clientColorMap.set(color, null);
     }
 

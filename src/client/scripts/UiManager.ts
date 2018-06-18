@@ -12,26 +12,56 @@ export class UiManager {
     private _turnInfoSprite: Sprite;
     private _inputManager: InputManager;
 
+    /**
+     * Has an InputManager to be able of adding Events
+     * to interactive Ui Elements (f.e. buttons)
+     * @param {Phaser.Game} _game
+     */
     constructor(private _game: Game) {
         this._inputManager = new InputManager(_game);
+        this.loadImages(_game);
     }
 
+    /**
+     * Somehow neccessary due to client infrastructure
+     * //ToDo try to refactor components dependencies to get rid off
+     * @returns {InputManager}
+     */
+    public get inputManager(): InputManager {
+        return this._inputManager;
+    }
+
+    /**
+     * Create buttons & texts
+     */
     public createUi(): void {
         this.createButtons(this._game);
         this.createTexts(this._game);
     }
 
+    /**
+     * Update Loop For Ui Elements
+     */
     public update() {
         // All Updates are currently event based - Woho!
         this._inputManager.debug();
     }
 
-    public get inputManager(): InputManager { // todo get rid of
-        return this._inputManager;
+    /**
+     * Load Images from /img directory
+     * Images get stored by key in this (game)
+     * @param {Phaser.Game} game
+     */
+    private loadImages(game: Game): void {
+        game.load.image("gridTile", "./img/square32_grey.png");
+        game.load.image("startButton", "./img/startButton.png");
+        game.load.image("joinRoom01", "./img/joinRoom01.png");
+        game.load.image("joinRoom02", "./img/joinRoom02.png");
+        game.load.image("leaveRoom", "./img/leaveRoom.png");
     }
 
     /**
-     * f.e. StartButton
+     * Create Buttons
      * @param {Phaser.Game} game
      */
     private createButtons(game: Game): void {
@@ -50,7 +80,8 @@ export class UiManager {
     }
 
     /**
-     * f.e. feedback text, turn info text +sprite
+     * Create Text Elements (Feedback messages, Display OtherPlayers in Room, etc.)
+     * Create TurnInfoSprite (Square that is tinted in the color of the current player at turn)
      * @param {Phaser.Game} game
      */
     private createTexts(game: Game): void {
@@ -95,30 +126,71 @@ export class UiManager {
         this._turnInfoSprite.tint = 0xcccccc;
     }
 
+    /**
+     * Create a grid of given image, sizes & color
+     * Is owned by room but called here as it consists of ui elements
+     * @param {number} sizeX
+     * @param {number} sizeY
+     * @param {number} color
+     * @returns {Grid}
+     */
     public createGrid(sizeX: number, sizeY: number, color: number): Grid {
         const grid = new Grid(this._game, this._inputManager);
         grid.createGrid("gridTile", sizeX, sizeY, 40, color);
         return grid;
     }
 
+    /**
+     * Recreates a grid that already exists on server side
+     * Is owned by room but called here as it consists of ui elements
+     * @param {IPlayer[][]} gridInfo
+     * @param {number} color
+     * @returns {Grid}
+     */
+    public createGridByInfo(gridInfo: IPlayer[][], color: number): Grid {
+        const grid = this.createGrid(gridInfo[0].length, gridInfo.length, color);
+        grid.placedTiles(gridInfo);
+        return grid;
+    }
+
+    /**
+     * Display feedback text
+     * @param {string} text
+     */
     public textElement(text: string): void {
         this._textElement.text = text;
     }
 
+    /**
+     * Display current room name
+     * @param {string} text
+     */
     public roomName(text: string): void {
         this._roomNameElement.text = "room: " + text;
     }
 
+    /**
+     * Display list of Otherplayers in room
+     * @param {string} text
+     */
     public roomList(text: string): void {
         this._roomListElement.text = text;
     }
 
+    /**
+     * Color the square based on color of current players turn
+     * @param {number} color
+     */
     public turnInfo(color: number): void {
         this._turnInfoSprite.tint = color;
     }
 
-    public winGame(color: string): void {
-        this._textElement.text = "Winner: " + color;
+    /**
+     * Display winner of current game
+     * @param {string} name
+     */
+    public winGame(name: string): void {
+        this._textElement.text = "Winner: " + name;
     }
 
 }

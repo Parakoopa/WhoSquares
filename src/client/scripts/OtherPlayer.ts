@@ -1,6 +1,9 @@
-export class OtherPlayer implements IPlayer {
+export class OtherPlayer {
 
     /**
+     * Represents every other player
+     * Values are used to interact with Otherplayers via Requests
+     * IPlayer is located in /common directory
      * @param _player
      */
     constructor(private _player: IPlayer) {}
@@ -17,15 +20,17 @@ export class OtherPlayer implements IPlayer {
         this._player.name = val;
     }
 
-    public get color(): string {
+    public get color(): number {
         return this._player.color;
     }
 
-    public set color(val: string) {
+    public set color(val: number) {
         this._player.color = val;
     }
 
-    public getColorHex(): number {
-        return  parseInt(this._player.color, 16);
+    public equals(other: IPlayer) {
+        if (this.player === other ) return true;
+        return this.player.name === other.name && this.player.color === other.color;
     }
+
 }

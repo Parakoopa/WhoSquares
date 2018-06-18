@@ -1,6 +1,7 @@
 interface IPlayer {
     name: string;
-    color: string;
+    color: number;
+    isObserver: boolean;
 }
 
 interface ILocalPlayer extends IPlayer {

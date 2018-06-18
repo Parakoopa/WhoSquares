@@ -1,36 +1,37 @@
-import {Client} from "../../Client/Client";
+import {LocalPlayer} from "../../Client/Player/LocalPlayer";
 
 export class TurnManager {
 
     private _index: number = 0;
-    private readonly _clients: Client[];
+    private _players: LocalPlayer[];
 
     constructor() {
-        this._clients = [];
+        this._players = [];
     }
 
     public reset(): void {
         this._index = 0;
+        this._players = [];
     }
 
-    public addClient(client: Client): void {
-        this._clients.push(client);
+    public addClient(player: LocalPlayer): void {
+        this._players.push(player);
     }
 
-    public removeClient(client: Client): void {
-        const index: number = this._clients.indexOf(client);
+    public removeClient(player: LocalPlayer): void {
+        const index: number = this._players.indexOf(player);
         if (index < 0) return;
-        this._clients.splice(index, 1);
-        if (this._index >= this._clients.length) this._index = 0;
+        this._players.splice(index, 1);
+        if (this._index >= this._players.length) this._index = 0;
     }
 
-    public curClient(): Client {
-        return this._clients[this._index];
+    public curClient(): LocalPlayer {
+        return this._players[this._index];
     }
 
     public setNextClient(): void {
         this._index += 1;
-        if (this._index >= this._clients.length) this._index = 0;
+        if (this._index >= this._players.length) this._index = 0;
     }
 
     // ToDo Add removeClient(client:Client)...

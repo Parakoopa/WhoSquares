@@ -4,10 +4,12 @@ export class Player implements IPlayer {
     /**
      * @param name
      * @param color
+     * @param isObserver
      */
     constructor(
         public name: string,
-        public color: string = null
+        public color: number = null,
+        public isObserver: boolean = false
     ) {}
 
 }

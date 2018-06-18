@@ -16,22 +16,53 @@ export class Grid {
      */
     constructor(private _game: Game, private _inputManager: InputManager) {}
 
+    /**
+     * @returns {number}
+     */
     public sizeX(): number {
         return this._sizeX;
     }
 
+    /**
+     * @returns {number}
+     */
     public sizeY(): number {
         return this._sizeY;
     }
 
-    public placedTile(color: number, x: number, y: number) {
-       const sprite: Sprite =  this._grid[y][x];
-       sprite.data.color = color; // save color on object as it is overwritten f.e. onOver
-       this._grid[y][x].tint = color;
+    /**
+     * Assign an IPlayer to a specific tile in grid
+     * Tint the color based on the players color
+     * Always saves the base color
+     * @param {IPlayer} player
+     * @param {number} x
+     * @param {number} y
+     */
+    public placedTile(player: IPlayer, y: number, x: number) {
+        if (!player) return; // tile is not owned by any player
+        const sprite: Sprite =  this._grid[y][x];
+        sprite.data.color = player.color; // save color on object as it is overwritten f.e. onOver
+        this._grid[y][x].tint = player.color;
     }
 
     /**
-     * Creates a grid of image tiles
+     * Used to recreate a grid by assigning all tiles of
+     * another 2D grid
+     * @param {IPlayer[][]} gridInfo
+     */
+    public placedTiles(gridInfo: IPlayer[][]) {
+        for (let y = 0; y < gridInfo.length; y++) {
+            for (let x = 0; x < gridInfo[y].length; x++) {
+                this.placedTile(gridInfo[y][x], y, x);
+            }
+        }
+    }
+
+    /**
+     * Creates a 2D grid of image tiles
+     * Adjusrs TileSizes, Offsets, etc.
+     * Sets Color & Tint
+     * Adds EventListener for Mouse to each Tile (OonDown, OnOver, OnOut)
      * @param imageName
      * @param sizeX
      * @param sizeY
@@ -73,7 +104,13 @@ export class Grid {
 
     }
 
-    public destroy(): void{
+    /**
+     * Destroys each tile of the grid,
+     * thus destroying the grid.
+     * Setting grid null is not enough as tiles are referenced
+     * in game
+     */
+    public destroy(): void {
         for (let y = 0; y < this._grid.length; y++) {
             for (let x = 0; x < this._grid[y].length; x++) {
                this._grid[y][x].destroy(true);
@@ -104,6 +141,6 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     public onDown(sprite: Sprite) {
-        this._inputManager.placeTile(sprite.data.x, sprite.data.y);
+        this._inputManager.placeTile(sprite.data.y, sprite.data.x);
     }
 }
