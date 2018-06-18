@@ -182,7 +182,7 @@ export class Room extends RoomEvents implements IRoom {
      * @param x
      * @param y
      */
-    public placeTile(client: Client, x: number, y: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
+    public placeTile(client: Client, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
         const localPlayer: LocalPlayer = this._clientMap.get(client);
         if (localPlayer.player.isObserver) {
             return [this.observerEvent(client)];
@@ -190,12 +190,12 @@ export class Room extends RoomEvents implements IRoom {
         if (localPlayer !== this._turnManager.curClient()) {
             return [this.notYourTurnEvent(client, this.name)];
         }
-        if (this._serverGrid.placeTile(localPlayer.player, x, y)) {
+        if (this._serverGrid.placeTile(localPlayer.player, y, x)) {
             if (localPlayer.mission.check(localPlayer.player, this._serverGrid.gridInfo)) {
                 console.log("Client won his mission: " + localPlayer.player.color);
                 return [this.winGameEvent(this.clients, this.name, localPlayer.player)];
             }
-            const placedEvent: IEvent = this.placedEvent(this.clients, this.name, localPlayer.player, x, y); // Also sets next client
+            const placedEvent: IEvent = this.placedEvent(this.clients, this.name, localPlayer.player, y, x); // Also sets next client
             this._turnManager.setNextClient();
             const player = this._turnManager.curClient().player;
             const informTurnEvent = this.informTurnEvent(this.clients, player); // inform for next player color

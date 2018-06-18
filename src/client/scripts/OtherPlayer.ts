@@ -28,4 +28,9 @@ export class OtherPlayer {
         this._player.color = val;
     }
 
+    public equals(other: IPlayer) {
+        if (this.player === other ) return true;
+        return this.player.name === other.name && this.player.color === other.color;
+    }
+
 }

@@ -38,7 +38,7 @@ export class ResponseReceiver {
             this._gameMan.otherJoinedRoom(resp.otherPlayer);
         });
         this._socket.on("placedTile", (resp: IPlacedTileResponse) => {
-            this._gameMan.placedTile(resp.x, resp.y, resp.player);
+            this._gameMan.placedTile(resp.y, resp.x, resp.player);
         });
         this._socket.on("startGame", (resp: IStartGameResponse) => {
             this._gameMan.startedGame(resp.sizeX, resp.sizeY);

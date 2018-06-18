@@ -65,7 +65,7 @@ export class ConnectionManager {
                 const client: Client = this.clientBySocket(socket);
                 const room = this._lobby.roomByKey(req.roomKey);
                 if (!room) return; // Todo return invalid roomkey response
-                const placeEvents: IEvent[] =  room.placeTile(client, req.x, req.y);
+                const placeEvents: IEvent[] =  room.placeTile(client, req.y, req.x);
                 this.emitEvents(placeEvents);
             });
 

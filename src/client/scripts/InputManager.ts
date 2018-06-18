@@ -61,8 +61,8 @@ export class InputManager {
      * @param {number} x
      * @param {number} y
      */
-    public placeTile(x: number, y: number): void {
-        this._requestEmitter.placeTile(x, y);
+    public placeTile(y: number, x: number): void {
+        this._requestEmitter.placeTile(y, x);
     }
 
     /**

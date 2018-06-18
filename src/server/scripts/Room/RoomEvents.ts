@@ -42,8 +42,8 @@ export class RoomEvents {
         return {clients, name: "informTurn", response};
     }
 
-    public placedEvent(clients: Client[], roomName: string, player: IPlayer, x: number, y: number): IEvent {
-        const response: IPlacedTileResponse = {response: "placedTile", roomName, player, x, y};
+    public placedEvent(clients: Client[], roomName: string, player: IPlayer, y: number, x: number): IEvent {
+        const response: IPlacedTileResponse = {response: "placedTile", roomName, player, y, x};
         return {clients, name: "placedTile", response};
     }
 

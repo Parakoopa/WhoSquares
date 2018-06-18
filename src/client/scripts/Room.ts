@@ -66,8 +66,8 @@ export class Room {
      * @param {number} y
      * @param {IPlayer} player
      */
-    public placedTile(x: number, y: number, player: IPlayer): void {
-        this._grid.placedTile(player, x, y);
+    public placedTile(y: number, x: number, player: IPlayer): void {
+        this._grid.placedTile(player, y, x);
     }
 
     /**
@@ -121,10 +121,10 @@ export class Room {
 
     private getOtherPlayer(player: IPlayer): OtherPlayer {
         for (const otherPlayer of this._otherPlayers) {
-            if(otherPlayer.player === player) return otherPlayer;
+            // ToDo implement equals in real IPlayer on Client somehow
+            if (otherPlayer.equals(player)) return otherPlayer;
         }
     }
-
 
     /**
      * Convert IPlayers to OtherPlayers

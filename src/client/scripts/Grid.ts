@@ -38,7 +38,7 @@ export class Grid {
      * @param {number} x
      * @param {number} y
      */
-    public placedTile(player: IPlayer, x: number, y: number) {
+    public placedTile(player: IPlayer, y: number, x: number) {
         if (!player) return; // tile is not owned by any player
         const sprite: Sprite =  this._grid[y][x];
         sprite.data.color = player.color; // save color on object as it is overwritten f.e. onOver
@@ -53,7 +53,7 @@ export class Grid {
     public placedTiles(gridInfo: IPlayer[][]) {
         for (let y = 0; y < gridInfo.length; y++) {
             for (let x = 0; x < gridInfo[y].length; x++) {
-                this.placedTile(gridInfo[y][x], x, y);
+                this.placedTile(gridInfo[y][x], y, x);
             }
         }
     }
@@ -141,6 +141,6 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     public onDown(sprite: Sprite) {
-        this._inputManager.placeTile(sprite.data.x, sprite.data.y);
+        this._inputManager.placeTile(sprite.data.y, sprite.data.x);
     }
 }

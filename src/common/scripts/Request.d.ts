@@ -33,6 +33,6 @@ interface IPlaceTileRequest extends IRequest {
     request: "placeTile";
     playerKey: string;
     roomKey: string;
-    x: number;
     y: number;
+    x: number;
 }

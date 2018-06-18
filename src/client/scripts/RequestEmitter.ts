@@ -51,10 +51,10 @@ export class RequestEmitter {
      * @param {number} x
      * @param {number} y
      */
-    public placeTile(x: number, y: number): void {
+    public placeTile(y: number, x: number): void {
         const playerKey = this._localPlayer.key;
         const roomKey = this._localPlayer.room.key;
-        this._socket.emit("placeTile" , {request: "placeTile", playerKey, roomKey, x, y});
+        this._socket.emit("placeTile" , {request: "placeTile", playerKey, roomKey, y, x});
     }
 
 }

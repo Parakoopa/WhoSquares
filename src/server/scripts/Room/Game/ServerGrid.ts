@@ -36,9 +36,9 @@ export class ServerGrid {
         this._grid = grid;
     }
 
-    public placeTile(player: IPlayer, x: number, y: number): boolean {
+    public placeTile(player: IPlayer, y: number, x: number): boolean {
         if (x < this._sizeX && y < this._sizeY) {
-            this._grid[x][y] = player;
+            this._grid[y][x] = player;
             return true;
         } else return false; // ToDo Someone is cheating
     }

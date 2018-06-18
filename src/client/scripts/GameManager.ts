@@ -24,7 +24,6 @@ export class GameManager {
             preload() {
               self.centerGame(game);
               self._uiManager = new UiManager(game);
-              console.log(self._uiManager);
             },
             create() {
                 self._uiManager.createUi();
@@ -73,7 +72,6 @@ export class GameManager {
         this._localPlayer.joinedRoom(resp);
         // If game already started, recreate grid
         if (resp.gridInfo) {
-            console.log("color: " + this._localPlayer.color);
             const grid: Grid = this._uiManager.createGridByInfo(resp.gridInfo, this._localPlayer.color);
             this._localPlayer.room.startedGame(grid);
         }
@@ -107,7 +105,7 @@ export class GameManager {
      * @param player
      */
     public otherLeftRoom(player: IPlayer): void {
-        if (!this._localPlayer.room) return;
+        if (!this._localPlayer.room) return; //player currently disconnected
         this._localPlayer.room.otherLeftRoom(player);
         this.updateRoomList();
     }
@@ -128,8 +126,10 @@ export class GameManager {
      * @param {number} y
      * @param {IPlayer} player
      */
-    public placedTile(x: number, y: number, player: IPlayer): void {
-        this._localPlayer.room.placedTile(x, y, player);
+    public placedTile(y: number, x: number, player: IPlayer): void {
+        if (!this._localPlayer) return; // player currently disconnected
+        if (!this._localPlayer.room) return; // player currently not in room
+        this._localPlayer.room.placedTile(y, x, player);
         this._uiManager.textElement(player + " played tile on:" + x + "|" + y);
     }
 

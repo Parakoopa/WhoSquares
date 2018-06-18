@@ -70,7 +70,6 @@ export class Lobby extends LobbyEvents {
         const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
         const player = room.RemoveClient(client);
-
         if (!player) return []; // ToDo Notify client that client is not in this room
         client.removeRoom(room);
 
@@ -96,7 +95,6 @@ export class Lobby extends LobbyEvents {
     private removeRoom(room: Room): void {
         const index: number = this._rooms.indexOf(room);
         if (index < 0) return;
-        console.log("REMOVED ROOM");
         this._rooms.splice(index, 1);
     }
 
