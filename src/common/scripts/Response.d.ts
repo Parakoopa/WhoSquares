@@ -16,6 +16,7 @@ interface IConnectedResponse extends IResponse {
 
 interface IRoomIsFullResponse extends IResponse {
     response: "roomIsFull";
+    roomName: string;
 }
 
 interface IJoinedResponse extends IResponse {
@@ -29,37 +30,45 @@ interface IJoinedResponse extends IResponse {
 
 interface IOtherJoinedResponse extends IResponse {
     response: "otherJoinedRoom";
+    roomName: string;
     otherPlayer: IPlayer;
 }
 
 interface ILeftResponse extends IResponse {
     response: "leftRoom";
-    roomKey: string;
+    roomName: string;
 }
 
 interface IOtherLeftResponse extends IResponse {
     response: "otherLeftRoom";
-    roomKey: string;
-    name: string;
+    roomName: string;
+    player: IPlayer;
 }
 
 interface IRoomIsFullResponse extends IResponse {
     response: "roomIsFull";
+    roomName: string;
 }
 
 interface IStartGameResponse extends IResponse {
     response: "startGame";
+    roomName: string;
     sizeX: number;
     sizeY: number;
 }
 
 interface INotOwnerResponse extends IResponse {
     response: "notOwner";
+    roomName: string;
+}
+
+interface INotInRoomResponse extends IResponse {
+    response: "notInRoom";
 }
 
 interface IPlacedTileResponse extends IResponse {
     response: "placedTile";
-    roomKey: string;
+    roomName: string;
     player: IPlayer;
     x: number;
     y: number;
@@ -67,7 +76,7 @@ interface IPlacedTileResponse extends IResponse {
 
 interface INotYourTurnResponse extends IResponse {
     response: "notYourTurn";
-    roomKey: string;
+    roomName: string;
 }
 
 interface IAlreadyInRoomResponse extends IResponse {
@@ -85,7 +94,11 @@ interface IInformTurnResponse extends IResponse {
 
 interface IWinGameResponse extends IResponse {
     response: "winGame";
-    roomKey: string;
+    roomName: string;
     player: IPlayer;
 }
 
+interface IInvalidPlacement extends IResponse {
+    response: "invalidPlacement";
+    roomName: string;
+}

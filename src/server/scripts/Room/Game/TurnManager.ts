@@ -1,4 +1,4 @@
-import {LocalPlayer} from "../../Client/LocalPlayer";
+import {LocalPlayer} from "../../Client/Player/LocalPlayer";
 
 export class TurnManager {
 

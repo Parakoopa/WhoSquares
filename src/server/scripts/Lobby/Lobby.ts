@@ -1,21 +1,22 @@
-import {Client} from "./Client/Client";
-import {LocalPlayer} from "./Client/LocalPlayer";
-import {IEvent} from "./Event";
-import {Room} from "./Room/Room";
-import {Utility} from "./Utility";
+import {Client} from "../Client/Client";
+import {IEvent} from "../Event";
+import {Room} from "../Room/Room";
+import {Utility} from "../Utility";
+import {LobbyEvents} from "./LobbyEvents";
 
-export class Lobby {
+export class Lobby extends LobbyEvents {
 
-    private _minimumClientsPerGame: number = 1;
     private readonly _rooms: Room[];
+    private _minimumClientsPerGame: number = 1;
     private _maxRoomSize: number = 10;
-
     private _minGridSize: number = 3;
     private _maxGridSize: number = 10;
 
     constructor() {
+        super();
         this._rooms = [];
     }
+
     /**
      * Tell all Clients to start GameManager
      * @constructor
@@ -31,11 +32,7 @@ export class Lobby {
         sizeX = sizes[0];
         sizeY = sizes[1];
 
-        room.createGame(sizeX, sizeY);
-
-        const startEvent: IEvent = this.startEvent(room.clients, sizeX, sizeY);
-        const informTurnEvent: IEvent = room.informTurnEvent();
-        return [startEvent, informTurnEvent];
+        return room.createGame(sizeX, sizeY);
     }
 
     /**
@@ -72,11 +69,16 @@ export class Lobby {
     public leaveRoom(client: Client, roomKey: string): IEvent[] {
         const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
-        if (!room.RemoveClient(client)) return []; // ToDo Notify client that client is not in this room
+        const player = room.RemoveClient(client);
+
+        if (!player) return []; // ToDo Notify client that client is not in this room
         client.removeRoom(room);
-        const leftEvent: IEvent = this.leftEvent(client, room);
+
+        // ToDo move into RoomEvents and call from Room?
+        const leftEvent: IEvent = this.leftEvent(client, room.name);
+        const otherLeftEvent: IEvent = this.otherLeftEvent(room.getClientsExcept(client), room.name, player);
+
         if (room.isEmpty()) this.removeRoom(room);
-        const otherLeftEvent: IEvent = this.otherLeftEvent(client, room);
         return [leftEvent, otherLeftEvent];
     }
 
@@ -94,6 +96,7 @@ export class Lobby {
     private removeRoom(room: Room): void {
         const index: number = this._rooms.indexOf(room);
         if (index < 0) return;
+        console.log("REMOVED ROOM");
         this._rooms.splice(index, 1);
     }
 
@@ -121,44 +124,6 @@ export class Lobby {
             if (room.key === roomKey) return room;
         }
         return null;
-    }
-
-    // EVENTS
-    private roomIsFullEvent(client: Client, roomName: string): IEvent {
-        const response: IRoomIsFullResponse = {response: "roomIsFull", roomName};
-        return {clients: [client], name: "roomIsFull", response};
-    }
-
-    private notOwnerEvent(client: Client, roomName: string): IEvent {
-        const response: INotOwnerResponse = {response: "notOwner", roomName};
-        return {clients: [client], name: "notOwner", response};
-    }
-
-    private notInRoomEvent(client: Client): IEvent {
-        const response: INotInRoomResponse = {response: "notInRoom"};
-        return {clients: [client], name: "notInRoom", response};
-    }
-
-    private startEvent(clients: Client[], sizeX: number, sizeY: number): IEvent {
-        const startResponse: IStartGameResponse = {response: "startGame", sizeX, sizeY};
-        return {clients, name: "startGame", response: startResponse};
-    }
-
-    private leftEvent(client: Client, room: Room): IEvent {
-        const leftResponse: ILeftResponse = {response: "leftRoom", roomKey: room.key};
-        return {clients: [client], name: "leftRoom", response: leftResponse}; // no one else in room to notify
-    }
-
-    private otherLeftEvent(client: Client, room: Room): IEvent {
-        const otherLeftResponse: IOtherLeftResponse = {response: "otherLeftRoom",
-            roomKey: room.key,
-            name: client.name
-        };
-        return {
-            clients: room.getClientsExcept(client),
-            name: "otherLeftRoom",
-            response: otherLeftResponse
-        };
     }
 
 }

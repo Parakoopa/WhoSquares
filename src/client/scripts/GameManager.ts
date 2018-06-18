@@ -102,11 +102,13 @@ export class GameManager {
     }
 
     /**
+     * Check if player really is in  a room
      * Tell room that otherPlayer left & update Ui
-     * @param {string} name
+     * @param player
      */
-    public otherLeftRoom(name: string): void {
-        this._localPlayer.room.otherLeftRoom(name);
+    public otherLeftRoom(player: IPlayer): void {
+        if (!this._localPlayer.room) return;
+        this._localPlayer.room.otherLeftRoom(player);
         this.updateRoomList();
     }
 

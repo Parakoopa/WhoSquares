@@ -31,7 +31,7 @@ export class ResponseReceiver {
             this._gameMan.leftRoom();
         });
         this._socket.on("otherLeftRoom", (resp: IOtherLeftResponse) => {
-            this._gameMan.otherLeftRoom(resp.name);
+            this._gameMan.otherLeftRoom(resp.player);
         });
         this._socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
 

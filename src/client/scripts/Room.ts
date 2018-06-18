@@ -14,7 +14,7 @@ export class Room {
      * @param {IPlayer[]} otherPlayers
      */
     constructor(private _roomKey: string, private _roomName: string, otherPlayers: IPlayer[]) {
-        this._otherPlayers = this.toOtherPlayer(otherPlayers);
+        this._otherPlayers = this.toOtherPlayers(otherPlayers);
     }
 
     /**
@@ -43,11 +43,11 @@ export class Room {
 
     /**
      * Get Player by name and tell room to remove it
-     * @param {string} name
+     * @param player
      */
-    public otherLeftRoom(name: string): void {
-        const player: OtherPlayer = this.playerByName(name);
-        this.removePlayer(player);
+    public otherLeftRoom(player: IPlayer): void {
+        const otherPlayer = this.getOtherPlayer(player);
+        this.removePlayer(otherPlayer);
     }
 
     /**
@@ -101,10 +101,12 @@ export class Room {
     }
 
     /**
-     * Add OtherPlayer to this room
+     * Add OtherPlayer to this room if not contained yet
+     * ToDo might have to be adjusted dis/reconnect Responses are added
      * @param {OtherPlayer} player
      */
     private addPlayer(player: OtherPlayer): void {
+        if (this._otherPlayers.includes(player)) return;
         this._otherPlayers.push(player);
     }
 
@@ -117,12 +119,19 @@ export class Room {
         if (index > -1) this._otherPlayers.splice(index, 1);
     }
 
+    private getOtherPlayer(player: IPlayer): OtherPlayer {
+        for (const otherPlayer of this._otherPlayers) {
+            if(otherPlayer.player === player) return otherPlayer;
+        }
+    }
+
+
     /**
      * Convert IPlayers to OtherPlayers
      * @param {IPlayer[]} players
      * @returns {OtherPlayer[]}
      */
-    private toOtherPlayer(players: IPlayer[]): OtherPlayer[] {
+    private toOtherPlayers(players: IPlayer[]): OtherPlayer[] {
         const otherPlayers = []; // Reset on Join Room
         for (const player of players) {
             otherPlayers.push(new OtherPlayer(player));

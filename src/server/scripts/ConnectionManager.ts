@@ -1,8 +1,8 @@
 import {Socket} from "socket.io";
 import {Client} from "./Client/Client";
-import {Player} from "./Client/Player";
+import {Player} from "./Client/Player/Player";
 import {IEvent} from "./Event";
-import {Lobby} from "./Lobby";
+import {Lobby} from "./Lobby/Lobby";
 import {Utility} from "./Utility";
 
 export class ConnectionManager {
