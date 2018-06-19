@@ -13,7 +13,7 @@ build_image:
   tags:
     - marco
   stage: build
-  image: nexus.informatik.haw-hamburg.de/docker:stable-dind
+  image: docker:stable-dind
   script:
    # Einloggen in meinen privaten Docker Host
    - mkdir -p ~/.docker
