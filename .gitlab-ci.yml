@@ -3,6 +3,7 @@ stages:
     - deploy
 
 variables:
+ DOCKER_HOST: "tcp://localhost:2375"
  DOCKER_REGISTRY: "docker-hub.informatik.haw-hamburg.de"
  NEXUS_REGISTRY: "nexus.informatik.haw-hamburg.de"
  SERVICE_NAME: "wp-mbc-ss2018/who-squares"
