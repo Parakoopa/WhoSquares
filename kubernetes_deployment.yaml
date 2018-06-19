@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: who-squares
+    name: who-squares
+  name: who-squares
+spec:
+  selector:
+    matchLabels:
+      service: who-squares
+  template:
+    metadata:
+      labels:
+        service: who-squares
+    spec:
+      imagePullSecrets:
+        - name: gitlab-docker-hub
+      containers:
+        - image: docker-hub.informatik.haw-hamburg.de/wp-mbc-ss2018/who-squares:latest
+          name: who-squares
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              memory: "500Mi"
+              cpu: "200m"
+            limits:
+              memory: "4000Mi"
+              cpu: "4000m"
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: who-squares
+    name: who-squares
+  name: who-squares
+spec:
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    service: who-squares
+  type: ClusterIP
+
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+  name: who-squares
+spec:
+  tls:
+  - hosts:
+    - who-squares.informatik.haw-hamburg.de
+    secretName: who-squares-tls
+  rules:
+  - host: who-squares.informatik.haw-hamburg.de
+    http:
+      paths:
+      - path: /
+        backend:
+            serviceName: who-squares
+            servicePort: 8080
