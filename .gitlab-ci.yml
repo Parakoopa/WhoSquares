@@ -3,17 +3,22 @@ stages:
     - deploy
 
 variables:
- DOCKER_HOST: "tcp://localhost:2375"
+ DOCKER_HOST: "tcp://yourcoon.de:2376"
  DOCKER_REGISTRY: "docker-hub.informatik.haw-hamburg.de"
  NEXUS_REGISTRY: "nexus.informatik.haw-hamburg.de"
  SERVICE_NAME: "wp-mbc-ss2018/who-squares"
+ DOCKER_TLS_VERIFY: 1
 
 build_image:
+  tags: marco
   stage: build
   image: nexus.informatik.haw-hamburg.de/docker:stable-dind
-  services:
-   - nexus.informatik.haw-hamburg.de/docker:stable-dind
   script:
+   # Einloggen in meinen privaten Docker Host
+   - mkdir -p ~/.docker
+   - echo "$TLSCACERT" > ~/.docker/ca.pem
+   - echo "$TLSCERT" > ~/.docker/cert.pem
+   - echo "$TLSKEY" > ~/.docker/key.pem
    # Einloggen in HAW Registries
    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $DOCKER_REGISTRY
    - docker login -u $NEXUS_USER -p $NEXUS_PW $NEXUS_REGISTRY
@@ -29,6 +34,7 @@ build_image:
 
 # Triggered das Deployment
 deploy:
+  tags: k8s
   environment:
     name: ICC-K8s
   stage: deploy
