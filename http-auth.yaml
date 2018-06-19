@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  # base64 encodiert -- master:$apr1$n4hqNn3Z$TL1PwIq6pYk5pGRaMlg00. -- [master:modern]
+  auth: bWFzdGVyOiRhcHIxJG40aHFObjNaJFRMMVB3SXE2cFlrNXBHUmFNbGcwMC4K
+kind: Secret
+metadata:
+  name: basic-auth
+type: Opaque
