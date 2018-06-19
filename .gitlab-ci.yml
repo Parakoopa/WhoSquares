@@ -10,7 +10,8 @@ variables:
  DOCKER_TLS_VERIFY: 1
 
 build_image:
-  tags: marco
+  tags:
+    - marco
   stage: build
   image: nexus.informatik.haw-hamburg.de/docker:stable-dind
   script:
@@ -34,7 +35,8 @@ build_image:
 
 # Triggered das Deployment
 deploy:
-  tags: k8s
+  tags:
+    - k8s
   environment:
     name: ICC-K8s
   stage: deploy
