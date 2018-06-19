@@ -1,4 +1,4 @@
-FROM nexus.informatik.haw-hamburg.de/node:8
+FROM node:8
 
 # Install app dependencies
 COPY package.json .
