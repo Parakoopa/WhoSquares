@@ -6,10 +6,12 @@ import {InputManager} from "./InputManager";
 export class UiManager {
 
     private _textElement: Phaser.Text = null;
+    private _startGameElement: Phaser.Text = null;
     private _roomListElement: Phaser.Text = null;
     private _roomNameElement: Phaser.Text = null;
 
     private _turnInfoSprite: Sprite;
+    private _gridBackground: Sprite;
     private _inputManager: InputManager;
 
     /**
@@ -35,6 +37,8 @@ export class UiManager {
      * Create buttons & texts
      */
     public createUi(): void {
+        this._game.add.tileSprite(0, 0, 800, 600, "background");
+
         this.createButtons(this._game);
         this.createTexts(this._game);
     }
@@ -53,8 +57,9 @@ export class UiManager {
      * @param {Phaser.Game} game
      */
     private loadImages(game: Game): void {
+        game.load.image("background", "./img/background.png");
         game.load.image("gridTile", "./img/square32_grey.png");
-        game.load.image("startButton", "./img/startButton.png");
+        game.load.image("startButton", "./img/startButton2.png");
         game.load.image("joinRoom01", "./img/joinRoom01.png");
         game.load.image("joinRoom02", "./img/joinRoom02.png");
         game.load.image("leaveRoom", "./img/leaveRoom.png");
@@ -66,7 +71,7 @@ export class UiManager {
      */
     private createButtons(game: Game): void {
         const startButton = game.add.button(
-            game.world.centerX - 82, 10, "startButton",
+            game.world.centerX - 150, 20, "startButton",
             () => this._inputManager.startGame(), game, 2, 1, 0);
         const joinRoomButton1 = game.add.button(
             game.world.centerX + 118, 400, "joinRoom01",
@@ -90,16 +95,25 @@ export class UiManager {
             game.world.centerX,
             game.world.centerY * 0.35,
             "Bla",
-            {font: "32px Arial", fill: "#ff0044", align: "center"}
+            {font: "32px Sunflower", fill: "#ff0044", align: "center"}
         );
         this._textElement.anchor.setTo(0.5, 0.5);
+
+        // Start Game Text
+        this._startGameElement = game.add.text(
+            game.world.centerX,
+            58,
+            "START GAME",
+            { font: "32px Sunflower", fill: "#FFFFFF", align: "center" }
+        );
+        this._startGameElement.anchor.setTo(0.5, 0.5);
 
         // RoomName
         this._roomNameElement = game.add.text(
             game.world.centerX * 1.6,
             game.world.centerY - 130,
             "Raumname",
-            {font: "32px Arial", fill: "#ff0044", align: "center"}
+            {font: "32px Sunflower", fill: "#ff0044", align: "center"}
         );
         this._roomNameElement.anchor.setTo(0.5, 0.5);
 
@@ -108,7 +122,7 @@ export class UiManager {
             game.world.centerX * 1.6,
             game.world.centerY,
             "Du bist in keinem Raum",
-            {font: "32px Arial", fill: "#ff0044", align: "center"}
+            {font: "32px Sunflower", fill: "#ff0044", align: "center"}
         );
         this._roomListElement.anchor.setTo(0.5, 0.5);
 
@@ -116,7 +130,7 @@ export class UiManager {
             game.world.centerX - 80,
             game.world.centerY * 0.4 + 4,
             "Turn of:",
-            {font: "20px Arial", fill: "#555555", align: "center"}
+            {font: "20px Sunflower", fill: "#555555", align: "center"}
         );
 
         this._turnInfoSprite = this._game.add.sprite(
