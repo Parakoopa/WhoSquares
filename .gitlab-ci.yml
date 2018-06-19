@@ -40,7 +40,7 @@ deploy:
   environment:
     name: ICC-K8s
   stage: deploy
-  image: nexus.informatik.haw-hamburg.de/kubectl:v1.10.3
+  image: nexus.informatik.haw-hamburg.de/kubectl:latest
   script:
     #
     - cp kubernetes_deployment.yaml kubernetes_deployment_new.yaml
