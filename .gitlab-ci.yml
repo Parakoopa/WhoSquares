@@ -11,6 +11,8 @@ variables:
 build_image:
   stage: build
   image: nexus.informatik.haw-hamburg.de/docker:stable-dind
+  services:
+   - nexus.informatik.haw-hamburg.de/docker:stable-dind
   script:
    # Einloggen in HAW Registries
    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $DOCKER_REGISTRY
