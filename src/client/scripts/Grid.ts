@@ -76,7 +76,7 @@ export class Grid {
         this._sizeY = sizeY;
         this._overColor = overColor;
     //    const self = this;
-        const offset = this._sizeX * cellSize / 2.0 - 20; // Why -20? not centered otherwise whyever
+        const offset = this._sizeX * cellSize / 2.0;
         const xOffset: number = this._game.world.centerX - offset;
         const yOffset: number = this._game.world.centerY - offset;
         this._grid = [];
