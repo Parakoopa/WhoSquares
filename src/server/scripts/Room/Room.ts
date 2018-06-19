@@ -101,6 +101,16 @@ export class Room extends RoomEvents implements IRoom {
         return [joinedEvent, otherJoinedEvent];
     }
 
+    public reconnectClient(client: Client): IEvent[] {
+        const localPlayer = this._clientMap.get(client);
+        const otherPlayers = this.getPlayersExcept(localPlayer);
+        const joinedEvent: IEvent =  this.joinedEvent(
+            client, this._name, this._key, localPlayer.player.color, otherPlayers, this.gridInfo);
+        const otherClients = this.getClientsExcept(client);
+        const otherJoinedEvent: IEvent = this.otherJoinedEvent(otherClients, this.name, localPlayer);
+        return [joinedEvent, otherJoinedEvent];
+    }
+
     private createObserver(client: Client): LocalPlayer {
         // ToDo Observers do not need game colors or missions
         const color = this._colorDistr.getFreeColor();

@@ -7,6 +7,7 @@ import {Room} from "../Room/Room";
  */
 export class Client  {
 
+    // ToDo limit user to one room
     private _rooms: Room[];
 
     /**
@@ -25,6 +26,10 @@ export class Client  {
 
     public get socket(): Socket {
         return this._socket;
+    }
+
+    public set socket(val: Socket) {
+        this._socket = val;
     }
 
     public get key(): string {
@@ -50,6 +55,12 @@ export class Client  {
 
     public roomCount(): number {
         return this._rooms.length;
+    }
+
+    public getRoom(): Room {
+        // ToDo limit user to one room
+        if (this._rooms.length === 0 )return null;
+        return this._rooms[0];
     }
 
 }

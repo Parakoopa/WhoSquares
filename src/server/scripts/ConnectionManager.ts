@@ -24,12 +24,26 @@ export class ConnectionManager {
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const connectionEvent: IEvent = this.addClient(socket);
-            this.emitEvent(connectionEvent);
+            const key = socket.handshake.headers.key;
+            const client = this.clientByKey(key);
+            console.log("private key of connected client: " + key);
+            //console.log(client);
+            if (!client) {
+                console.log("adding client");
+                const connectionEvent: IEvent = this.addClient(socket);
+                console.log("After adding client: " + this._clients.length);
+                this.emitEvent(connectionEvent);
+            } else {
+                console.log("reconnecting");
+                client.socket = socket;
+                const reconnectionEvents: IEvent[] = this.reconnectClient(client);
+                this.emitEvents(reconnectionEvents);
+            }
 
             // Disconnect
             socket.on("disconnect", () => {
-                this.removeClient(socket);
+                //ToDo Add Timer to allow reconnecting for limited time span
+                //this.removeClient(socket);
             });
 
             // Client requests to join specific room
@@ -102,10 +116,28 @@ export class ConnectionManager {
     private addClient(socket: Socket): IEvent {
         const key = Utility.getGUID();
         const player: IPlayer = new Player("" + this.connectionCounter++);
-        const client: Client = new Client(socket, key, key); //Todo make key -> name
+        const client: Client = new Client(socket, key, key); // Todo make key -> name
         this._clients.push(client);
         const response =  {response: "connected", player, key} as IConnectedResponse;
         return {clients: [client], name: "connected", response};
+    }
+
+    /**
+     * A who-squares-private-key has been sent by the client
+     * so the player has to be informed that he has reconnected
+     * @returns {}
+     * @param client
+     */
+    private reconnectClient(client: Client): IEvent[] {
+        // ToDo Replace with a stored name that has been set by the player
+        const player: IPlayer = new Player("" + this.connectionCounter++);
+        const response =  {response: "connected", player, key: client.key} as IConnectedResponse;
+        const reconnectionEvent: IEvent = {clients: [client], name: "connected", response};
+        const room = client.getRoom();
+        console.log(client);
+        if (!room) return [reconnectionEvent];
+        return[reconnectionEvent, ...room.reconnectClient(client)];
+
     }
 
     /**
@@ -139,7 +171,9 @@ export class ConnectionManager {
      * @constructor
      */
     private clientByKey(key: string): Client {
+        console.log(this._clients.length);
         for (const client of this._clients) {
+            console.log(client.key + " === " + key);
             if (client.key === key) return client;
         }
         return null;

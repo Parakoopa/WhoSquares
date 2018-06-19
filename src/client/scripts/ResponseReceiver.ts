@@ -19,6 +19,8 @@ export class ResponseReceiver {
     private eventListener() {
         // Initial Connection
         this._socket.on("connected", (resp: IConnectedResponse) => {
+            console.log("connected and got key:" + resp.key);
+            localStorage["who-squares-private-key"] = resp.key; // only strings
             this._gameMan.addLocalPlayer(resp.player, resp.key);
         });
         // Actions
