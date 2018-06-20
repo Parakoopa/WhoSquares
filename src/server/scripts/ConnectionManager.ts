@@ -25,31 +25,27 @@ export class ConnectionManager {
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
             const key = socket.handshake.headers.key;
-            const client = this.clientByKey(key);
+            const newClient = this.clientByKey(key);
             console.log("private key of connected client: " + key);
-            //console.log(client);
-            if (!client) {
-                console.log("adding client");
+            if (!newClient) {
                 const connectionEvent: IEvent = this.addClient(socket);
-                console.log("After adding client: " + this._clients.length);
                 this.emitEvent(connectionEvent);
             } else {
-                console.log("reconnecting");
-                client.socket = socket;
-                const reconnectionEvents: IEvent[] = this.reconnectClient(client);
+                newClient.socket = socket;
+                const reconnectionEvents: IEvent[] = this.reconnectClient(newClient);
                 this.emitEvents(reconnectionEvents);
             }
 
             // Disconnect
             socket.on("disconnect", () => {
-                //ToDo Add Timer to allow reconnecting for limited time span
-                //this.removeClient(socket);
+                // ToDo Add Timer to allow reconnecting for limited time span
+                // this.removeClient(socket);
             });
 
             // Client requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
-                const client: Client = this.clientBySocket(socket);
-                if(!client) return; // ToDo client does not exist yet or no longer so recreate client
+                const client = this.isValidClient(socket);
+                if (!client) return;
                 if (client.room) { // leave existing room
                     const response: IAlreadyInRoomResponse = {response: "alreadyInRoom"};
                     const event = {clients: [client], name: "alreadyInRoom", response};
@@ -62,13 +58,16 @@ export class ConnectionManager {
 
             // Player requests to join specific room
             socket.on("leaveRoom", (req: ILeaveRoomRequest) => {
-                const leftEvents: IEvent[] = this._lobby.leaveRoom(this.clientBySocket(socket), req.roomKey);
+                const client = this.isValidClient(socket);
+                if (!client) return;
+                const leftEvents: IEvent[] = this._lobby.leaveRoom(client, req.roomKey);
                 this.emitEvents(leftEvents);
             });
 
             // Start Game, create Grid, inform Players
             socket.on("startGame", (req: IStartGameRequest) => {
-                const client: Client = this.clientBySocket(socket);
+                const client = this.isValidClient(socket);
+                if (!client) return;
                 const room = this._lobby.roomByKey(req.roomKey);
                 const startEvents: IEvent[] = this._lobby.startGame(client, room, req.sizeX, req.sizeY);
                 this.emitEvents(startEvents);
@@ -76,7 +75,8 @@ export class ConnectionManager {
 
             // A client colors a certain tile
             socket.on("placeTile", (req: IPlaceTileRequest) => {
-                const client: Client = this.clientBySocket(socket);
+                const client = this.isValidClient(socket);
+                if (!client) return;
                 const room = this._lobby.roomByKey(req.roomKey);
                 if (!room) return; // Todo return invalid roomkey response
                 const placeEvents: IEvent[] =  room.placeTile(client, req.y, req.x);
@@ -85,6 +85,18 @@ export class ConnectionManager {
 
         });
 
+    }
+
+    /**
+     * Sends an refreshEvent to the client if the socket does not represent a client
+     * (This happens by opening a new window or being disconnected for too long)
+     * @param {SocketIO.Socket} socket
+     * @returns {Client}
+     */
+    private isValidClient(socket: Socket): Client {
+        const client: Client = this.clientBySocket(socket);
+        if (!client) socket.emit("refresh", {response: "refresh"});
+        return client;
     }
 
     /**

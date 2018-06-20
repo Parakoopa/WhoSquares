@@ -14,6 +14,10 @@ interface IConnectedResponse extends IResponse {
     key: string;
 }
 
+interface IRefreshResponse extends IResponse {
+    response: "refresh";
+}
+
 interface IRoomIsFullResponse extends IResponse {
     response: "roomIsFull";
     roomName: string;

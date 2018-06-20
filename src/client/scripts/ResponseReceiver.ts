@@ -54,6 +54,9 @@ export class ResponseReceiver {
         });
 
         // Error Feedback
+        this._socket.on("refresh", (resp: IRefreshResponse) => {
+            this._uiManager.textElement("PLEASE REFRESH PAGE");
+        });
         this._socket.on("observer", () => {
             this._uiManager.textElement("Observers to not play!");
         });
