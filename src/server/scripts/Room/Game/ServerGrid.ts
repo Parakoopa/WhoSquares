@@ -24,12 +24,11 @@ export class ServerGrid {
     }
 
     private createGrid(sizeX: number, sizeY: number): void {
-        const player: IPlayer = null; // default Value
         const grid = [];
         for (let y = 0; y < sizeY; y++) {
             const row: IPlayer[] = [];
             for (let x = 0; x < sizeX; x++) {
-                row[x] = player;
+                row[x] = null;
             }
             grid[y] = row;
         }
@@ -41,6 +40,14 @@ export class ServerGrid {
             this._grid[y][x] = player;
             return true;
         } else return false; // ToDo Someone is cheating
+    }
+
+    public removePlayer(player: IPlayer): void {
+        for (let y = 0; y < this._grid.length; y++) {
+            for (let x = 0; x < this._grid[y].length; x++) {
+                if (this._grid[y][x] === player) this._grid[y][x] = null;
+            }
+        }
     }
 
 }

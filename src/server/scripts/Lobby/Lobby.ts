@@ -69,7 +69,7 @@ export class Lobby extends LobbyEvents {
     public leaveRoom(client: Client, roomKey: string): IEvent[] {
         const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
-        const player = room.RemoveClient(client);
+        const player = room.removeClient(client);
         if (!player) return []; // ToDo Notify client that client is not in this room
         client.room = null;
 

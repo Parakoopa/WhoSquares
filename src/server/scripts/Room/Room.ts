@@ -137,11 +137,12 @@ export class Room extends RoomEvents implements IRoom {
      * @param {Client} client
      * @constructor
      */
-    public RemoveClient(client: Client): IPlayer {
+    public removeClient(client: Client): IPlayer {
         const localPlayer = this._clientMap.get(client);
         if (localPlayer === undefined) return null; // todo think of spectators
         // ToDo somehow flag disconnected players for client to be displayed that way
         this._colorDistr.resetColor(this._clientMap.get(client).player.color);
+        this._serverGrid.removePlayer(this._clientMap.get(client).player);
         this._clientMap.delete(client);
         if (this._owner === client) this.assignNewOwner();
         return localPlayer.player;
