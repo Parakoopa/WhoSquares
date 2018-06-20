@@ -48,6 +48,7 @@ export class Room {
     public otherLeftRoom(player: IPlayer): void {
         const otherPlayer = this.getOtherPlayer(player);
         this.removePlayer(otherPlayer);
+        this._grid.removePlayer(player);
     }
 
     /**

@@ -93,7 +93,7 @@ export class GameManager {
             const grid: Grid = this._uiManager.createGridByInfo(resp.gridInfo, this._localPlayer.color);
             this._localPlayer.room.startedGame(grid);
         }
-        this._uiManager.textElement("joined Room - Color: " + resp.color);
+        this._uiManager.textElement("You joined, color: " + resp.color);
         this._uiManager.roomName(resp.roomName);
         this.updateRoomList();
     }
@@ -114,6 +114,7 @@ export class GameManager {
      */
     public otherJoinedRoom(otherPlayer: IPlayer): void {
         this._localPlayer.room.otherJoinedRoom(otherPlayer);
+        this._uiManager.textElement(otherPlayer.name + "joined");
         this.updateRoomList();
     }
 
@@ -125,6 +126,7 @@ export class GameManager {
     public otherLeftRoom(player: IPlayer): void {
         if (!this._localPlayer.room) return; // player currently disconnected
         this._localPlayer.room.otherLeftRoom(player);
+        this._uiManager.textElement(player.name + "left");
         this.updateRoomList();
     }
 
@@ -135,7 +137,7 @@ export class GameManager {
      */
     public startedGame(sizeX: number, sizeY: number): void {
         this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.color));
-        this._uiManager.textElement("Started game");
+        this._uiManager.textElement("Game has been started!");
     }
 
     /**
@@ -148,7 +150,7 @@ export class GameManager {
         if (!this._localPlayer) return; // player currently disconnected
         if (!this._localPlayer.room) return; // player currently not in room
         this._localPlayer.room.placedTile(y, x, player);
-        this._uiManager.textElement(player + " played tile on:" + x + "|" + y);
+        this._uiManager.textElement(player + " colored: " + x + "|" + y);
     }
 
     /**

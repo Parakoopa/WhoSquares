@@ -104,6 +104,16 @@ export class Grid {
 
     }
 
+    public removePlayer(player: IPlayer): void {
+        for (const row of this._grid) {
+            for (const sprite of row) {
+                if (player.color === sprite.data.color) {
+                    sprite.tint = 0x555555; // Initially Grey
+                    sprite.data.color = 0x555555;
+                }
+            }
+        }
+    }
     /**
      * Destroys each tile of the grid,
      * thus destroying the grid.
