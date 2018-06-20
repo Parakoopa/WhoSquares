@@ -71,7 +71,7 @@ export class Lobby extends LobbyEvents {
         if (room === null) return []; // ToDo notfiy client that room does not exist
         const player = room.RemoveClient(client);
         if (!player) return []; // ToDo Notify client that client is not in this room
-        client.removeRoom(room);
+        client.room = null;
 
         // ToDo move into RoomEvents and call from Room?
         const leftEvent: IEvent = this.leftEvent(client, room.name);

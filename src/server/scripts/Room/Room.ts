@@ -20,7 +20,6 @@ export class Room extends RoomEvents implements IRoom {
     private _colorDistr: ColorDistributer;
     private _missionDistr: MissionDistributer;
     private _turnManager: TurnManager;
-    private _discconnectCount: number = 0;
 
     constructor(private _name: string, private _key: string, private _maxSize: number) {
         super();
@@ -84,12 +83,12 @@ export class Room extends RoomEvents implements IRoom {
      * @constructor
      */
     public AddClient(client: Client): IEvent[] { // ToDo make string into color enum
-        client.addRoom(this);
+        client.room = this;
         if (!this._owner) this._owner = client;
         let localPlayer: LocalPlayer = this._clientMap.get(client);
-        if (localPlayer) this._discconnectCount--; // Return reconnected player
-        else if (this._serverGrid) {
+        if (this._serverGrid) {
             localPlayer = this.createObserver(client);
+            // ToDo Add InformTurn for Observer
         } else {
             localPlayer = this.createPlayer(client);
         }
@@ -107,8 +106,9 @@ export class Room extends RoomEvents implements IRoom {
         const joinedEvent: IEvent =  this.joinedEvent(
             client, this._name, this._key, localPlayer.player.color, otherPlayers, this.gridInfo);
         const otherClients = this.getClientsExcept(client);
-        const otherJoinedEvent: IEvent = this.otherJoinedEvent(otherClients, this.name, localPlayer);
-        return [joinedEvent, otherJoinedEvent];
+        const otherJoinedEvent = this.otherJoinedEvent(otherClients, this.name, localPlayer);
+        const informTurnEvent = this.informTurnEvent(this.clients, this._turnManager.curClient().player);
+        return [joinedEvent, otherJoinedEvent, informTurnEvent];
     }
 
     private createObserver(client: Client): LocalPlayer {
@@ -134,24 +134,21 @@ export class Room extends RoomEvents implements IRoom {
 
     /**
      * Remove Client from room & make its color available
-     * //ToDo Client does not get removed from room if he leaves for test purposes
      * @param {Client} client
      * @constructor
      */
     public RemoveClient(client: Client): IPlayer {
         const localPlayer = this._clientMap.get(client);
         if (localPlayer === undefined) return null; // todo think of spectators
-        if (this._owner === client) this.assignNewOwner();
-        this._discconnectCount++;
         // ToDo somehow flag disconnected players for client to be displayed that way
-        // player may rejoin a room at any time, so valuesdo not get reset
-        // this._colorDistr.resetColor(client);
-        // this._clientMap.set(client, null);
+        this._colorDistr.resetColor(this._clientMap.get(client).player.color);
+        this._clientMap.delete(client);
+        if (this._owner === client) this.assignNewOwner();
         return localPlayer.player;
     }
 
     public isEmpty(): boolean {
-        return this.size() <= this._discconnectCount;
+        return this.size() === 0;
     }
     private assignNewOwner() {
         if (this.size() > 0) {

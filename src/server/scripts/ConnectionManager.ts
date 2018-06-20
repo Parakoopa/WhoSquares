@@ -49,8 +49,8 @@ export class ConnectionManager {
             // Client requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
                 const client: Client = this.clientBySocket(socket);
-
-                if (client.roomCount() > 0) { // leave existing room
+                if(!client) return; // ToDo client does not exist yet or no longer so recreate client
+                if (client.room) { // leave existing room
                     const response: IAlreadyInRoomResponse = {response: "alreadyInRoom"};
                     const event = {clients: [client], name: "alreadyInRoom", response};
                     this.emitEvent(event); // ToDo maybe make SwitchRoomResponse to be safe
@@ -133,8 +133,7 @@ export class ConnectionManager {
         const player: IPlayer = new Player("" + this.connectionCounter++);
         const response =  {response: "connected", player, key: client.key} as IConnectedResponse;
         const reconnectionEvent: IEvent = {clients: [client], name: "connected", response};
-        const room = client.getRoom();
-        console.log(client);
+        const room = client.room;
         if (!room) return [reconnectionEvent];
         return[reconnectionEvent, ...room.reconnectClient(client)];
 
