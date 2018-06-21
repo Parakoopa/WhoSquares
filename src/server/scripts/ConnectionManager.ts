@@ -1,4 +1,5 @@
 import {Socket} from "socket.io";
+import SocketIO = require("socket.io");
 import {Client} from "./Client/Client";
 import {Player} from "./Client/Player/Player";
 import {IEvent} from "./Event";
@@ -19,72 +20,120 @@ export class ConnectionManager {
     }
 
     /**
-     * Add all Listening Events here
+     * Server listens via socket.io to Client Requests
      * @constructor
      */
     public EventListener() {
         this._io.on("connection", (socket: Socket) => {
-            const key = socket.handshake.headers.key;
-            const newClient = this.clientByKey(key);
-            console.log("private key of connected client: " + key);
-            if (!newClient) {
-                const connectionEvent: IEvent = this.addClient(socket);
-                this.emitEvent(connectionEvent);
-            } else {
-                newClient.socket = socket;
-                const reconnectionEvents: IEvent[] = this.reconnectClient(newClient);
-                this.emitEvents(reconnectionEvents);
-            }
+            this.connect(socket);
 
-            // Disconnect
             socket.on("disconnect", () => {
-                // ToDo Add Timer to allow reconnecting for limited time span
-                // this.removeClient(socket);
+                this.disconnect(socket);
             });
-
-            // Client requests to join specific room
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
-                const client = this.isValidClient(socket);
-                if (!client) return;
-                if (client.room) { // leave existing room
-                    const response: IAlreadyInRoomResponse = {response: "alreadyInRoom"};
-                    const event = {clients: [client], name: "alreadyInRoom", response};
-                    this.emitEvent(event); // ToDo maybe make SwitchRoomResponse to be safe
-                    return;
-                }
-                const joinEvents: IEvent[] = this._lobby.joinRoom(client, req);
-                this.emitEvents(joinEvents);
+               this.joinRoom(socket, req);
             });
-
-            // Player requests to join specific room
             socket.on("leaveRoom", (req: ILeaveRoomRequest) => {
-                const client = this.isValidClient(socket);
-                if (!client) return;
-                const leftEvents: IEvent[] = this._lobby.leaveRoom(client, req.roomKey);
-                this.emitEvents(leftEvents);
+                this.leaveRoom(socket, req);
             });
-
-            // Start Game, create Grid, inform Players
             socket.on("startGame", (req: IStartGameRequest) => {
-                const client = this.isValidClient(socket);
-                if (!client) return;
-                const room = this._lobby.roomByKey(req.roomKey);
-                const startEvents: IEvent[] = this._lobby.startGame(client, room, req.sizeX, req.sizeY);
-                this.emitEvents(startEvents);
+                this.startGame(socket, req);
             });
-
-            // A client colors a certain tile
             socket.on("placeTile", (req: IPlaceTileRequest) => {
-                const client = this.isValidClient(socket);
-                if (!client) return;
-                const room = this._lobby.roomByKey(req.roomKey);
-                if (!room) return; // Todo return invalid roomkey response
-                const placeEvents: IEvent[] =  room.placeTile(client, req.y, req.x);
-                this.emitEvents(placeEvents);
+                this.placeTile(socket, req);
             });
-
         });
 
+    }
+
+    /**
+     * (Reconnects if valid secret-key is given)
+     * Initial Connection of Client
+     * Create new Client on Server and send connectionEvent to requesting Client
+     * @param {SocketIO.Socket} socket
+     */
+    private connect(socket: Socket): void {
+        const key = socket.handshake.headers.key;
+        const newClient = this.clientByKey(key);
+        console.log("private key of connected client: " + key);
+        if (!newClient) {
+            const connectionEvent: IEvent = this.addClient(socket);
+            this.emitEvent(connectionEvent);
+        } else {
+            newClient.socket = socket;
+            const reconnectionEvents: IEvent[] = this.reconnectClient(newClient);
+            this.emitEvents(reconnectionEvents);
+        }
+    }
+
+    /**
+     * Disconnects client after a certain amount of time
+     * @param {SocketIO.Socket} socket
+     */
+    private disconnect(socket: Socket): void {
+        // ToDo Add Timer to allow reconnecting for limited time span
+        // this.removeClient(socket);
+    }
+
+    /**
+     * Add Client to room if he is not yet in a room
+     * Informs client and other clients in room that he joined
+     * @param {SocketIO.Socket} socket
+     * @param {IJoinRoomRequest} req
+     */
+    private joinRoom(socket: Socket, req: IJoinRoomRequest){
+        const client = this.isValidClient(socket);
+        if (!client) return;
+        if (client.room) { // leave existing room
+            const response: IAlreadyInRoomResponse = {response: "alreadyInRoom"};
+            const event = {clients: [client], name: "alreadyInRoom", response};
+            this.emitEvent(event); // ToDo maybe make SwitchRoomResponse to be safe
+            return;
+        }
+        const joinEvents: IEvent[] = this._lobby.joinRoom(client, req);
+        this.emitEvents(joinEvents);
+    }
+
+    /**
+     * Remove Client from room
+     * Informs client and other clients in room that he left
+     * @param {SocketIO.Socket} socket
+     * @param {ILeaveRoomRequest} req
+     */
+    private leaveRoom(socket: Socket, req: ILeaveRoomRequest): void {
+        const client = this.isValidClient(socket);
+        if (!client) return;
+        const leftEvents: IEvent[] = this._lobby.leaveRoom(client, req.roomKey);
+        this.emitEvents(leftEvents);
+    }
+
+    /**
+     * Starts a new game in room of client if he is room owner
+     * Informs client and other clients in room that a game has been started
+     * @param {SocketIO.Socket} socket
+     * @param {IStartGameRequest} req
+     */
+    private startGame(socket: Socket, req: IStartGameRequest): void {
+        const client = this.isValidClient(socket);
+        if (!client) return;
+        const room = this._lobby.roomByKey(req.roomKey);
+        const startEvents: IEvent[] = this._lobby.startGame(client, room, req.sizeX, req.sizeY);
+        this.emitEvents(startEvents);
+    }
+
+    /**
+     * Client places tile in his current room on given tile coordinates
+     * Informs client and other clients in room that a tile has been placed
+     * @param {SocketIO.Socket} socket
+     * @param {IPlaceTileRequest} req
+     */
+    private placeTile(socket: Socket, req: IPlaceTileRequest): void {
+        const client = this.isValidClient(socket);
+        if (!client) return;
+        const room = this._lobby.roomByKey(req.roomKey);
+        if (!room) return; // Todo return invalid roomkey response
+        const placeEvents: IEvent[] =  room.placeTile(client, req.y, req.x);
+        this.emitEvents(placeEvents);
     }
 
     /**
@@ -121,7 +170,7 @@ export class ConnectionManager {
     }
 
     /**
-     * Save
+     * Create a new Client (Limited to one per browser (local storage))
      * @returns {IEvent}
      * @param socket
      */

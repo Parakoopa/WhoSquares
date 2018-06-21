@@ -7,11 +7,11 @@ import * as express from "express";
 // usw.
 import {Request, Response} from "express";
 import {Server} from "http";
+import * as path from "path";
 // var express = require('socket.io');
 import * as socket from "socket.io";
 import {compileClientTypeScript} from "./compileClientTypeScript";
 import {ConnectionManager} from "./scripts/ConnectionManager";
-import * as path from "path";
 
 compileClientTypeScript();
 
@@ -20,12 +20,13 @@ const app = express();
 const http = new Server(app);
 const io = socket(http);
 
-app.use("/phaser", express.static(__dirname + "/../../node_modules/phaser"));
-app.use("/requirejs", express.static(__dirname + "/../../node_modules/requirejs"));
-//scripts auf dem Server zeigt auf den dist Ordner in dem die kompilierten .ts Dateien aus dem "echten" scripts Ordner landen.
+// scripts auf dem Server zeigt auf den dist Ordner in dem die
+// kompilierten .ts Dateien aus dem "echten" scripts Ordner landen.
 app.use("/scripts", express.static(__dirname + "/../client/scripts/"));
 app.use("/dist", express.static(__dirname + "/../client/dist"));
 app.use("/img", express.static(__dirname + "/../client/img"));
+app.use("/phaser", express.static(__dirname + "/../../node_modules/phaser"));
+app.use("/requirejs", express.static(__dirname + "/../../node_modules/requirejs"));
 
 app.get("/", (req: Request, res: Response) => res.sendFile(path.resolve(__dirname + "/../client/index.html")));
 // Handle all Incoming/Outgoing Events

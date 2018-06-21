@@ -4,6 +4,10 @@ import {Room} from "../Room/Room";
 import {Utility} from "../Utility";
 import {LobbyEvents} from "./LobbyEvents";
 
+/**
+ * Initializes Lobby and sets base values for rooms/
+ * ToDo make given values room specific via input fields being fillable by client
+ */
 export class Lobby extends LobbyEvents {
 
     private readonly _rooms: Room[];
@@ -18,7 +22,10 @@ export class Lobby extends LobbyEvents {
     }
 
     /**
-     * Tell all Clients to start GameManager
+     * Return NotInRoomEvent if client is not in room
+     * Return NotOwnerEvent if requesting client is not room owner
+     * Return NotEnoughClientsEvent if room lacks players
+     * Tells room to create a game
      * @constructor
      */
     public startGame(client: Client, room: Room, sizeX: number, sizeY: number): IEvent[] {
@@ -36,7 +43,7 @@ export class Lobby extends LobbyEvents {
     }
 
     /**
-     *
+     * Readjusts grid sizes to be inside minimum-maximum range
      * @param {number} sizeX
      * @param {number} sizeY
      * @returns {number[]}
@@ -50,8 +57,9 @@ export class Lobby extends LobbyEvents {
     }
 
     /**
-     * Create Room if necessary
-     * Return responses: RoomIsFull or JoinedRoom + clientCount
+     * Create Room if it does not yet exist
+     * Return RoomIsFullEvent if room is full
+     * Otherwise tell room to add client
      * @param {Client} client
      * @param req
      * @returns {string}
@@ -66,6 +74,14 @@ export class Lobby extends LobbyEvents {
         return room.AddClient(client);
     }
 
+    /**
+     * Remove Client from room & room from client
+     * Remove room if room is empty now
+     * Tell client & other clients that given player left
+     * @param {Client} client
+     * @param {string} roomKey
+     * @returns {IEvent[]}
+     */
     public leaveRoom(client: Client, roomKey: string): IEvent[] {
         const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
@@ -92,6 +108,10 @@ export class Lobby extends LobbyEvents {
         return room;
     }
 
+    /**
+     * Remove a room
+     * @param {Room} room
+     */
     private removeRoom(room: Room): void {
         const index: number = this._rooms.indexOf(room);
         if (index < 0) return;

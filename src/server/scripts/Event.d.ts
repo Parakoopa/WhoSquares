@@ -3,9 +3,6 @@
  */
 import {Client} from "./Client/Client";
 
-// ToDo Maybe Make Client add his secretkey to all requests
-// ToDo Maybe Make Server respond to joinRoom with room secret key
-// ToDo Maybe Make Client add his room secretkey to all room interactions
 interface IEvent {
     clients: Client[];
     name: string;

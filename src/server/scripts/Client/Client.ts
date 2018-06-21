@@ -2,8 +2,8 @@ import {Socket} from "socket.io";
 import {Room} from "../Room/Room";
 
 /**
- * A Room hosts a game for clients
- * Each client gets a color assigned
+ * A Client consists of a socket which Responses get send to
+ * A Client has a secret key to reconnect, a name and a room.
  */
 export class Client  {
 
