@@ -1,7 +1,7 @@
 import Game = Phaser.Game;
+import {ResponseManager} from "./ResponseManager/ResponseManager";
 import {Grid} from "./Grid";
 import {LocalPlayer} from "./LocalPlayer";
-import {ResponseReceiver} from "./ResponseReceiver";
 import {UiManager} from "./UiManager";
 
 export class GameManager {
@@ -9,7 +9,7 @@ export class GameManager {
     private _game: Game;
     private _socket: SocketIOClient.Socket;
     private _uiManager: UiManager;
-    private _responseReceiver: ResponseReceiver;
+    private _eventListener: ResponseManager;
     private _localPlayer: LocalPlayer;
 
     /**
@@ -30,7 +30,7 @@ export class GameManager {
                 self._game = game;
                 self.customHandshake();
                 // self._socket = io();
-                self._responseReceiver = new ResponseReceiver(self, self._socket, self._uiManager);
+                self._eventListener = new ResponseManager(self, self._socket, self._uiManager);
             },
             update() {
                 self._uiManager.update();
@@ -151,6 +151,22 @@ export class GameManager {
         if (!this._localPlayer.room) return; // player currently not in room
         this._localPlayer.room.placedTile(y, x, player);
         this._uiManager.textElement(player + " colored: " + x + "|" + y);
+    }
+
+    /**
+     * Update Ui to display winner
+     * @param {IPlayer} player
+     */
+    public winGame(player: IPlayer): void {
+        this._uiManager.winGame(player.name);
+    }
+
+    /**
+     * Update Ui for current players turn
+     * @param {IPlayer} player
+     */
+    public turnInfo(player: IPlayer): void {
+        this._uiManager.turnInfo(player.color);
     }
 
     /**
