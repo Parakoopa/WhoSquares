@@ -1,49 +1,25 @@
 import {Socket} from "socket.io";
 import SocketIO = require("socket.io");
-import {Client} from "./Client/Client";
-import {Player} from "./Client/Player/Player";
-import {IEvent} from "./Event";
-import {Lobby} from "./Lobby/Lobby";
-import {Utility} from "./Utility";
+import {Client} from "../Client/Client";
+import {Player} from "../Client/Player/Player";
+import {IEvent} from "../Event";
+import {Lobby} from "../Lobby/Lobby";
+import {Utility} from "../Utility";
 
-export class ConnectionManager {
+/**
+ * Used to manage client requests
+ * Every Request returns one or several responses
+ * packaged as an IEvent[]
+ */
+export class ClientManager {
 
-    private _io: SocketIO.Server;
     private readonly _clients: Client[];
     private _lobby: Lobby;
     private connectionCounter: number = 100;
 
-    constructor( io: SocketIO.Server ) {
+    constructor() {
         this._lobby = new Lobby();
         this._clients = [];
-        this._io = io;
-    }
-
-    /**
-     * Server listens via socket.io to Client Requests
-     * @constructor
-     */
-    public EventListener() {
-        this._io.on("connection", (socket: Socket) => {
-            this.connect(socket);
-
-            socket.on("disconnect", () => {
-                this.disconnect(socket);
-            });
-            socket.on("joinRoom", (req: IJoinRoomRequest) => {
-               this.joinRoom(socket, req);
-            });
-            socket.on("leaveRoom", (req: ILeaveRoomRequest) => {
-                this.leaveRoom(socket, req);
-            });
-            socket.on("startGame", (req: IStartGameRequest) => {
-                this.startGame(socket, req);
-            });
-            socket.on("placeTile", (req: IPlaceTileRequest) => {
-                this.placeTile(socket, req);
-            });
-        });
-
     }
 
     /**
@@ -52,17 +28,15 @@ export class ConnectionManager {
      * Create new Client on Server and send connectionEvent to requesting Client
      * @param {SocketIO.Socket} socket
      */
-    private connect(socket: Socket): void {
+    public connect(socket: Socket): IEvent[] {
         const key = socket.handshake.headers.key;
         const newClient = this.clientByKey(key);
         console.log("private key of connected client: " + key);
         if (!newClient) {
-            const connectionEvent: IEvent = this.addClient(socket);
-            this.emitEvent(connectionEvent);
+            return this.addClient(socket);
         } else {
             newClient.socket = socket;
-            const reconnectionEvents: IEvent[] = this.reconnectClient(newClient);
-            this.emitEvents(reconnectionEvents);
+            return this.reconnectClient(newClient);
         }
     }
 
@@ -70,9 +44,10 @@ export class ConnectionManager {
      * Disconnects client after a certain amount of time
      * @param {SocketIO.Socket} socket
      */
-    private disconnect(socket: Socket): void {
+    public disconnect(socket: Socket): IEvent[] {
         // ToDo Add Timer to allow reconnecting for limited time span
         // this.removeClient(socket);
+        return [];
     }
 
     /**
@@ -81,17 +56,15 @@ export class ConnectionManager {
      * @param {SocketIO.Socket} socket
      * @param {IJoinRoomRequest} req
      */
-    private joinRoom(socket: Socket, req: IJoinRoomRequest){
+    public joinRoom(socket: Socket, req: IJoinRoomRequest): IEvent[]{
         const client = this.isValidClient(socket);
         if (!client) return;
         if (client.room) { // leave existing room
             const response: IAlreadyInRoomResponse = {response: "alreadyInRoom"};
             const event = {clients: [client], name: "alreadyInRoom", response};
-            this.emitEvent(event); // ToDo maybe make SwitchRoomResponse to be safe
-            return;
+            return [event]; // ToDo maybe make SwitchRoomResponse to be safe
         }
-        const joinEvents: IEvent[] = this._lobby.joinRoom(client, req);
-        this.emitEvents(joinEvents);
+        return this._lobby.joinRoom(client, req);
     }
 
     /**
@@ -100,11 +73,10 @@ export class ConnectionManager {
      * @param {SocketIO.Socket} socket
      * @param {ILeaveRoomRequest} req
      */
-    private leaveRoom(socket: Socket, req: ILeaveRoomRequest): void {
+    public leaveRoom(socket: Socket, req: ILeaveRoomRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
-        const leftEvents: IEvent[] = this._lobby.leaveRoom(client, req.roomKey);
-        this.emitEvents(leftEvents);
+        return this._lobby.leaveRoom(client, req.roomKey);
     }
 
     /**
@@ -113,12 +85,11 @@ export class ConnectionManager {
      * @param {SocketIO.Socket} socket
      * @param {IStartGameRequest} req
      */
-    private startGame(socket: Socket, req: IStartGameRequest): void {
+    public startGame(socket: Socket, req: IStartGameRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
         const room = this._lobby.roomByKey(req.roomKey);
-        const startEvents: IEvent[] = this._lobby.startGame(client, room, req.sizeX, req.sizeY);
-        this.emitEvents(startEvents);
+        return this._lobby.startGame(client, room, req.sizeX, req.sizeY);
     }
 
     /**
@@ -127,13 +98,12 @@ export class ConnectionManager {
      * @param {SocketIO.Socket} socket
      * @param {IPlaceTileRequest} req
      */
-    private placeTile(socket: Socket, req: IPlaceTileRequest): void {
+    public placeTile(socket: Socket, req: IPlaceTileRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
         const room = this._lobby.roomByKey(req.roomKey);
         if (!room) return; // Todo return invalid roomkey response
-        const placeEvents: IEvent[] =  room.placeTile(client, req.y, req.x);
-        this.emitEvents(placeEvents);
+        return room.placeTile(client, req.y, req.x);
     }
 
     /**
@@ -147,40 +117,19 @@ export class ConnectionManager {
         if (!client) socket.emit("refresh", {response: "refresh"});
         return client;
     }
-
-    /**
-     * Emits a Response to all clients listed in IEvent
-     * @param {IEvent} event
-     */
-    private emitEvent(event: IEvent): void {
-        console.log("Emitted to Players: " + event.name + " to: " + event.clients);
-        for (let i = 0; i < event.clients.length; i++) {
-            event.clients[i].socket.emit(event.name, event.response);
-        }
-    }
-
-    /**
-     * Emits Multiple Events made of Responses to multiple Players
-     * @param {IEvent[]} events
-     */
-    private emitEvents(events: IEvent[]): void {
-        for (let i = 0; i < events.length; i++) {
-            this.emitEvent(events[i]);
-        }
-    }
-
+    
     /**
      * Create a new Client (Limited to one per browser (local storage))
      * @returns {IEvent}
      * @param socket
      */
-    private addClient(socket: Socket): IEvent {
+    private addClient(socket: Socket): IEvent[] {
         const key = Utility.getGUID();
         const player: IPlayer = new Player("" + this.connectionCounter++);
         const client: Client = new Client(socket, key, key); // Todo make key -> name
         this._clients.push(client);
         const response =  {response: "connected", player, key} as IConnectedResponse;
-        return {clients: [client], name: "connected", response};
+        return [{clients: [client], name: "connected", response}];
     }
 
     /**
@@ -196,7 +145,7 @@ export class ConnectionManager {
         const reconnectionEvent: IEvent = {clients: [client], name: "connected", response};
         const room = client.room;
         if (!room) return [reconnectionEvent];
-        return[reconnectionEvent, ...room.reconnectClient(client)];
+        return [reconnectionEvent, ...room.reconnectClient(client)];
 
     }
 

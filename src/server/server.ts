@@ -11,7 +11,7 @@ import * as path from "path";
 // var express = require('socket.io');
 import * as socket from "socket.io";
 import {compileClientTypeScript} from "./compileClientTypeScript";
-import {ConnectionManager} from "./scripts/ConnectionManager";
+import {RequestManager} from "./scripts/ConnectionManager/RequestManager";
 
 compileClientTypeScript();
 
@@ -30,8 +30,8 @@ app.use("/requirejs", express.static(__dirname + "/../../node_modules/requirejs"
 
 app.get("/", (req: Request, res: Response) => res.sendFile(path.resolve(__dirname + "/../client/index.html")));
 // Handle all Incoming/Outgoing Events
-const connectionManager = new ConnectionManager(io);
-connectionManager.EventListener();
+const connectionManager = new RequestManager(io);
+connectionManager.RequestListener();
 
 console.log("Server is running. Port 8080 (http://localhost:8080)");
 http.listen(8080);
