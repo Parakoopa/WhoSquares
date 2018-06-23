@@ -1,7 +1,7 @@
 import Game = Phaser.Game;
-import {ResponseManager} from "./ResponseManager/ResponseManager";
 import {Grid} from "./Grid";
 import {LocalPlayer} from "./LocalPlayer";
+import {ResponseManager} from "./ResponseManager/ResponseManager";
 import {UiManager} from "./UiManager";
 
 export class GameManager {

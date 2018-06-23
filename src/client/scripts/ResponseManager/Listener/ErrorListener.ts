@@ -33,6 +33,9 @@ export class ErrorListener {
         socket.on("notOwner", () => {
             _uiManager.textElement("You are not the room owner!");
         });
+        socket.on("gameAlreadyEnded", () => {
+            _uiManager.textElement("the game already ended");
+        });
     }
 
 }

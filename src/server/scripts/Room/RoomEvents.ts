@@ -132,4 +132,9 @@ export class RoomEvents {
         return {clients: [client], name: "invalidPlacement", response};
     }
 
+    public gameAlreadyEnded(client: Client, roomName: string): IEvent {
+        const response: IGameAlreadyEnded = {response: "gameAlreadyEnded", roomName};
+        return {clients: [client], name: "gameAlreadyEnded", response};
+    }
+
 }

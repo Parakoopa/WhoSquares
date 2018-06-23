@@ -24,6 +24,7 @@ export class Room extends RoomEvents implements IRoom {
     private _colorDistr: ColorDistributer;  // Todo Readd color property to client class on server
     private _missionDistr: MissionDistributer;  // Todo mission LocalPlayer property to client class on server
     private _turnManager: TurnManager;
+    private _gameEnded: boolean;
 
     constructor(private _name: string, private _key: string, private _maxSize: number) {
         super();
@@ -256,6 +257,7 @@ export class Room extends RoomEvents implements IRoom {
     public createGame(sizeX: number, sizeY: number): IEvent[] {
         this._turnManager.reset();
         this.observerToPlayer();
+        this._gameEnded = false;
         this._serverGrid = new ServerGrid(sizeX, sizeY);
         const startEvent: IEvent = this.startEvent(this.clients, this.name, sizeX, sizeY);
         const informTurnEvent: IEvent = this.informTurnEvent(this.clients, this._turnManager.curClient().player);
@@ -283,6 +285,7 @@ export class Room extends RoomEvents implements IRoom {
      * @param y
      */
     public placeTile(client: Client, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
+        if(this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
         const localPlayer: LocalPlayer = this._clientMap.get(client);
         if (localPlayer.player.isObserver) {
             return [this.observerEvent(client)];
@@ -293,6 +296,7 @@ export class Room extends RoomEvents implements IRoom {
         if (this._serverGrid.placeTile(localPlayer.player, y, x)) {
             if (localPlayer.mission.check(localPlayer.player, this._serverGrid.gridInfo)) {
                 console.log("Client won his mission: " + localPlayer.player.color);
+                this._gameEnded = true;
                 return [this.winGameEvent(this.clients, this.name, localPlayer.player)];
             }
             const placedEvent: IEvent = this.placedEvent(this.clients, this.name, localPlayer.player, y, x); // Also sets next client

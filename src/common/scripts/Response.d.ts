@@ -106,3 +106,8 @@ interface IInvalidPlacement extends IResponse {
     response: "invalidPlacement";
     roomName: string;
 }
+
+interface IGameAlreadyEnded extends IResponse {
+    response: "gameAlreadyEnded";
+    roomName: string;
+}
