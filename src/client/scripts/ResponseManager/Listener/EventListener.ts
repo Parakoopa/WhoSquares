@@ -16,6 +16,7 @@ export class EventListener {
             localStorage["who-squares-private-key"] = resp.key; // only strings
             gameMan.addLocalPlayer(resp.player, resp.key);
         });
+
         // Actions
         socket.on("joinedRoom", (resp: IJoinedResponse) => {
             gameMan.joinedRoom(resp);
@@ -27,7 +28,6 @@ export class EventListener {
             gameMan.otherLeftRoom(resp.player);
         });
         socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
-
             gameMan.otherJoinedRoom(resp.otherPlayer);
         });
         socket.on("placedTile", (resp: IPlacedTileResponse) => {
@@ -36,7 +36,6 @@ export class EventListener {
         socket.on("startGame", (resp: IStartGameResponse) => {
             gameMan.startedGame(resp.sizeX, resp.sizeY);
         });
-        // Game Events
         socket.on("winGame", (resp: IWinGameResponse) => {
             gameMan.winGame(resp.player);
         });

@@ -66,6 +66,9 @@ export class Lobby extends LobbyEvents {
      * @constructor
      */
     public joinRoom(client: Client, req: IJoinRoomRequest): IEvent[] {
+        if (client.room) { // leave existing room
+            return [this.alreadyInRoomEvent(client)]; // ToDo maybe make SwitchRoomResponse to be safe
+        }
         let room: Room = this.roomByName(req.roomName);
         if (room === null) room = this.createRoom(req.roomName);
         else if (room.clients.length > room.maxSize) {

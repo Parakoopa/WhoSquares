@@ -22,7 +22,6 @@ export class RoomEvents {
         client: Client, roomName: string, roomKey: string,
         color: number, otherPlayers: IPlayer[], gridInfo: IPlayer[][]): IEvent {
         const response: IJoinedResponse = {
-            response: "joinedRoom",
             roomName,
             roomKey,
             color,
@@ -42,7 +41,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public startEvent(clients: Client[], roomName: string, sizeX: number, sizeY: number): IEvent {
-        const startResponse: IStartGameResponse = {response: "startGame", roomName, sizeX, sizeY};
+        const startResponse: IStartGameResponse = {roomName, sizeX, sizeY};
         return {clients, name: "startGame", response: startResponse};
     }
 
@@ -55,7 +54,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public otherJoinedEvent(clients: Client[], roomName: string, localPlayer: LocalPlayer): IEvent {
-        const response: IOtherJoinedResponse = {response: "otherJoinedRoom", roomName, otherPlayer: localPlayer.player};
+        const response: IOtherJoinedResponse = {roomName, otherPlayer: localPlayer.player};
         return {clients, name: "otherJoinedRoom", response};
     }
 
@@ -66,8 +65,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public observerEvent(client: Client): IEvent {
-        const response: IObserverResponse = {response: "observer"};
-        return {clients: [client], name: "observer", response};
+        return {clients: [client], name: "observer", response: {}};
     }
 
     /**
@@ -77,8 +75,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public informTurnEvent(clients: Client[], player: IPlayer): IEvent {
-        const response: IInformTurnResponse = {response: "informTurn", player};
-        return {clients, name: "informTurn", response};
+        return {clients, name: "informTurn", response: {player}};
     }
 
     /**
@@ -92,7 +89,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public placedEvent(clients: Client[], roomName: string, player: IPlayer, y: number, x: number): IEvent {
-        const response: IPlacedTileResponse = {response: "placedTile", roomName, player, y, x};
+        const response: IPlacedTileResponse = {roomName, player, y, x};
         return {clients, name: "placedTile", response};
     }
 
@@ -103,8 +100,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public notYourTurnEvent(client: Client, roomName: string): IEvent {
-        const response: INotYourTurnResponse = {response: "notYourTurn", roomName};
-        return {clients: [client], name: "notYourTurn", response};
+        return {clients: [client], name: "notYourTurn", response: {roomName}};
     }
 
     /**
@@ -116,7 +112,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public winGameEvent(clients: Client[], roomName: string, player: IPlayer): IEvent {
-        const response: IWinGameResponse = {response: "winGame", roomName, player};
+        const response: IWinGameResponse = {roomName, player};
         return {clients, name: "winGame", response};
     }
 
@@ -128,13 +124,11 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public invalidPlacement(client: Client, roomName: string): IEvent {
-        const response: IInvalidPlacement = {response: "invalidPlacement", roomName};
-        return {clients: [client], name: "invalidPlacement", response};
+        return {clients: [client], name: "invalidPlacement", response: {roomName}};
     }
 
     public gameAlreadyEnded(client: Client, roomName: string): IEvent {
-        const response: IGameAlreadyEnded = {response: "gameAlreadyEnded", roomName};
-        return {clients: [client], name: "gameAlreadyEnded", response};
+        return {clients: [client], name: "gameAlreadyEnded", response: {roomName}};
     }
 
 }

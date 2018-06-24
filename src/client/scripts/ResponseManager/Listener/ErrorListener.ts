@@ -11,17 +11,16 @@ export class ErrorListener {
     public static listen(socket: Socket, _uiManager: UiManager) {
 
         // Error Feedback
-        // Actions
-        socket.on("roomIsFull", (resp: IRoomIsFullResponse) => {
-            _uiManager.textElement(resp.response);
+        socket.on("roomIsFull", () => {
+            _uiManager.textElement("Room is full!");
         });
-        socket.on("refresh", (resp: IRefreshResponse) => {
+        socket.on("refresh", () => {
             _uiManager.textElement("PLEASE REFRESH PAGE");
         });
         socket.on("observer", () => {
             _uiManager.textElement("Observers to not play!");
         });
-        socket.on("notYourTurn", (resp: INotYourTurnResponse) => {
+        socket.on("notYourTurn", () => {
             _uiManager.textElement("It is not your turn!");
         });
         socket.on("notInRoom", () => {

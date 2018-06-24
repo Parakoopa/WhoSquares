@@ -59,11 +59,6 @@ export class ClientManager {
     public joinRoom(socket: Socket, req: IJoinRoomRequest): IEvent[]{
         const client = this.isValidClient(socket);
         if (!client) return;
-        if (client.room) { // leave existing room
-            const response: IAlreadyInRoomResponse = {response: "alreadyInRoom"};
-            const event = {clients: [client], name: "alreadyInRoom", response};
-            return [event]; // ToDo maybe make SwitchRoomResponse to be safe
-        }
         return this._lobby.joinRoom(client, req);
     }
 
@@ -114,7 +109,7 @@ export class ClientManager {
      */
     private isValidClient(socket: Socket): Client {
         const client: Client = this.clientBySocket(socket);
-        if (!client) socket.emit("refresh", {response: "refresh"});
+        if (!client) socket.emit("refresh", {response: {}});
         return client;
     }
     
