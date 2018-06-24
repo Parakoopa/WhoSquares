@@ -16,7 +16,7 @@ export class RequestEmitter {
      */
     public joinRoom(roomName: string): void {
         const playerKey = this._localPlayer.key;
-        this._socket.emit("joinRoom", {request: "joinRoom", playerKey, roomName});
+        this._socket.emit("joinRoom", {playerKey, roomName});
     }
 
     /**
@@ -26,7 +26,7 @@ export class RequestEmitter {
         if (!this._localPlayer.room) return;
         const playerKey = this._localPlayer.key;
         const roomKey = this._localPlayer.room.key;
-        this._socket.emit("leaveRoom", {request: "leaveRoom", playerKey, roomKey});
+        this._socket.emit("leaveRoom", {playerKey, roomKey});
     }
 
     /**
@@ -39,11 +39,11 @@ export class RequestEmitter {
     public startGame(sizeX: number, sizeY: number): void {
         const playerKey = this._localPlayer.key;
         if (!this._localPlayer.room) { // ToDo replace with uiManager message instead of redundantly asking server?
-             this._socket.emit("startGame", {request: "startGame", playerKey, roomKey: null, sizeX, sizeY});
+             this._socket.emit("startGame", {playerKey, roomKey: null, sizeX, sizeY});
              return;
          }
         const roomKey = this._localPlayer.room.key;
-        this._socket.emit("startGame", {request: "startGame", playerKey, roomKey, sizeX, sizeY});
+        this._socket.emit("startGame", {playerKey, roomKey, sizeX, sizeY});
     }
 
     /**
@@ -54,7 +54,7 @@ export class RequestEmitter {
     public placeTile(y: number, x: number): void {
         const playerKey = this._localPlayer.key;
         const roomKey = this._localPlayer.room.key;
-        this._socket.emit("placeTile" , {request: "placeTile", playerKey, roomKey, y, x});
+        this._socket.emit("placeTile" , {playerKey, roomKey, y, x});
     }
 
 }
