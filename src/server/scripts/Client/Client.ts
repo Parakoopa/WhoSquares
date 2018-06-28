@@ -2,12 +2,13 @@ import {Socket} from "socket.io";
 import {Room} from "../Room/Room";
 
 /**
- * A Room hosts a game for clients
- * Each client gets a color assigned
+ * A Client consists of a socket which Responses get send to
+ * A Client has a secret key to reconnect, a name and a room.
  */
 export class Client  {
 
-    private _rooms: Room[];
+    // ToDo limit user to one room
+    private _room: Room;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
@@ -19,12 +20,14 @@ export class Client  {
         private _socket: Socket,
         private _key: string,
         private _name: string
-    ) {
-        this._rooms = [];
-    }
+    ) {}
 
     public get socket(): Socket {
         return this._socket;
+    }
+
+    public set socket(val: Socket) {
+        this._socket = val;
     }
 
     public get key(): string {
@@ -39,17 +42,12 @@ export class Client  {
         this._name = val;
     }
 
-    public addRoom(room: Room): void {
-        this._rooms.push(room);
+    public get room(): Room {
+        return this._room;
     }
 
-    public removeRoom(room: Room): void {
-        const index = this._rooms.indexOf(room);
-        if (index > -1) this._rooms.splice(index, 1);
-    }
-
-    public roomCount(): number {
-        return this._rooms.length;
+    public set room(val: Room) {
+        this._room = val;
     }
 
 }

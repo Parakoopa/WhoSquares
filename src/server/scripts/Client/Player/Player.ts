@@ -1,4 +1,8 @@
-
+/**
+ * A player that represents the client in a room
+ * Represented by name and color.
+ * Observer flag determines whether player can interact with grid
+ */
 export class Player implements IPlayer {
 
     /**

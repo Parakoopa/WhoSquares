@@ -1,7 +1,7 @@
 import Game = Phaser.Game;
 import {Grid} from "./Grid";
 import {LocalPlayer} from "./LocalPlayer";
-import {ResponseReceiver} from "./ResponseReceiver";
+import {ResponseManager} from "./ResponseManager/ResponseManager";
 import {UiManager} from "./UiManager";
 
 export class GameManager {
@@ -9,7 +9,7 @@ export class GameManager {
     private _game: Game;
     private _socket: SocketIOClient.Socket;
     private _uiManager: UiManager;
-    private _responseReceiver: ResponseReceiver;
+    private _eventListener: ResponseManager;
     private _localPlayer: LocalPlayer;
 
     /**
@@ -28,13 +28,31 @@ export class GameManager {
             create() {
                 self._uiManager.createUi();
                 self._game = game;
-                self._socket = io();
-                self._responseReceiver = new ResponseReceiver(self, self._socket, self._uiManager);
+                self.customHandshake();
+                // self._socket = io();
+                self._eventListener = new ResponseManager(self, self._socket, self._uiManager);
             },
             update() {
                 self._uiManager.update();
             }
         });
+    }
+
+    private customHandshake(): void {
+        const key =  localStorage["who-squares-private-key"];
+        if (key === undefined) this._socket = io();
+        else {
+            console.log("send key:" + key);
+            this._socket = io({
+                transportOptions: {
+                    polling: {
+                        extraHeaders: {
+                            key
+                        }
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -75,7 +93,7 @@ export class GameManager {
             const grid: Grid = this._uiManager.createGridByInfo(resp.gridInfo, this._localPlayer.color);
             this._localPlayer.room.startedGame(grid);
         }
-        this._uiManager.textElement("joined Room - Color: " + resp.color);
+        this._uiManager.textElement("You joined, color: " + resp.color);
         this._uiManager.roomName(resp.roomName);
         this.updateRoomList();
     }
@@ -96,6 +114,7 @@ export class GameManager {
      */
     public otherJoinedRoom(otherPlayer: IPlayer): void {
         this._localPlayer.room.otherJoinedRoom(otherPlayer);
+        this._uiManager.textElement(otherPlayer.name + "joined");
         this.updateRoomList();
     }
 
@@ -105,8 +124,9 @@ export class GameManager {
      * @param player
      */
     public otherLeftRoom(player: IPlayer): void {
-        if (!this._localPlayer.room) return; //player currently disconnected
+        if (!this._localPlayer.room) return; // player currently disconnected
         this._localPlayer.room.otherLeftRoom(player);
+        this._uiManager.textElement(player.name + "left");
         this.updateRoomList();
     }
 
@@ -117,7 +137,7 @@ export class GameManager {
      */
     public startedGame(sizeX: number, sizeY: number): void {
         this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.color));
-        this._uiManager.textElement("Started game");
+        this._uiManager.textElement("Game has been started!");
     }
 
     /**
@@ -130,7 +150,23 @@ export class GameManager {
         if (!this._localPlayer) return; // player currently disconnected
         if (!this._localPlayer.room) return; // player currently not in room
         this._localPlayer.room.placedTile(y, x, player);
-        this._uiManager.textElement(player + " played tile on:" + x + "|" + y);
+        this._uiManager.textElement(player + " colored: " + x + "|" + y);
+    }
+
+    /**
+     * Update Ui to display winner
+     * @param {IPlayer} player
+     */
+    public winGame(player: IPlayer): void {
+        this._uiManager.winGame(player.name);
+    }
+
+    /**
+     * Update Ui for current players turn
+     * @param {IPlayer} player
+     */
+    public turnInfo(player: IPlayer): void {
+        this._uiManager.turnInfo(player.color);
     }
 
     /**

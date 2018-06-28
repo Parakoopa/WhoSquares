@@ -2,6 +2,7 @@
 export class ColorDistributer {
 
     private _clientColorMap: Map<number, boolean>;
+
     private readonly _colors: number[] = [
            parseInt("FF3333", 16), // red
            parseInt("FF9933", 16), // orange
@@ -21,8 +22,7 @@ export class ColorDistributer {
     }
 
     /**
-     * Initialize all available color
-     * => Somehow add them on definition of _clientColorMap!
+     * Initialize all available colors
      * @constructor
      */
     private setColors(): void {

@@ -1,5 +1,9 @@
 import {Room} from "../../Room/Room";
 
+/**
+ * A wrapper class to add private information to player
+ * like f.e. the mission
+ */
 export class LocalPlayer {
 
     /**

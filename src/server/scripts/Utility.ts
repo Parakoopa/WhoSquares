@@ -1,6 +1,5 @@
 export class Utility {
 
-
     /**
      * MOVE INTO SOME NEW UTILITY CLASS
      * Generate Unique Identifier

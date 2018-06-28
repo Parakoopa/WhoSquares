@@ -9,20 +9,16 @@ interface IRequest {
 }
 
 interface IJoinRoomRequest extends IRequest {
-    request: "joinRoom";
     playerKey: string;
     roomName: string;
 }
 
 interface ILeaveRoomRequest extends IRequest {
-    request: "leaveRoom";
     playerKey: string;
     roomKey: string;
 }
 
-
 interface IStartGameRequest extends IRequest {
-    request: "startGame";
     playerKey: string;
     roomKey: string;
     sizeX: number;
@@ -30,7 +26,6 @@ interface IStartGameRequest extends IRequest {
 }
 
 interface IPlaceTileRequest extends IRequest {
-    request: "placeTile";
     playerKey: string;
     roomKey: string;
     y: number;

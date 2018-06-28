@@ -10,17 +10,21 @@ import {RoomEvents} from "./RoomEvents";
 
 /**
  * A Room hosts a game for clients
- * Each client gets a color assigned
+ * Uses ClientMap to link player in room to the client(socket)
+ * Uses ServerGrid to calculate and check tile placements & missions
+ * Uses ColorDistributer to assign each player a color
+ * Uses Missiondistributer to assign mission(s) to each player
+ * Uses TurnManager to determine turn order of players
  */
 export class Room extends RoomEvents implements IRoom {
 
     private _owner: Client;
-    private _clientMap: Map<Client, LocalPlayer>;
+    private _clientMap: Map<Client, LocalPlayer>; // Todo Readd LocalPlayer property to client class on server
     private _serverGrid: ServerGrid;
-    private _colorDistr: ColorDistributer;
-    private _missionDistr: MissionDistributer;
+    private _colorDistr: ColorDistributer;  // Todo Readd color property to client class on server
+    private _missionDistr: MissionDistributer;  // Todo mission LocalPlayer property to client class on server
     private _turnManager: TurnManager;
-    private _discconnectCount: number = 0;
+    private _gameEnded: boolean;
 
     constructor(private _name: string, private _key: string, private _maxSize: number) {
         super();
@@ -30,14 +34,27 @@ export class Room extends RoomEvents implements IRoom {
         this._turnManager = new TurnManager();
     }
 
+    /**
+     *
+     * @returns {string}
+     */
     public get name(): string {
         return this._name;
     }
 
+    /**
+     * secret key of room
+     * @returns {string}
+     */
     public get key(): string {
         return this._key;
     }
 
+    /**
+     * Transform LocalPlayers into IPlayer
+     * to avoid sending secret-keys
+     * @returns {IPlayer[]}
+     */
     public get players(): IPlayer[] {
         const players: IPlayer[] = [];
         for (const localPlayer of this.localPlayers()) {
@@ -46,6 +63,11 @@ export class Room extends RoomEvents implements IRoom {
         return players;
     }
 
+    /**
+     * Return all players of a room except the given one
+     * @param {LocalPlayer} player
+     * @returns {IPlayer[]}
+     */
     public getPlayersExcept(player: LocalPlayer): IPlayer[] {
         const players: IPlayer[] = [];
         for (const curPlayer of  this.localPlayers()) {
@@ -56,40 +78,64 @@ export class Room extends RoomEvents implements IRoom {
         return players;
     }
 
+    /**
+     * All clients in room
+     * @returns {Client[]}
+     */
     public get clients(): Client[] {
         return Array.from(this._clientMap.keys());
     }
 
+    /**
+     * All localplayers in room
+     * @returns {LocalPlayer[]}
+     */
     private localPlayers(): LocalPlayer[] {
         return Array.from(this._clientMap.values());
     }
 
+    /**
+     * Maximum amount of players allowed in room
+     * @returns {number}
+     */
     public get maxSize(): number {
         return this._maxSize;
     }
 
+    /**
+     * Client owning this room
+     * @returns {Client}
+     * @constructor
+     */
     public Owner(): Client {
         return this._owner;
     }
 
+    /**
+     * Return the whole grid
+     * @returns {IPlayer[][]}
+     */
     get gridInfo(): IPlayer[][] {
         if (!this._serverGrid) return null;
         return this._serverGrid.gridInfo;
     }
 
     /**
-     * Add Client & assign/return its color
+     * Add Client to room
+     * Adds Client as Observer if game has started
+     * Inform player that he has joined
+     * Inform other clients that player has joined
      * @param {Client} client
      * @returns {string}
      * @constructor
      */
     public AddClient(client: Client): IEvent[] { // ToDo make string into color enum
-        client.addRoom(this);
+        client.room = this;
         if (!this._owner) this._owner = client;
         let localPlayer: LocalPlayer = this._clientMap.get(client);
-        if (localPlayer) this._discconnectCount--; // Return reconnected player
-        else if (this._serverGrid) {
+        if (this._serverGrid) {
             localPlayer = this.createObserver(client);
+            // ToDo Add InformTurn for Observer
         } else {
             localPlayer = this.createPlayer(client);
         }
@@ -101,6 +147,29 @@ export class Room extends RoomEvents implements IRoom {
         return [joinedEvent, otherJoinedEvent];
     }
 
+    /**
+     * Inform client & other clients in room that he reconnected
+     * Sends room & grid information so that client may continue game
+     * without reentering room etc.
+     * @param {Client} client
+     * @returns {IEvent[]}
+     */
+    public reconnectClient(client: Client): IEvent[] {
+        const localPlayer = this._clientMap.get(client);
+        const otherPlayers = this.getPlayersExcept(localPlayer);
+        const joinedEvent: IEvent =  this.joinedEvent(
+            client, this._name, this._key, localPlayer.player.color, otherPlayers, this.gridInfo);
+        const otherClients = this.getClientsExcept(client);
+        const otherJoinedEvent = this.otherJoinedEvent(otherClients, this.name, localPlayer);
+        const informTurnEvent = this.informTurnEvent(this.clients, this._turnManager.curClient().player);
+        return [joinedEvent, otherJoinedEvent, informTurnEvent];
+    }
+
+    /**
+     * Create a player that may not interact with the active game
+     * @param {Client} client
+     * @returns {LocalPlayer}
+     */
     private createObserver(client: Client): LocalPlayer {
         // ToDo Observers do not need game colors or missions
         const color = this._colorDistr.getFreeColor();
@@ -112,6 +181,12 @@ export class Room extends RoomEvents implements IRoom {
         return localPlayer;
     }
 
+    /**
+     * Create a player that may interact with an active game
+     * Assining color, turn order and mission
+     * @param {Client} client
+     * @returns {LocalPlayer}
+     */
     private createPlayer(client: Client): LocalPlayer {
         const color = this._colorDistr.getFreeColor();
         const mission = this._missionDistr.getMission();
@@ -124,25 +199,32 @@ export class Room extends RoomEvents implements IRoom {
 
     /**
      * Remove Client from room & make its color available
-     * //ToDo Client does not get removed from room if he leaves for test purposes
      * @param {Client} client
      * @constructor
      */
-    public RemoveClient(client: Client): IPlayer {
+    public removeClient(client: Client): IPlayer {
         const localPlayer = this._clientMap.get(client);
         if (localPlayer === undefined) return null; // todo think of spectators
-        if (this._owner === client) this.assignNewOwner();
-        this._discconnectCount++;
         // ToDo somehow flag disconnected players for client to be displayed that way
-        // player may rejoin a room at any time, so valuesdo not get reset
-        // this._colorDistr.resetColor(client);
-        // this._clientMap.set(client, null);
+        this._colorDistr.resetColor(this._clientMap.get(client).player.color);
+        if(this._serverGrid) this._serverGrid.removePlayer(this._clientMap.get(client).player);
+        this._clientMap.delete(client);
+        if (this._owner === client) this.assignNewOwner();
         return localPlayer.player;
     }
 
+    /**
+     * Check if room is empty
+     * @returns {boolean}
+     */
     public isEmpty(): boolean {
-        return this.size() <= this._discconnectCount;
+        return this.size() === 0;
     }
+
+    /**
+     * Assign new room owner if available (chronologically)
+     * Room already gets deleted if emptyin lobby //Todo move delete room (this) from lobby to here?
+     */
     private assignNewOwner() {
         if (this.size() > 0) {
             this._owner = this.clients[0]; // Todo find better way to select new owner
@@ -151,6 +233,11 @@ export class Room extends RoomEvents implements IRoom {
         }
     }
 
+    /**
+     * Returns all clients except the given one
+     * @param {Client} client
+     * @returns {Client[]}
+     */
     public getClientsExcept(client: Client): Client[] {
         const clients: Client[] = [];
         for (const curClient of this.clients) {
@@ -159,16 +246,27 @@ export class Room extends RoomEvents implements IRoom {
         return clients;
     }
 
-    // Grid Interaction
+    /**
+     * Create a grid in this room with given sizes
+     * All observers are transformed to player so that can play too
+     * Send startGame events to all clients in room
+     * @param {number} sizeX
+     * @param {number} sizeY
+     * @returns {IEvent[]}
+     */
     public createGame(sizeX: number, sizeY: number): IEvent[] {
         this._turnManager.reset();
         this.observerToPlayer();
+        this._gameEnded = false;
         this._serverGrid = new ServerGrid(sizeX, sizeY);
         const startEvent: IEvent = this.startEvent(this.clients, this.name, sizeX, sizeY);
         const informTurnEvent: IEvent = this.informTurnEvent(this.clients, this._turnManager.curClient().player);
         return [startEvent, informTurnEvent];
     }
 
+    /**
+     * Transform Observer to player
+     */
     private observerToPlayer(): void {
         for (const localPlayer of this.localPlayers()) {
             localPlayer.player.isObserver = false;
@@ -177,12 +275,17 @@ export class Room extends RoomEvents implements IRoom {
     }
 
     /**
-     * Place Clients instead of Colors as grids not displayed anyway
+     * Return ObserverEvent if observer tried to place tile
+     * Return NotYourTurnEvent if wrong player tried to place tile
+     * Return WonEvent to all clients if player won by placing this tile
+     * Return InvalidPlacementEvent if tile would have been placed invalidly
+     * Otherwise inform all clients that given player has placed a tile
      * @param {Client} client
      * @param x
      * @param y
      */
     public placeTile(client: Client, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
+        if(this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
         const localPlayer: LocalPlayer = this._clientMap.get(client);
         if (localPlayer.player.isObserver) {
             return [this.observerEvent(client)];
@@ -193,6 +296,7 @@ export class Room extends RoomEvents implements IRoom {
         if (this._serverGrid.placeTile(localPlayer.player, y, x)) {
             if (localPlayer.mission.check(localPlayer.player, this._serverGrid.gridInfo)) {
                 console.log("Client won his mission: " + localPlayer.player.color);
+                this._gameEnded = true;
                 return [this.winGameEvent(this.clients, this.name, localPlayer.player)];
             }
             const placedEvent: IEvent = this.placedEvent(this.clients, this.name, localPlayer.player, y, x); // Also sets next client
@@ -205,6 +309,10 @@ export class Room extends RoomEvents implements IRoom {
         }
     }
 
+    /**
+     * Count of all clients in room (players + observers)
+     * @returns {number}
+     */
     private size(): number {
         return Array.from(this._clientMap.keys()).length;
     }
