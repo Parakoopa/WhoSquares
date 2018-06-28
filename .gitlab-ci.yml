@@ -31,7 +31,6 @@ build_image:
    - docker push $DOCKER_REGISTRY/$SERVICE_NAME:latest
   only:
   - master
-  - icc
 
 # Triggered das Deployment
 deploy:
@@ -48,3 +47,5 @@ deploy:
     # Deploy files
     - kubectl apply -f http-auth.yaml
     - kubectl apply -f kubernetes_deployment_new.yaml
+  only:
+  - master
