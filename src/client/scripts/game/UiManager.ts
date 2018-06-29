@@ -99,7 +99,7 @@ export class UiManager {
         );
         this._textElement.anchor.setTo(0.5, 0.5);
 
-        // Start Game Text
+        // Start GameWrapper Text
         this._startGameElement = game.add.text(
             game.world.centerX,
             58,

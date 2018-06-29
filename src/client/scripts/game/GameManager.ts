@@ -1,4 +1,5 @@
 import Game = Phaser.Game;
+import {GameWrapper} from "../ui/components/GameWrapper";
 import {Grid} from "./Grid";
 import {LocalPlayer} from "./LocalPlayer";
 import {ResponseManager} from "./ResponseManager/ResponseManager";
@@ -11,14 +12,17 @@ export class GameManager {
     private _uiManager: UiManager;
     private _eventListener: ResponseManager;
     private _localPlayer: LocalPlayer;
+    private _gameWrapper: GameWrapper;
 
     /**
-     * Create Game, Layout Game, Load Images
+     * Create GameWrapper, Layout GameWrapper, Load Images
      * Initialize UiManager
      * Initialize ResponseReceiver
      * Start UpdateLoop (Client only Updates UI & Logic stuff only by Server Events)
      */
-    constructor() {
+    constructor(gameWrapper: GameWrapper) {
+        this._gameWrapper = gameWrapper;
+
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "game", {
             preload() {
@@ -75,6 +79,7 @@ export class GameManager {
         this._localPlayer = new LocalPlayer(player, key);
         this._uiManager.inputManager.createRequestEmitter(this._socket, this._localPlayer);
         this._uiManager.textElement("LocalPlayer: " +  this._localPlayer.name);
+        this._uiManager.inputManager.joinRoom(this._gameWrapper.props.roomid);
     }
 
     /**
@@ -106,6 +111,7 @@ export class GameManager {
         this._uiManager.textElement("left room");
         this._uiManager.roomName("left room");
         this.updateRoomList();
+        this._gameWrapper.leftRoom();
     }
 
     /**
@@ -137,7 +143,7 @@ export class GameManager {
      */
     public startedGame(sizeX: number, sizeY: number): void {
         this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.color));
-        this._uiManager.textElement("Game has been started!");
+        this._uiManager.textElement("GameWrapper has been started!");
     }
 
     /**
