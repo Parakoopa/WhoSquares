@@ -20,7 +20,7 @@ export class GameManager {
      */
     constructor() {
         const self = this;
-        const game = new Phaser.Game(800, 600, Phaser.AUTO, "", {
+        const game = new Phaser.Game(800, 600, Phaser.AUTO, "game", {
             preload() {
               self.centerGame(game);
               self._uiManager = new UiManager(game);
