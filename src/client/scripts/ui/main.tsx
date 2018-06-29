@@ -1,12 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import {BrowserRouter} from "react-router-dom";
+import {HashRouter} from "react-router-dom";
 import {App} from "./App";
+import {Route} from "react-router";
 
 ReactDOM.render(
-    <BrowserRouter>
-        <App name="Ich"/>
-    </BrowserRouter>,
+    <HashRouter>
+        <Route path="/">
+            <App name="Ich"/>
+        </Route>
+    </HashRouter>,
     document.getElementById("content")
 );

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {GameManager} from "../game/GameManager";
+import {GameManager} from "../../game/GameManager";
 
 export interface IGameProps {
 
