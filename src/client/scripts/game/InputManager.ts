@@ -49,7 +49,7 @@ export class InputManager {
     }
 
     /**
-     * Tell RequestEmitter to start given GameWrapper with given sizes
+     * Tell RequestEmitter to start given Room with given sizes
      * ToDo: Connect Sizes to InputFields
      */
     public startGame() {
