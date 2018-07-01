@@ -1,23 +1,21 @@
 import * as React from "react";
-import {Link} from "react-router-dom";
-import {Game} from "../components/Game";
+import {Login} from "../components/Login";
 
-export interface IGameViewProps {
-
-}
-export interface IGameViewState {
+export interface ILoginViewProps {
 
 }
+export interface ILoginViewState {
 
-export class GameView extends React.Component<IGameViewProps, IGameViewState> {
+}
+
+export class LoginView extends React.Component<ILoginViewProps, ILoginViewState> {
     public render() {
         return <div>
-            <h2>GameView!</h2>
-            <Link to="/">Zurück / Schließen</Link>
+            <h2>Login!</h2>
             {/* Die Game(View) Komponente lädt aktuell einfach den aktuellen Spiel-Canvas. Später muss man der wohl
                 noch beibringen zbs. welcher Raum betreten werden soll? Das würde ich dann hier
                 als Prop mitgeben: */}
-            <Game />
+            <Login/>
         </div>;
     }
 }

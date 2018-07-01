@@ -1,4 +1,5 @@
 import Game = Phaser.Game;
+import {Room} from "../ui/components/Room";
 import {Grid} from "./Grid";
 import {LocalPlayer} from "./LocalPlayer";
 import {ResponseManager} from "./ResponseManager/ResponseManager";
@@ -11,14 +12,19 @@ export class GameManager {
     private _uiManager: UiManager;
     private _eventListener: ResponseManager;
     private _localPlayer: LocalPlayer;
+    private _room: Room;
+    private _username: string;
 
     /**
-     * Create Game, Layout Game, Load Images
+     * Create Room, Layout Room, Load Images
      * Initialize UiManager
      * Initialize ResponseReceiver
      * Start UpdateLoop (Client only Updates UI & Logic stuff only by Server Events)
      */
-    constructor() {
+    constructor(room: Room) {
+        this._room = room;
+        this._username = room.getUsername();
+
         const self = this;
         const game = new Phaser.Game(800, 600, Phaser.AUTO, "game", {
             preload() {
@@ -75,6 +81,7 @@ export class GameManager {
         this._localPlayer = new LocalPlayer(player, key);
         this._uiManager.inputManager.createRequestEmitter(this._socket, this._localPlayer);
         this._uiManager.textElement("LocalPlayer: " +  this._localPlayer.name);
+        this._uiManager.inputManager.joinRoom(this._room.props.roomid);
     }
 
     /**
@@ -99,6 +106,13 @@ export class GameManager {
     }
 
     /**
+     * Action for leaving the room
+     */
+    public actionLeaveRoom(): void {
+        this._uiManager.inputManager.leaveRoom();
+    }
+
+    /**
      * Tell room that localPlayer left & update Ui
      */
     public leftRoom(): void {
@@ -106,6 +120,7 @@ export class GameManager {
         this._uiManager.textElement("left room");
         this._uiManager.roomName("left room");
         this.updateRoomList();
+        this._room.leftRoom();
     }
 
     /**
@@ -137,7 +152,7 @@ export class GameManager {
      */
     public startedGame(sizeX: number, sizeY: number): void {
         this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.color));
-        this._uiManager.textElement("Game has been started!");
+        this._uiManager.textElement("Room has been started!");
     }
 
     /**

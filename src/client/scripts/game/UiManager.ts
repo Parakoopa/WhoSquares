@@ -11,7 +11,6 @@ export class UiManager {
     private _roomNameElement: Phaser.Text = null;
 
     private _turnInfoSprite: Sprite;
-    private _gridBackground: Sprite;
     private _inputManager: InputManager;
 
     /**
@@ -99,7 +98,7 @@ export class UiManager {
         );
         this._textElement.anchor.setTo(0.5, 0.5);
 
-        // Start Game Text
+        // Start Room Text
         this._startGameElement = game.add.text(
             game.world.centerX,
             58,
