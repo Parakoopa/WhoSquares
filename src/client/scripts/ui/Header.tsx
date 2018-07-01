@@ -1,4 +1,5 @@
 import * as React from "react";
+import {transform} from "typescript";
 
 export interface IHeaderProps {
 }
@@ -10,8 +11,23 @@ export interface IHeaderState {
 export class Header extends React.Component<IHeaderProps, IHeaderState> {
 
     public render(): any {
-        return <div id="header">
-            <h1> WHO SQUARES! </h1>
+        const headerStyle = {
+            "display": "flex",
+            "flex-direction": "row",
+            "align-items": "center",
+            "margin-bottom": "15em",
+        };
+
+        const divStyle = {
+            "width": "fit-content",
+            "margin-left": "1em",
+        };
+
+        return <div style={headerStyle} id="header">
+            <a href="https://www.w3schools.com">
+            <img alt="W3Schools" src="../../img/startButton.png" width="40em" height="40em" />
+            </a>
+            <span><h1 style={divStyle}> Who Squares? </h1></span>
         </div>;
     }
 }

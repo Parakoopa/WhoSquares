@@ -1,6 +1,7 @@
 import * as React from "react";
 import {Redirect} from "react-router-dom";
 import {Routes} from "../Routes";
+import {render} from "react-dom";
 
 export interface ILoginProps {
 }
@@ -37,8 +38,14 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     public render() {
         const { fireRedirect } = this.state;
 
+        const divStyle = {
+            "width": "fit-content",
+            "text-align": "center",
+            "vertical-align": "center",
+        };
+
         return (
-            <div className="Login">
+            <div style={divStyle} className="Login">
                 <form onSubmit={this.handleSubmit}>
                     <label>
                         Username:
