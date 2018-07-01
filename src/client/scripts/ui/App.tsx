@@ -38,7 +38,7 @@ export class App extends React.Component<IAppProps, IAppState> {
             }
         ];
 
-        return <div>
+        return <div id="app">
             <Header />
             {routes.map((route, index) => (
                 <Route

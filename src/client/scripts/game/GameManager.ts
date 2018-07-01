@@ -1,18 +1,18 @@
 import Game = Phaser.Game;
-import {Room} from "../ui/components/Room";
+import {IUserInterface} from "../ui/IUserInterface";
 import {Grid} from "./Grid";
+import {InputManager} from "./InputManager";
 import {LocalPlayer} from "./LocalPlayer";
 import {ResponseManager} from "./ResponseManager/ResponseManager";
-import {UiManager} from "./UiManager";
 
 export class GameManager {
 
-    private _game: Game;
+    public _game: Game;
+    public _inputManager: InputManager;
+    public _localPlayer: LocalPlayer;
     private _socket: SocketIOClient.Socket;
-    private _uiManager: UiManager;
     private _eventListener: ResponseManager;
-    private _localPlayer: LocalPlayer;
-    private _room: Room;
+    private _ui: IUserInterface;
     private _username: string;
 
     /**
@@ -21,31 +21,29 @@ export class GameManager {
      * Initialize ResponseReceiver
      * Start UpdateLoop (Client only Updates UI & Logic stuff only by Server Events)
      */
-    constructor(room: Room) {
-        this._room = room;
-        this._username = room.getUsername();
+    constructor(ui: IUserInterface) {
+        this._ui = ui;
+        this._username = ui.getUsername();
 
         const self = this;
-        const game = new Phaser.Game(800, 600, Phaser.AUTO, "game", {
+        const game = new Phaser.Game("100", "100", Phaser.AUTO, "game", {
             preload() {
-              self.centerGame(game);
-              self._uiManager = new UiManager(game);
+                self._inputManager = new InputManager(game);
+
+                game.load.image("gridTile", "./img/square32_grey.png");
             },
             create() {
-                self._uiManager.createUi();
                 self._game = game;
                 self.customHandshake();
                 // self._socket = io();
-                self._eventListener = new ResponseManager(self, self._socket, self._uiManager);
-            },
-            update() {
-                self._uiManager.update();
+                self._eventListener = new ResponseManager(self, self._socket, self._ui);
             }
-        });
+        }, true);
+
     }
 
     private customHandshake(): void {
-        const key =  localStorage["who-squares-private-key"];
+        const key = localStorage["who-squares-private-key"];
         if (key === undefined) this._socket = io();
         else {
             console.log("send key:" + key);
@@ -62,16 +60,6 @@ export class GameManager {
     }
 
     /**
-     * Center the game inside the window
-     * @param {Phaser.Game} game
-     */
-    private centerGame(game: Game): void {
-        game.scale.pageAlignHorizontally = true;
-        game.scale.pageAlignVertically = true;
-        game.scale.refresh();
-    }
-
-    /**
      * Create a single local Player which represents the Client in rooms/games
      * Create RequestEmitter, as requests always involve a connected local player
      * @param {IPlayer} player
@@ -79,9 +67,9 @@ export class GameManager {
      */
     public addLocalPlayer(player: IPlayer, key: string): void {
         this._localPlayer = new LocalPlayer(player, key);
-        this._uiManager.inputManager.createRequestEmitter(this._socket, this._localPlayer);
-        this._uiManager.textElement("LocalPlayer: " +  this._localPlayer.name);
-        this._uiManager.inputManager.joinRoom(this._room.props.roomid);
+        this._inputManager.createRequestEmitter(this._socket, this._localPlayer);
+        this._ui.updateGameInfo("LocalPlayer: " + this._localPlayer.name);
+        this._inputManager.joinRoom(this._ui.getRoomID());
     }
 
     /**
@@ -91,17 +79,16 @@ export class GameManager {
      * @param {IJoinedResponse} resp
      */
     public joinedRoom(resp: IJoinedResponse) {
-    // if(this._localPlayer.room) { seems to be redundant as server checks
-    //    this._uiManager.textElement("You are already in a room. Leave first!");
-    // }
+        // if(this._localPlayer.room) { seems to be redundant as server checks
+        //    this._uiManager.textElement("You are already in a room. Leave first!");
+        // }
         this._localPlayer.joinedRoom(resp);
         // If game already started, recreate grid
         if (resp.gridInfo) {
-            const grid: Grid = this._uiManager.createGridByInfo(resp.gridInfo, this._localPlayer.color);
+            const grid: Grid = Grid.createGridByInfo(resp.gridInfo, this);
             this._localPlayer.room.startedGame(grid);
         }
-        this._uiManager.textElement("You joined, color: " + resp.color);
-        this._uiManager.roomName(resp.roomName);
+        this._ui.updateGameInfo("You joined, color: " + resp.color);
         this.updateRoomList();
     }
 
@@ -109,7 +96,14 @@ export class GameManager {
      * Action for leaving the room
      */
     public actionLeaveRoom(): void {
-        this._uiManager.inputManager.leaveRoom();
+        this._inputManager.leaveRoom();
+    }
+
+    /**
+     * Action for starting the game
+     */
+    public actionStartGame(): void {
+        this._inputManager.startGame();
     }
 
     /**
@@ -117,10 +111,9 @@ export class GameManager {
      */
     public leftRoom(): void {
         this._localPlayer.leftRoom();
-        this._uiManager.textElement("left room");
-        this._uiManager.roomName("left room");
+        this._ui.updateGameInfo("left room");
         this.updateRoomList();
-        this._room.leftRoom();
+        this._ui.leftRoom();
     }
 
     /**
@@ -129,7 +122,7 @@ export class GameManager {
      */
     public otherJoinedRoom(otherPlayer: IPlayer): void {
         this._localPlayer.room.otherJoinedRoom(otherPlayer);
-        this._uiManager.textElement(otherPlayer.name + "joined");
+        this._ui.updateGameInfo(otherPlayer.name + "joined");
         this.updateRoomList();
     }
 
@@ -141,7 +134,7 @@ export class GameManager {
     public otherLeftRoom(player: IPlayer): void {
         if (!this._localPlayer.room) return; // player currently disconnected
         this._localPlayer.room.otherLeftRoom(player);
-        this._uiManager.textElement(player.name + "left");
+        this._ui.updateGameInfo(player.name + "left");
         this.updateRoomList();
     }
 
@@ -151,8 +144,10 @@ export class GameManager {
      * @param {number} sizeY
      */
     public startedGame(sizeX: number, sizeY: number): void {
-        this._localPlayer.room.startedGame(this._uiManager.createGrid(sizeX, sizeY, this._localPlayer.color));
-        this._uiManager.textElement("Room has been started!");
+        const grid = Grid.createGrid(sizeX, sizeY, this);
+
+        this._localPlayer.room.startedGame(grid);
+        this._ui.updateGameInfo("Room has been started!");
     }
 
     /**
@@ -165,7 +160,7 @@ export class GameManager {
         if (!this._localPlayer) return; // player currently disconnected
         if (!this._localPlayer.room) return; // player currently not in room
         this._localPlayer.room.placedTile(y, x, player);
-        this._uiManager.textElement(player + " colored: " + x + "|" + y);
+        this._ui.updateGameInfo(player + " colored: " + x + "|" + y);
     }
 
     /**
@@ -173,7 +168,7 @@ export class GameManager {
      * @param {IPlayer} player
      */
     public winGame(player: IPlayer): void {
-        this._uiManager.winGame(player.name);
+        this._ui.updateWinner(player);
     }
 
     /**
@@ -181,7 +176,7 @@ export class GameManager {
      * @param {IPlayer} player
      */
     public turnInfo(player: IPlayer): void {
-        this._uiManager.turnInfo(player.color);
+        this._ui.updateTurnInfo( player );
     }
 
     /**
@@ -189,14 +184,9 @@ export class GameManager {
      * Tell UiManager to display it
      */
     private updateRoomList(): void {
-        let roomList: string = "";
-        if (this._localPlayer.room) { // check if room exists
-            for (const player of this._localPlayer.room.otherPlayers) {
-                roomList += player.name + "\n";
-            }
+        if (this._localPlayer.room) {
+            this._ui.updatePlayerlist(this._localPlayer.room.otherPlayers);
         }
-        this._uiManager.roomList(roomList);
-
     }
 
 }

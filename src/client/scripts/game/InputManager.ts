@@ -65,17 +65,4 @@ export class InputManager {
         this._requestEmitter.placeTile(y, x);
     }
 
-    /**
-     * Debug
-     * Display weather a certain mouse button is clicked
-     */
-    public debug(): void {
-        this._game.debug.text("Left Button: " +
-            this._game.input.activePointer.leftButton.isDown, 0, 150);
-        this._game.debug.text("Middle Button: " +
-            this._game.input.activePointer.middleButton.isDown, 0, 175);
-        this._game.debug.text("Right Button: " +
-            this._game.input.activePointer.rightButton.isDown, 0, 200);
-    }
-
 }

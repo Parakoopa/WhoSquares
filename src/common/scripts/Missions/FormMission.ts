@@ -19,7 +19,7 @@ export abstract class FormMission implements IMission {
                     const compareY = y + coord[1];
 
                     // Is checking in bounds of grid
-                    if (compareY > gridHeight || compareY < 0 || compareX > gridWidth || compareX < 0) {
+                    if (compareY >= gridHeight || compareY < 0 || compareX >= gridWidth || compareX < 0) {
                         currentFormCheck = false;
                         break;
                     }
