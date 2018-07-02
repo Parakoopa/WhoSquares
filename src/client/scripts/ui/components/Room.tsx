@@ -114,7 +114,7 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         };
 
         const divStyle = {
-            "width": "fit-content",
+            "width": "100%",
             "text-align": "center",
             "vertical-align": "center",
             "font-size": "1.25em",
