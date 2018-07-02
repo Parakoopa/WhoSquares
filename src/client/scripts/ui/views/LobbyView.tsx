@@ -16,15 +16,10 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
         const divStyle = {
             "width": "fit-content",
             "text-align": "center",
-            "margin-top": "10em",
         };
 
-        const hStyle = {
-            marginBottom: "1.5em",
-        };
 
         return <div style={divStyle}>
-            <h2 style={hStyle}>Welcome to the Room Lobby!</h2>
             {/* Die Game(View) Komponente lädt aktuell einfach den aktuellen Spiel-Canvas. Später muss man der wohl
                 noch beibringen zbs. welcher Raum betreten werden soll? Das würde ich dann hier
                 als Prop mitgeben: */}

@@ -112,7 +112,7 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         const styleTurnInfo = {
             backgroundColor: this.getActivePlayerColorHtml()
         };
-        
+
         const divStyle = {
             "width": "fit-content",
             "text-align": "center",
@@ -132,6 +132,13 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
             "font-size": "0.75em",
             "color": "White",
             "alignment": "center",
+        };
+
+        const gameStyle = {
+            "width": "250px",
+            "height": "250px",
+            "alignment": "center",
+            "margin": "0 auto",
         };
 
         return <div style={divStyle}>
@@ -157,7 +164,7 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
             <div>
                 <label>GameInfo: {this.state.gameInfo}</label>
             </div>
-            <div id="game" />
+            <div id="game" style={gameStyle}/>
             <button style={buttonStyle} onClick={this.leaveRoom}>Leave Room</button>
         </div>;
     }
