@@ -1,13 +1,14 @@
 const gulp = require("gulp");
 
 const browserify = require('browserify');
+const sourcemapify = require('sourcemapify');
 const source = require('vinyl-source-stream');
 const tsify = require('tsify');
 
 gulp.task("js", function () {
     return browserify({
         basedir: '.',
-        debug: false,
+        debug: true,
         entries: [
             'src/client/scripts/ui/main.tsx'
         ],
@@ -23,6 +24,7 @@ gulp.task("js", function () {
         .require('react-router')
         .require('react-router-dom')
         .plugin(tsify, {project: "./src/client/tsconfig.json"})
+        .plugin(sourcemapify)
         .bundle()
         .pipe(source('bundle.js'))
         .pipe(gulp.dest("src/client/dist/"));
