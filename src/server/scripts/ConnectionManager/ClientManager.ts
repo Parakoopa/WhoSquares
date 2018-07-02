@@ -101,6 +101,14 @@ export class ClientManager {
         return room.placeTile(client, req.y, req.x);
     }
 
+    public roomMessage(socket: Socket, req: IChatMessageRequest): IEvent[] {
+        const client = this.isValidClient(socket);
+        if (!client) return;
+        const room = this._lobby.roomByKey(req.roomKey);
+        if (!room) return; // Todo return invalid roomkey response
+        return room.chatMessage(client, req.message);
+    }
+
     /**
      * Sends an refreshEvent to the client if the socket does not represent a client
      * (This happens by opening a new window or being disconnected for too long)
@@ -141,7 +149,6 @@ export class ClientManager {
         const room = client.room;
         if (!room) return [reconnectionEvent];
         return [reconnectionEvent, ...room.reconnectClient(client)];
-
     }
 
     /**

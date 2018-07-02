@@ -93,6 +93,11 @@ export class RoomEvents {
         return {clients, name: "placedTile", response};
     }
 
+    public roomMessageEvent(clients: Client[], roomName: string, player: IPlayer, message: string ): IEvent {
+        const response: IRoomMessageResponse = {roomName, player, message};
+        return {clients, name: "roomMessage", response};
+    }
+
     /**
      * Inform client that he is not at turn via INotYourTurnResponse
      * @param {Client} client

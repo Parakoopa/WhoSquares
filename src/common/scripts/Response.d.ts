@@ -54,6 +54,12 @@ interface IWinGameResponse extends IResponse {
     player: IPlayer;
 }
 
+interface IRoomMessageResponse extends IResponse {
+    roomName: string;
+    player: IPlayer;
+    message: string;
+}
+
 interface IRoomIsFullResponse extends IResponse {
     roomName: string;
 }

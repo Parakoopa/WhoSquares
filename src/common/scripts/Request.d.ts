@@ -31,3 +31,9 @@ interface IPlaceTileRequest extends IRequest {
     y: number;
     x: number;
 }
+
+interface IRoomMessageRequest extends IRequest {
+    playerKey: string;
+    roomKey: string;
+    message: string;
+}

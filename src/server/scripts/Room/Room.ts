@@ -305,8 +305,13 @@ export class Room extends RoomEvents implements IRoom {
             const informTurnEvent = this.informTurnEvent(this.clients, player); // inform for next player color
             return [placedEvent, informTurnEvent];
         } else {
-             return [this.invalidPlacement(client, this.name)]; // ToDo change to cheat Reponse
+             return [this.invalidPlacement(client, this.name)]; // ToDo change to cheat Response
         }
+    }
+
+    public chatMessage(client: Client, message: string): IEvent[] {
+        const player: IPlayer = this._clientMap.get(client).player;
+        return [this.roomMessageEvent(this.clients, this._name, player, message)];
     }
 
     /**

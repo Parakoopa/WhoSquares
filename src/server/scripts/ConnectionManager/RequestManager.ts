@@ -44,6 +44,9 @@ export class RequestManager extends ResponseEmitter {
             socket.on("placeTile", (req: IPlaceTileRequest) => {
                 this.emitEvents(this._clientManager.placeTile(socket, req));
             });
+            socket.on("roomMessage", (req: IRoomMessageRequest) => {
+                this.emitEvents(this._clientManager.roomMessage(socket, req));
+            });
         });
 
     }
