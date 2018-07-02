@@ -145,6 +145,7 @@ export class Room extends RoomEvents implements IRoom {
             client, this._name, this._key, player.color, otherPlayers, this.gridInfo);
         const otherClients = this.getClientsExcept(client);
         const otherJoinedEvent = this.otherJoinedEvent(otherClients, this.name, player);
+        if (this._serverGrid == null) return [joinedEvent, otherJoinedEvent]; // No Grid (running game) => no TurnEvents
         const informTurnEvent = this.informTurnEvent(this._clients, this._turnManager.curClient().player);
         return [joinedEvent, otherJoinedEvent, informTurnEvent];
     }

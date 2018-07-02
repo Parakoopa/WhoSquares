@@ -9,6 +9,16 @@ export class LobbyEvents {
     /**
      * Return AlreadyInRoomEvent
      * @param {Client} client
+     * @param rooms
+     * @returns {}
+     */
+    public joinLobbyEvent(client: Client, rooms: string[]): IEvent {
+        return {clients: [client], name: "joinLobby", response: {rooms}};
+    }
+
+    /**
+     * Return AlreadyInRoomEvent
+     * @param {Client} client
      * @returns {}
      */
     public alreadyInRoomEvent(client: Client): IEvent {

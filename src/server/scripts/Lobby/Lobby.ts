@@ -21,6 +21,18 @@ export class Lobby extends LobbyEvents {
         this._rooms = [];
     }
 
+    private roomNames(): string[] {
+        const names: string[] = [];
+        for (const room of this._rooms) {
+            names.push(room.name);
+        }
+        return names;
+    }
+
+    public joinLobby(client: Client): IEvent {
+        return this.joinLobbyEvent(client, this.roomNames());
+    }
+
     /**
      * Return NotInRoomEvent if client is not in room
      * Return NotOwnerEvent if requesting client is not room owner

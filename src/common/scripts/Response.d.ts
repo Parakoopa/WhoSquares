@@ -9,6 +9,10 @@ interface IConnectedResponse extends IResponse {
     key: string;
 }
 
+interface IJoinLobbyEvent extends IResponse {
+    rooms: string[];
+}
+
 interface IJoinedResponse extends IResponse {
     roomKey: string;
     roomName: string;
