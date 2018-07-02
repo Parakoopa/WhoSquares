@@ -42,6 +42,18 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             "width": "fit-content",
             "text-align": "center",
             "vertical-align": "center",
+            "font-size": "1.25em",
+            "margin-bottom": "3em",
+        };
+
+        const inputStyle = {
+            "width": "fit-content",
+            "margin-left": "1em",
+            "backgroundColor": "#162856",
+            "border": "3px solid #7887AB",
+            "padding": "0.25em 1em",
+            "font-size": "0.75em",
+            "color": "White",
         };
 
         return (
@@ -49,9 +61,9 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                 <form onSubmit={this.handleSubmit}>
                     <label>
                         Username:
-                        <input type="text" value={this.state.username} onChange={this.handleChange}/>
+                        <input style={inputStyle} type="text" value={this.state.username} onChange={this.handleChange}/>
                     </label>
-                    <input type="submit" disabled={!this.validateForm()} value="Submit" />
+                    <input style={inputStyle} type="submit" disabled={!this.validateForm()} value="Submit" />
                 </form>
                 {fireRedirect && (
                     <Redirect to={Routes.linkToLobby( this.state.username )}/>

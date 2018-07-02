@@ -13,6 +13,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         const divStyle = {
             "width": "fit-content",
             "text-align": "center",
+            "margin-top": "10em",
         };
 
         return <div style={divStyle}>

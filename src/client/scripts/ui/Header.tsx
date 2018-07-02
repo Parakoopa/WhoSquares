@@ -11,14 +11,14 @@ export interface IHeaderState {
 export class Header extends React.Component<IHeaderProps, IHeaderState> {
 
     public render(): any {
+
         const headerStyle = {
             "display": "flex",
             "flex-direction": "row",
             "align-items": "center",
-            "margin-bottom": "15em",
         };
 
-        const divStyle = {
+        const hStyle = {
             "width": "fit-content",
             "margin-left": "1em",
         };
@@ -27,7 +27,7 @@ export class Header extends React.Component<IHeaderProps, IHeaderState> {
             <a href="https://www.w3schools.com">
             <img alt="W3Schools" src="../../img/startButton.png" width="40em" height="40em" />
             </a>
-            <span><h1 style={divStyle}> Who Squares? </h1></span>
+            <span><h1 style={hStyle}> Who Squares? </h1></span>
         </div>;
     }
 }
