@@ -25,11 +25,15 @@ export class GameManager {
         this._ui = ui;
         this._username = ui.getUsername();
 
+        const width = document.getElementById("game").clientWidth;
+        const height = document.getElementById("game").clientHeight;
+
         const self = this;
-        const game = new Phaser.Game("100", "100", Phaser.AUTO, "game", {
+        const game = new Phaser.Game(width, height, Phaser.AUTO, "game", {
             preload() {
                 self._inputManager = new InputManager(game);
-
+                this.game.scale.pageAlignHorizontally = true;
+                this.game.scale.pageAlignVertically = true;
                 game.load.image("gridTile", "./img/square32_grey.png");
             },
             create() {

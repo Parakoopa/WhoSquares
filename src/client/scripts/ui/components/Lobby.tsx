@@ -11,12 +11,12 @@ export interface ILobbyState {
 
 export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
 
-    constructor( props: ILobbyProps ) {
-        super( props );
+    constructor(props: ILobbyProps) {
+        super(props);
     }
 
-    private getGameURL( roomid: string) {
-        return Routes.linkToGame( this.props.username, roomid );
+    private getGameURL(roomid: string) {
+        return Routes.linkToGame(this.props.username, roomid);
     }
 
     public render() {
@@ -25,33 +25,33 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
             "text-align": "center",
             "vertical-align": "center",
             "font-size": "1.25em",
-            "margin-bottom": "3em",
         };
 
         const buttonStyle = {
-            "width": "fit-content",
-            "margin-left": "1em",
-            "margin-top": "1em",
             "backgroundColor": "#162856",
             "border": "3px solid #7887AB",
-            "padding": "0.25em 1em",
             "font-size": "0.75em",
             "color": "White",
+            "margin": "5px",
+            "padding-top": "5px",
+            "text-align": "center"
         };
 
-        return <div style={divStyle}>
-            <div>Available Rooms:</div>
+        const roomlist = [
+            "room01",
+            "room02"
+        ].map((name) =>
+            <div>
+                <Link to={this.getGameURL(name)}>
+                    <button style={buttonStyle}>
+                        {name}
+                    </button>
+                </Link>
+            </div>
+        );
 
-            <Link to={this.getGameURL("room01")}>
-                <button style={buttonStyle}>
-                    Join Room "room01"
-                </button>
-            </Link>
-            <Link to={this.getGameURL("room02")}>
-                <button style={buttonStyle}>
-                    Join Room "room02"
-                </button>
-            </Link>
+        return <div style={divStyle}>
+            {roomlist}
         </div>;
     }
 }

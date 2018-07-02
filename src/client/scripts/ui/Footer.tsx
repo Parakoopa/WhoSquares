@@ -9,7 +9,15 @@ export interface IFooterState {
 export class Footer extends React.Component<IFooterProps, IFooterState> {
 
     public render(): any {
-        return <div id="footer">
+
+        const style = {
+            "display": "flex",
+            "flex-direction": "row",
+            "align-items": "center",
+            "margin-top": "1em"
+        };
+
+        return <div id="footer" style={style}>
             Footer
         </div>;
     }
