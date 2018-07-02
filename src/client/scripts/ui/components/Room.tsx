@@ -39,9 +39,30 @@ export class Room extends React.Component<IRoomProps, IRoomState> {
     }
 
     public render() {
-        return <div>
-            <button onClick={this.leaveRoom}>Leave Room</button>
+        const divStyle = {
+            "width": "fit-content",
+            "text-align": "center",
+            "vertical-align": "center",
+            "font-size": "1.25em",
+            "margin-bottom": "3em",
+        };
+
+        const buttonStyle = {
+            "display": "block",
+            "margin": "0 auto",
+            "width": "fit-content",
+            "margin-top": "1em",
+            "backgroundColor": "#162856",
+            "border": "3px solid #7887AB",
+            "padding": "0.25em 1em",
+            "font-size": "0.75em",
+            "color": "White",
+            "alignment": "center",
+        };
+
+        return <div style={divStyle}>
             <div id="game" />
+            <button style={buttonStyle} onClick={this.leaveRoom}>Leave Room</button>
         </div>;
     }
 }
