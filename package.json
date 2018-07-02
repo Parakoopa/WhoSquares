@@ -5,7 +5,8 @@
   "author": "Team Squares",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^10.1.0"
+    "@types/node": "^10.1.0",
+    "sourcemapify": "^1.1.4"
   },
   "dependencies": {
     "@types/express": "^4.11.1",
