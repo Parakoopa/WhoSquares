@@ -1,39 +1,39 @@
 import Socket = SocketIOClient.Socket;
-import {UiManager} from "../../UiManager";
+import {IUserInterface} from "../../../ui/IUserInterface";
 
 export class ErrorListener {
 
     /**
      * Listen for ErrorResponses on socket to be displayed via UiManager
      * @param {SocketIOClient.Socket} socket
-     * @param {UiManager} _uiManager
+     * @param {UiManager} _ui
      */
-    public static listen(socket: Socket, _uiManager: UiManager) {
+    public static listen(socket: Socket, _ui: IUserInterface) {
 
         // Error Feedback
         socket.on("roomIsFull", () => {
-            _uiManager.textElement("Room is full!");
+            _ui.updateGameInfo("Room is full!");
         });
         socket.on("refresh", () => {
-            _uiManager.textElement("PLEASE REFRESH PAGE");
+            _ui.updateGameInfo("PLEASE REFRESH PAGE");
         });
         socket.on("observer", () => {
-            _uiManager.textElement("Observers to not play!");
+            _ui.updateGameInfo("Observers to not play!");
         });
         socket.on("notYourTurn", () => {
-            _uiManager.textElement("It is not your turn!");
+            _ui.updateGameInfo("It is not your turn!");
         });
         socket.on("notInRoom", () => {
-            _uiManager.textElement("You are not in a room!");
+            _ui.updateGameInfo("You are not in a room!");
         });
         socket.on("alreadyInRoom", () => {
-            _uiManager.textElement("You are already in a room!");
+            _ui.updateGameInfo("You are already in a room!");
         });
         socket.on("notOwner", () => {
-            _uiManager.textElement("You are not the room owner!");
+            _ui.updateGameInfo("You are not the room owner!");
         });
         socket.on("gameAlreadyEnded", () => {
-            _uiManager.textElement("the game already ended");
+            _ui.updateGameInfo("the game already ended");
         });
     }
 

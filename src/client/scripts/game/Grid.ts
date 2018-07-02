@@ -1,6 +1,7 @@
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
 import {InputManager} from "./InputManager";
+import {GameManager} from "./GameManager";
 
 export class Grid {
 
@@ -59,6 +60,33 @@ export class Grid {
     }
 
     /**
+     * Create a grid of given image, sizes & color
+     * Is owned by room but called here as it consists of ui elements
+     * @param {number} sizeX
+     * @param {number} sizeY
+     * @param gameManager
+     * @returns {Grid}
+     */
+    public static createGrid(sizeX: number, sizeY: number, gameManager: GameManager): Grid {
+        const grid = new Grid(gameManager._game, gameManager._inputManager);
+        grid.createGrid("gridTile", sizeX, sizeY, 40, gameManager._localPlayer.color);
+        return grid;
+    }
+
+    /**
+     * Recreates a grid that already exists on server side
+     * Is owned by room but called here as it consists of ui elements
+     * @param {IPlayer[][]} gridInfo
+     * @param gameManager
+     * @returns {Grid}
+     */
+    public static createGridByInfo(gridInfo: IPlayer[][], gameManager: GameManager): Grid {
+        const grid = this.createGrid(gridInfo[0].length, gridInfo.length, gameManager);
+        grid.placedTiles(gridInfo);
+        return grid;
+    }
+
+    /**
      * Creates a 2D grid of image tiles
      * Adjusrs TileSizes, Offsets, etc.
      * Sets Color & Tint
@@ -71,7 +99,6 @@ export class Grid {
      * @constructor
      */
     public createGrid(imageName: string, sizeX: number, sizeY: number, cellSize: number, overColor: number): void {
-
         this._sizeX = sizeX;
         this._sizeY = sizeY;
         this._overColor = overColor;
@@ -101,7 +128,6 @@ export class Grid {
             }
             this._grid[y] = row;
         }
-
     }
 
     public removePlayer(player: IPlayer): void {

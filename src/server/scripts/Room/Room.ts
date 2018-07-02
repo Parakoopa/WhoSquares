@@ -285,7 +285,7 @@ export class Room extends RoomEvents implements IRoom {
      * @param y
      */
     public placeTile(client: Client, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
-        if(this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
+        if (this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
         const localPlayer: LocalPlayer = this._clientMap.get(client);
         if (localPlayer.player.isObserver) {
             return [this.observerEvent(client)];
