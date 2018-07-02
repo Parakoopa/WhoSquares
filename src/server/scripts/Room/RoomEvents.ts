@@ -1,5 +1,4 @@
 import {Client} from "../Client/Client";
-import {LocalPlayer} from "../Client/Player/LocalPlayer";
 import {IEvent} from "../Event";
 
 /**
@@ -40,9 +39,13 @@ export class RoomEvents {
      * @param {number} sizeY
      * @returns {IEvent}
      */
-    public startEvent(clients: Client[], roomName: string, sizeX: number, sizeY: number): IEvent {
-        const startResponse: IStartGameResponse = {roomName, sizeX, sizeY};
-        return {clients, name: "startGame", response: startResponse};
+    public startEvent(clients: Client[], roomName: string, sizeX: number, sizeY: number): IEvent[] {
+        const startEvents: IEvent[] = [];
+        for (const client of clients) {
+            const response: IStartGameResponse = {roomName, sizeX, sizeY, mission: client.mission};
+            startEvents.push({clients: [client], name: "startGame", response});
+        }
+        return startEvents;
     }
 
     /**
@@ -53,8 +56,8 @@ export class RoomEvents {
      * @param {LocalPlayer} localPlayer
      * @returns {IEvent}
      */
-    public otherJoinedEvent(clients: Client[], roomName: string, localPlayer: LocalPlayer): IEvent {
-        const response: IOtherJoinedResponse = {roomName, otherPlayer: localPlayer.player};
+    public otherJoinedEvent(clients: Client[], roomName: string, otherPlayer: IPlayer): IEvent {
+        const response: IOtherJoinedResponse = {roomName, otherPlayer};
         return {clients, name: "otherJoinedRoom", response};
     }
 

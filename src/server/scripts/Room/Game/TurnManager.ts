@@ -1,50 +1,50 @@
-import {LocalPlayer} from "../../Client/Player/LocalPlayer";
-
 /**
  * Stores all players of an active game in a chronological order
  */
+import {Client} from "../../Client/Client";
+
 export class TurnManager {
 
     private _index: number = 0;
-    private _players: LocalPlayer[];
+    private _clients: Client[];
 
     constructor() {
-        this._players = [];
+        this._clients = [];
     }
 
     /**
-     * Empty turn ordner and reset index
+     * Empty turn order and reset index
      */
     public reset(): void {
         this._index = 0;
-        this._players = [];
+        this._clients = [];
     }
 
     /**
      * add player to the end of the turn order
-     * @param {LocalPlayer} player
+     * @param client
      */
-    public addClient(player: LocalPlayer): void {
-        this._players.push(player);
+    public addClient(client: Client): void {
+        this._clients.push(client);
     }
 
     /**
      * Remove player from turn ordner
-     * @param {LocalPlayer} player
+     * @param client
      */
-    public removeClient(player: LocalPlayer): void {
-        const index: number = this._players.indexOf(player);
+    public removeClient(client: Client): void {
+        const index: number = this._clients.indexOf(client);
         if (index < 0) return;
-        this._players.splice(index, 1);
-        if (this._index >= this._players.length) this._index = 0;
+        this._clients.splice(index, 1);
+        if (this._index >= this._clients.length) this._index = 0;
     }
 
     /**
      * Return player at turn
-     * @returns {LocalPlayer}
+     * @returns Client
      */
-    public curClient(): LocalPlayer {
-        return this._players[this._index];
+    public curClient(): Client {
+        return this._clients[this._index];
     }
 
     /**
@@ -52,7 +52,7 @@ export class TurnManager {
      */
     public setNextClient(): void {
         this._index += 1;
-        if (this._index >= this._players.length) this._index = 0;
+        if (this._index >= this._clients.length) this._index = 0;
     }
 
 }
