@@ -1,2 +1,9 @@
 node_modules
 .git
+.gitlab-ci.yml
+components.md
+Dockerfile
+http-auth.yaml
+kubernetes_deployment.yaml
+README.md
+tslint.json

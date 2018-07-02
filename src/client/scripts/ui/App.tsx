@@ -3,9 +3,9 @@ import {Route} from "react-router";
 import {Footer} from "./Footer";
 import {Header} from "./Header";
 import {Routes} from "./Routes";
-import {RoomView} from "./views/RoomView";
 import {LobbyView} from "./views/LobbyView";
 import {LoginView} from "./views/LoginView";
+import {RoomView} from "./views/RoomView";
 
 export interface IAppProps {
     name: string;
@@ -38,7 +38,15 @@ export class App extends React.Component<IAppProps, IAppState> {
             }
         ];
 
-        return <div id="app">
+        const divStyle = {
+            "backgroundColor": "#061539",
+            "height": "100%",
+            "display": "flex",
+            "flex-direction": "column",
+            "align-items": "center",
+        };
+
+        return <div style={divStyle}>
             <Header />
             {routes.map((route, index) => (
                 <Route
