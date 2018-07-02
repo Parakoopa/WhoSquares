@@ -101,7 +101,7 @@ export class ClientManager {
         return room.placeTile(client, req.y, req.x);
     }
 
-    public roomMessage(socket: Socket, req: IChatMessageRequest): IEvent[] {
+    public roomMessage(socket: Socket, req: IRoomMessageRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
         const room = this._lobby.roomByKey(req.roomKey);

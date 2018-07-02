@@ -11,4 +11,5 @@ export interface IUserInterface {
     updateWinner( winner: IPlayer): void;
     getUsername(): string;
     getRoomID(): string;
+    roomMessage(player: IPlayer, message: string): void;
 }

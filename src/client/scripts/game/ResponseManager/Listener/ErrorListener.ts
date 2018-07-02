@@ -1,6 +1,7 @@
 import Socket = SocketIOClient.Socket;
 import {IUserInterface} from "../../../ui/IUserInterface";
 
+//ToDo rename into messageListener or smth like that
 export class ErrorListener {
 
     /**
@@ -34,6 +35,9 @@ export class ErrorListener {
         });
         socket.on("gameAlreadyEnded", () => {
             _ui.updateGameInfo("the game already ended");
+        });
+        socket.on("roomMessage", (resp: IRoomMessageResponse) => {
+            _ui.roomMessage(resp.player, resp.message);
         });
     }
 
