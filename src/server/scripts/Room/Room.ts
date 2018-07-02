@@ -294,12 +294,12 @@ export class Room extends RoomEvents implements IRoom {
             return [this.notYourTurnEvent(client, this.name)];
         }
         if (this._serverGrid.placeTile(localPlayer.player, y, x)) {
+            const placedEvent: IEvent = this.placedEvent(this.clients, this.name, localPlayer.player, y, x); // Also sets next client
             if (localPlayer.mission.check(localPlayer.player, this._serverGrid.gridInfo)) {
                 console.log("Client won his mission: " + localPlayer.player.color);
                 this._gameEnded = true;
-                return [this.winGameEvent(this.clients, this.name, localPlayer.player)];
+                return [placedEvent, this.winGameEvent(this.clients, this.name, localPlayer.player)];
             }
-            const placedEvent: IEvent = this.placedEvent(this.clients, this.name, localPlayer.player, y, x); // Also sets next client
             this._turnManager.setNextClient();
             const player = this._turnManager.curClient().player;
             const informTurnEvent = this.informTurnEvent(this.clients, player); // inform for next player color
