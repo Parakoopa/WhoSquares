@@ -4,6 +4,7 @@ import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
 import {LocalPlayer} from "./LocalPlayer";
 import {ResponseManager} from "./ResponseManager/ResponseManager";
+import {App} from "../ui/App";
 
 export class GameManager {
 
@@ -26,6 +27,8 @@ export class GameManager {
         this._username = ui.getUsername();
         this._socket = socket;
 
+        console.log( this._socket );
+
         const width = document.getElementById("game").clientWidth;
         const height = document.getElementById("game").clientHeight;
 
@@ -40,6 +43,8 @@ export class GameManager {
             create() {
                 self._game = game;
                 self._eventListener = new ResponseManager(self, self._socket, self._ui);
+
+                self.addLocalPlayer( App._localPlayer, App._key );
             }
         }, true);
 

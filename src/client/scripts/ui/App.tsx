@@ -20,6 +20,8 @@ export interface IAppState {
 export class App extends React.Component<IAppProps, IAppState> {
 
     public static _socket: SocketIOClient.Socket;
+    public static _localPlayer: IPlayer;
+    public static _key: string;
 
     public render(): any {
         const routes = [

@@ -119,8 +119,8 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
     }
 
     public render() {
-        const playerlist = this.state.players.map((player) =>
-            <li>{player.name}</li>
+        const playerlist = this.state.players.map((player, i) =>
+            <li key={i}>{player.name}</li>
         );
 
         const styleTurnInfo = {

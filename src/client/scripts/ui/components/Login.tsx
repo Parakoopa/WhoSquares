@@ -61,6 +61,9 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
             console.log("connected and got key:" + resp.key);
             localStorage["who-squares-private-key"] = resp.key; // only strings
 
+            App._localPlayer = resp.player;
+            App._key = resp.key;
+
             // Go to Lobby
             this.setState({ fireRedirect: true });
         });
