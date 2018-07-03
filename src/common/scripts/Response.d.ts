@@ -9,6 +9,10 @@ interface IConnectedResponse extends IResponse {
     key: string;
 }
 
+interface IJoinLobbyEvent extends IResponse {
+    rooms: string[];
+}
+
 interface IJoinedResponse extends IResponse {
     roomKey: string;
     roomName: string;
@@ -35,6 +39,7 @@ interface IStartGameResponse extends IResponse {
     roomName: string;
     sizeX: number;
     sizeY: number;
+    mission: IMission;
 }
 
 interface IPlacedTileResponse extends IResponse {
@@ -52,6 +57,12 @@ interface IInformTurnResponse extends IResponse {
 interface IWinGameResponse extends IResponse {
     roomName: string;
     player: IPlayer;
+}
+
+interface IRoomMessageResponse extends IResponse {
+    roomName: string;
+    player: IPlayer;
+    message: string;
 }
 
 interface IRoomIsFullResponse extends IResponse {

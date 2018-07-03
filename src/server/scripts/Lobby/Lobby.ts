@@ -21,6 +21,18 @@ export class Lobby extends LobbyEvents {
         this._rooms = [];
     }
 
+    private roomNames(): string[] {
+        const names: string[] = [];
+        for (const room of this._rooms) {
+            names.push(room.name);
+        }
+        return names;
+    }
+
+    public joinLobby(client: Client): IEvent {
+        return this.joinLobbyEvent(client, this.roomNames());
+    }
+
     /**
      * Return NotInRoomEvent if client is not in room
      * Return NotOwnerEvent if requesting client is not room owner
@@ -32,7 +44,7 @@ export class Lobby extends LobbyEvents {
         if (!room) return [this.notInRoomEvent(client)];
         if (room.Owner() !== client ) return [this.notOwnerEvent(client, room.name)];
 
-        if (room.clients.length < this._minimumClientsPerGame) {
+        if (room.size() < this._minimumClientsPerGame) {
             // ToDo Add NotEnoughClients  Response
         }
         const sizes = this.adjustGameSize(sizeX, sizeY);
@@ -71,7 +83,7 @@ export class Lobby extends LobbyEvents {
         }
         let room: Room = this.roomByName(req.roomName);
         if (room === null) room = this.createRoom(req.roomName);
-        else if (room.clients.length > room.maxSize) {
+        else if (room.size() > room.maxSize) {
             return [this.roomIsFullEvent(client, room.name)];
         }
         return room.AddClient(client);

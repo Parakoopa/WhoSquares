@@ -146,10 +146,12 @@ export class GameManager {
      * Tell room to create game with given sizes & update Ui
      * @param {number} sizeX
      * @param {number} sizeY
+     * @param mission
      */
-    public startedGame(sizeX: number, sizeY: number): void {
+    public startedGame(sizeX: number, sizeY: number, mission: IMission): void {
         const grid = Grid.createGrid(sizeX, sizeY, this);
-
+        this._localPlayer.mission = mission;
+        console.log("MISSION:" + this._localPlayer.mission);
         this._localPlayer.room.startedGame(grid);
         this._ui.updateGameInfo("Room has been started!");
     }

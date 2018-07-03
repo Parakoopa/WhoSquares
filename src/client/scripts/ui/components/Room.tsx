@@ -99,6 +99,19 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         window.location.href = Routes.linkToLobbyHREF(this.props.username);
     }
 
+    public roomMessage(player: IPlayer, message: string): void {
+        console.log(player + ": " + message);
+        // ToDo Update Chat Window
+    }
+
+    public joinLobby(rooms: string[]): void {
+        console.log("rooms" + ": ");
+        for (const room of rooms) {
+            console.log(room);
+        }
+        // ToDo Display room list to user
+    }
+
     public componentDidMount(): void {
         // Init game
         this.gameManager = new GameManager(this);

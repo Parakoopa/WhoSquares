@@ -9,6 +9,8 @@ export class Client  {
 
     // ToDo limit user to one room
     private _room: Room;
+    private _mission: IMission;
+    private _player: IPlayer;
 
     /**
      * Clients are talked to via socket and identified via unique id guid
@@ -21,6 +23,14 @@ export class Client  {
         private _key: string,
         private _name: string
     ) {}
+
+    public get player(): IPlayer {
+        return this._player;
+    }
+
+    public set player(val: IPlayer) {
+        this._player = val;
+    }
 
     public get socket(): Socket {
         return this._socket;
@@ -48,6 +58,14 @@ export class Client  {
 
     public set room(val: Room) {
         this._room = val;
+    }
+
+    public get mission(): IMission {
+        return this._mission;
+    }
+
+    public set mission(val: IMission) {
+        this._mission = val;
     }
 
 }

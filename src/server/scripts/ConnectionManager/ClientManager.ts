@@ -101,6 +101,14 @@ export class ClientManager {
         return room.placeTile(client, req.y, req.x);
     }
 
+    public roomMessage(socket: Socket, req: IRoomMessageRequest): IEvent[] {
+        const client = this.isValidClient(socket);
+        if (!client) return;
+        const room = this._lobby.roomByKey(req.roomKey);
+        if (!room) return; // Todo return invalid roomkey response
+        return room.chatMessage(client, req.message);
+    }
+
     /**
      * Sends an refreshEvent to the client if the socket does not represent a client
      * (This happens by opening a new window or being disconnected for too long)
@@ -119,12 +127,15 @@ export class ClientManager {
      * @param socket
      */
     private addClient(socket: Socket): IEvent[] {
+        console.log("new client");
         const key = Utility.getGUID();
         const player: IPlayer = new Player("" + this.connectionCounter++);
         const client: Client = new Client(socket, key, key); // Todo make key -> name
         this._clients.push(client);
         const response =  {response: "connected", player, key} as IConnectedResponse;
-        return [{clients: [client], name: "connected", response}];
+        const connectedEvent = {clients: [client], name: "connected", response};
+        const joinLobbyEvent = this._lobby.joinLobby(this.clientBySocket(socket));
+        return [connectedEvent, joinLobbyEvent];
     }
 
     /**
@@ -139,9 +150,12 @@ export class ClientManager {
         const response =  {response: "connected", player, key: client.key} as IConnectedResponse;
         const reconnectionEvent: IEvent = {clients: [client], name: "connected", response};
         const room = client.room;
-        if (!room) return [reconnectionEvent];
+        if (!room) {
+            const joinLobbyEvent = this._lobby.joinLobby(client);
+            console.log("no room");
+            return [reconnectionEvent, joinLobbyEvent];
+        }
         return [reconnectionEvent, ...room.reconnectClient(client)];
-
     }
 
     /**

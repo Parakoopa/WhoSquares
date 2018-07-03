@@ -37,6 +37,7 @@ export class RequestEmitter {
      * @param {number} sizeY
      */
     public startGame(sizeX: number, sizeY: number): void {
+        this.roomMessage("A simple chat message.");
         const playerKey = this._localPlayer.key;
         if (!this._localPlayer.room) { // ToDo replace with uiManager message instead of redundantly asking server?
              this._socket.emit("startGame", {playerKey, roomKey: null, sizeX, sizeY});
@@ -55,6 +56,12 @@ export class RequestEmitter {
         const playerKey = this._localPlayer.key;
         const roomKey = this._localPlayer.room.key;
         this._socket.emit("placeTile" , {playerKey, roomKey, y, x});
+    }
+
+    public roomMessage(message: string): void {
+        const playerKey = this._localPlayer.key;
+        const roomKey = this._localPlayer.room.key;
+        this._socket.emit("roomMessage" , {playerKey, roomKey, message});
     }
 
 }
