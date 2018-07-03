@@ -1,0 +1,59 @@
+html, body {
+    background: #061539;
+    font-family: Sunflower,serif;
+    color: White;
+    margin: 0;
+    padding: 0;
+}
+
+body * {
+    border: 0 solid red;
+}
+
+.app {
+    backgroundColor: #061539;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.view {
+    width: fit-content;
+    text-align: center;
+}
+
+.content {
+    width: fit-content;
+    text-align: center;
+    vertical-align: center;
+    font-size: 1.25em;
+}
+
+.button {
+    background-color: #162856;
+    border: 3px solid #7887AB;
+    font-size: 0.75em;
+    color: White;
+    margin: 0.25em;
+    padding: 0.25em;
+    text-align: center;
+}
+
+.input {
+    width: fit-content;
+    padding: 0.25em;
+    color: White;
+    background-color: #061539;
+    border: 3px solid #4F618F;
+    font-size: 0.75em;
+    text-align: center;
+}
+
+.game {
+    width: 15em;
+    height: 15em;
+    alignment: center;
+    margin: 0 auto;
+}

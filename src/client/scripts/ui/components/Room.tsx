@@ -123,38 +123,11 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         );
 
         const styleTurnInfo = {
-            backgroundColor: this.getActivePlayerColorHtml()
+            color: this.getActivePlayerColorHtml(),
+            fontWeight: 900,
         };
 
-        const divStyle = {
-            "width": "100%",
-            "text-align": "center",
-            "vertical-align": "center",
-            "font-size": "1.25em",
-            "margin-bottom": "3em",
-        };
-
-        const buttonStyle = {
-            "display": "block",
-            "margin": "0 auto",
-            "width": "fit-content",
-            "margin-top": "1em",
-            "backgroundColor": "#162856",
-            "border": "3px solid #7887AB",
-            "padding": "0.25em 1em",
-            "font-size": "0.75em",
-            "color": "White",
-            "alignment": "center",
-        };
-
-        const gameStyle = {
-            "width": "250px",
-            "height": "250px",
-            "alignment": "center",
-            "margin": "0 auto",
-        };
-
-        return <div style={divStyle}>
+        return <div className={"content"}>
             <div>
                 <label>RoomID: {this.props.roomid}</label>
             </div>
@@ -177,8 +150,8 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
             <div>
                 <label>GameInfo: {this.state.gameInfo}</label>
             </div>
-            <div id="game" style={gameStyle}/>
-            <button style={buttonStyle} onClick={this.leaveRoom}>Leave Room</button>
+            <div id="game" className={"game"}/>
+            <button className={"button"} onClick={this.leaveRoom}>Leave Room</button>
         </div>;
     }
 }
