@@ -10,6 +10,24 @@ body * {
     border: 0 solid red;
 }
 
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.title {
+    width: fit-content;
+    margin-left: 0.5em;
+}
+
+.footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 1em;
+}
+
 .app {
     backgroundColor: #061539;
     height: 100%;
