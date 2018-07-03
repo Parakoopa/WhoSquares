@@ -6,6 +6,8 @@ import {Routes} from "./Routes";
 import {LobbyView} from "./views/LobbyView";
 import {LoginView} from "./views/LoginView";
 import {RoomView} from "./views/RoomView";
+import {GameManager} from "../game/GameManager";
+import {IRoomProps} from "./components/Room";
 
 export interface IAppProps {
     name: string;
@@ -16,6 +18,8 @@ export interface IAppState {
 }
 
 export class App extends React.Component<IAppProps, IAppState> {
+
+    public static _socket: SocketIOClient.Socket;
 
     public render(): any {
         const routes = [

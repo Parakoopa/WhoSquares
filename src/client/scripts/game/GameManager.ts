@@ -7,10 +7,10 @@ import {ResponseManager} from "./ResponseManager/ResponseManager";
 
 export class GameManager {
 
+    private _socket: SocketIOClient.Socket;
     public _game: Game;
     public _inputManager: InputManager;
     public _localPlayer: LocalPlayer;
-    private _socket: SocketIOClient.Socket;
     private _eventListener: ResponseManager;
     private _ui: IUserInterface;
     private _username: string;
@@ -21,9 +21,10 @@ export class GameManager {
      * Initialize ResponseReceiver
      * Start UpdateLoop (Client only Updates UI & Logic stuff only by Server Events)
      */
-    constructor(ui: IUserInterface) {
+    constructor(socket: SocketIOClient.Socket, ui: IUserInterface) {
         this._ui = ui;
         this._username = ui.getUsername();
+        this._socket = socket;
 
         const width = document.getElementById("game").clientWidth;
         const height = document.getElementById("game").clientHeight;
@@ -38,29 +39,10 @@ export class GameManager {
             },
             create() {
                 self._game = game;
-                self.customHandshake();
-                // self._socket = io();
                 self._eventListener = new ResponseManager(self, self._socket, self._ui);
             }
         }, true);
 
-    }
-
-    private customHandshake(): void {
-        const key = localStorage["who-squares-private-key"];
-        if (key === undefined) this._socket = io();
-        else {
-            console.log("send key:" + key);
-            this._socket = io({
-                transportOptions: {
-                    polling: {
-                        extraHeaders: {
-                            key
-                        }
-                    }
-                }
-            });
-        }
     }
 
     /**

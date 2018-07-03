@@ -21,6 +21,7 @@ export class InputManager {
      * @param {LocalPlayer} localPlayer
      */
     public createRequestEmitter(socket: Socket, localPlayer: LocalPlayer) {
+        console.log( "Request Emitter erstellt!");
         this._requestEmitter = new RequestEmitter(socket, localPlayer);
     }
 
