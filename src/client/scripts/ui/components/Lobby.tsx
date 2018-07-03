@@ -25,7 +25,7 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
             "room01",
             "room02"
         ].map((name) =>
-            <div>
+            <div key={name}>
                 <Link to={this.getGameURL(name)}>
                     <button className={"button"}>
                         {name}
@@ -35,6 +35,7 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
         );
 
         return <div className={"content"}>
+            <h3 className={"description"}> Available Rooms: </h3>
             {roomlist}
         </div>;
     }

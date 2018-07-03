@@ -14,9 +14,8 @@ export class Header extends React.Component<IHeaderProps, IHeaderState> {
 
         return <div className={"header"} id="header">
             <a href="https://www.w3schools.com">
-            <img alt="W3Schools" src="../../img/startButton.png" width="40em" height="40em" />
+            <img alt="Who Squares?" src="../../img/header.png" width="500em" height="140em" />
             </a>
-            <h1 className={"title"}> Who Squares? </h1>
         </div>;
     }
 }

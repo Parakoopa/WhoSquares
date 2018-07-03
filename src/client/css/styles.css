@@ -16,11 +16,6 @@ body * {
     align-items: center;
 }
 
-.title {
-    width: fit-content;
-    margin-left: 0.5em;
-}
-
 .footer {
     display: flex;
     flex-direction: row;
@@ -49,13 +44,17 @@ body * {
     font-size: 1.25em;
 }
 
+.description {
+    margin-bottom: 0;
+}
+
 .button {
     background-color: #162856;
     border: 3px solid #7887AB;
     font-size: 0.75em;
     color: White;
     margin: 0.25em;
-    padding: 0.25em;
+    padding: 0.25em 0.75em 0.25em 0.75em;
     text-align: center;
 }
 
