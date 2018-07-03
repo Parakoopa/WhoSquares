@@ -12,5 +12,4 @@ export interface IUserInterface {
     getUsername(): string;
     getRoomID(): string;
     roomMessage(player: IPlayer, message: string): void;
-    joinLobby(rooms: string[]): void;
 }

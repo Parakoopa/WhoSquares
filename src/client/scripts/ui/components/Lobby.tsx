@@ -2,6 +2,7 @@ import * as React from "react";
 import {Link} from "react-router-dom";
 import {Routes} from "../Routes";
 import {App} from "../App";
+import {GameManager} from "../../game/GameManager";
 
 export interface ILobbyProps {
     username: string;
@@ -24,12 +25,7 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
 
         App._socket.emit("joinLobby");
         App._socket.once("joinLobby", (resp: IJoinLobbyEvent) => {
-            const roomlist = resp.rooms;
-
-            console.log( roomlist );
-
-            // Go to Lobby
-            this.setState({roomlist});
+            this.setState({roomlist : resp.rooms});
         });
     }
 
@@ -53,6 +49,9 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
 
     private handleChange(event: any) {
         this.setState({roomnameNew: event.target.value});
+    }
+
+    public componentDidMount() {
     }
 
     public render() {
