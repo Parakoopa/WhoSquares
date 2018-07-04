@@ -6,6 +6,7 @@ import {LocalPlayer} from "./LocalPlayer";
 import {MissionDistributer} from "./MissionDistributer";
 import {ResponseManager} from "./ResponseManager/ResponseManager";
 import {App} from "../ui/App";
+import {Connection} from "../Connection";
 
 export class GameManager {
 
@@ -45,7 +46,7 @@ export class GameManager {
                 self._game = game;
                 self._eventListener = new ResponseManager(self, self._socket, self._ui);
 
-                self.addLocalPlayer( App._localPlayer, App._key );
+                self.addLocalPlayer( Connection.getLocalPlayer(), Connection.getUsername() );
             }
         }, true);
 
