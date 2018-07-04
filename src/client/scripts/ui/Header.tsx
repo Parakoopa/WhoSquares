@@ -12,22 +12,10 @@ export class Header extends React.Component<IHeaderProps, IHeaderState> {
 
     public render(): any {
 
-        const headerStyle = {
-            "display": "flex",
-            "flex-direction": "row",
-            "align-items": "center",
-        };
-
-        const hStyle = {
-            "width": "fit-content",
-            "margin-left": "1em",
-        };
-
-        return <span style={headerStyle} id="header">
-            <a href="https://www.w3schools.com">
-            <img alt="W3Schools" src="../../img/startButton.png" width="40em" height="40em" />
+        return <div className={"header"} id="header">
+            <a href="https://gitlab.informatik.haw-hamburg.de/wp-mbc-ss2018/who-squares">
+            <img alt="Who Squares?" src="../../img/header.png" width="500em" height="140em" />
             </a>
-            <h1 style={hStyle}> Who Squares? </h1>
-        </span>;
+        </div>;
     }
 }

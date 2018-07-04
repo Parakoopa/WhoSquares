@@ -20,37 +20,22 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
     }
 
     public render() {
-        const divStyle = {
-            "width": "fit-content",
-            "text-align": "center",
-            "vertical-align": "center",
-            "font-size": "1.25em",
-        };
-
-        const buttonStyle = {
-            "backgroundColor": "#162856",
-            "border": "3px solid #7887AB",
-            "font-size": "0.75em",
-            "color": "White",
-            "margin": "5px",
-            "padding-top": "5px",
-            "text-align": "center"
-        };
 
         const roomlist = [
             "room01",
             "room02"
         ].map((name) =>
-            <div>
+            <div key={name}>
                 <Link to={this.getGameURL(name)}>
-                    <button style={buttonStyle}>
+                    <button className={"room"}>
                         {name}
                     </button>
                 </Link>
             </div>
         );
 
-        return <div style={divStyle}>
+        return <div className={"content"}>
+            <h3 className={"description"}> Available Rooms: </h3>
             {roomlist}
         </div>;
     }

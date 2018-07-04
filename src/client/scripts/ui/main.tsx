@@ -9,5 +9,5 @@ ReactDOM.render(
     <HashRouter>
         <Route path="/" component={App} />
     </HashRouter>,
-    document.getElementById("content")
+    document.getElementById("mainapp")
 );

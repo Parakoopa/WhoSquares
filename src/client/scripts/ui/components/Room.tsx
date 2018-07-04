@@ -123,62 +123,38 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         );
 
         const styleTurnInfo = {
-            backgroundColor: this.getActivePlayerColorHtml()
+            color: this.getActivePlayerColorHtml(),
+            fontWeight: 900,
         };
 
-        const divStyle = {
-            "width": "100%",
-            "text-align": "center",
-            "vertical-align": "center",
-            "font-size": "1.25em",
-            "margin-bottom": "3em",
-        };
-
-        const buttonStyle = {
-            "display": "block",
-            "margin": "0 auto",
-            "width": "fit-content",
-            "margin-top": "1em",
-            "backgroundColor": "#162856",
-            "border": "3px solid #7887AB",
-            "padding": "0.25em 1em",
-            "font-size": "0.75em",
-            "color": "White",
-            "alignment": "center",
-        };
-
-        const gameStyle = {
-            "width": "250px",
-            "height": "250px",
-            "alignment": "center",
-            "margin": "0 auto",
-        };
-
-        return <div style={divStyle}>
-            <div>
-                <label>RoomID: {this.props.roomid}</label>
+        return <div className={"content"}>
+            <div id="game" className={"game"}/>
+            <div id={"buttons"}>
+                <button className={"button"} onClick={this.startGame}>Start Game</button>
+                <button className={"button"} onClick={this.leaveRoom}>Leave Room</button>
             </div>
-            <div>
-                <label>Winner: {this.getWinnerName()}</label>
+            <div className={"info"}>
+                <div>
+                    <label>Current Room: {this.props.roomid}</label>
+                </div>
+                <div>
+                    <label>Winner: {this.getWinnerName()}</label>
+                </div>
+                <div>
+                    <label>Players: </label>
+                    {playerlist}
+                </div>
+                <br/>
+                <div>
+                    <label>Turn Info: </label>
+                    <label style={styleTurnInfo}>
+                        {this.getActivePlayerName()}
+                    </label>
+                </div>
+                <div>
+                    <label>Game Info: {this.state.gameInfo}</label>
+                </div>
             </div>
-            <div>
-                <label>Players: </label>
-                {playerlist}
-            </div>
-            <div>
-                <label>TurnInfo: </label>
-                <label style={styleTurnInfo}>
-                    {this.getActivePlayerName()}
-                </label>
-            </div>
-            <div>
-                <button onClick={this.startGame}>Start Game</button>
-            </div>
-            <div>
-                <label>GameInfo: {this.state.gameInfo}</label>
-            </div>
-            <div id="game" style={gameStyle}/>
-            <button style={buttonStyle} onClick={this.leaveRoom}>Leave Room</button>
         </div>;
     }
 }

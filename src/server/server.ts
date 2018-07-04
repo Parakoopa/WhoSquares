@@ -17,6 +17,7 @@ const app = express();
 const http = new Server(app);
 const io = socket(http);
 
+app.use("/css", express.static(__dirname + "/../client/css"));
 app.use("/dist", express.static(__dirname + "/../client/dist"));
 app.use("/img", express.static(__dirname + "/../client/img"));
 app.use("/phaser", express.static(__dirname + "/../../node_modules/phaser"));
