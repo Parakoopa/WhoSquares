@@ -44,25 +44,23 @@ export class App extends React.Component<IAppProps, IAppState> {
             }
         ];
 
-        const divStyle = {
-            "backgroundColor": "#061539",
-            "height": "100%",
-            "display": "flex",
-            "flex-direction": "column",
-            "align-items": "center",
-        };
-
-        return <div style={divStyle}>
-            <Header />
-            {routes.map((route, index) => (
-                <Route
-                    key={index}
-                    path={route.path}
-                    exact={route.exact}
-                    component={route.component}
-                />
-            ))}
-            <Footer/>
+        return <div className={"app"}>
+            <div id={"header"}>
+                <Header />
+            </div>
+            <div id={"body"}>
+                {routes.map((route, index) => (
+                    <Route
+                        key={index}
+                        path={route.path}
+                        exact={route.exact}
+                        component={route.component}
+                    />
+                ))}
+            </div>
+            <div id={"footer"}>
+                <Footer/>
+            </div>
         </div>;
     }
 }

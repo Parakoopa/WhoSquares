@@ -39,7 +39,7 @@ interface IStartGameResponse extends IResponse {
     roomName: string;
     sizeX: number;
     sizeY: number;
-    mission: IMission;
+    missionName: string;
 }
 
 interface IPlacedTileResponse extends IResponse {

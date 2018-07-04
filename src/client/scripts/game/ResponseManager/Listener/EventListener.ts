@@ -34,7 +34,7 @@ export class EventListener {
             gameMan.placedTile(resp.y, resp.x, resp.player);
         });
         socket.on("startGame", (resp: IStartGameResponse) => {
-            gameMan.startedGame(resp.sizeX, resp.sizeY, resp.mission);
+            gameMan.startedGame(resp.sizeX, resp.sizeY, resp.missionName);
         });
         socket.on("winGame", (resp: IWinGameResponse) => {
             gameMan.winGame(resp.player);

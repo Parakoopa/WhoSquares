@@ -7,7 +7,7 @@ export class ExpandMission implements IMission {
     }
 
     public name(): string {
-        return "";
+        return "Capture 40%";
     }
 
     public check(player: IPlayer, grid: IPlayer[][]): boolean {

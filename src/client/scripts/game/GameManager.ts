@@ -3,6 +3,7 @@ import {IUserInterface} from "../ui/IUserInterface";
 import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
 import {LocalPlayer} from "./LocalPlayer";
+import {MissionDistributer} from "./MissionDistributer";
 import {ResponseManager} from "./ResponseManager/ResponseManager";
 import {App} from "../ui/App";
 
@@ -133,11 +134,11 @@ export class GameManager {
      * Tell room to create game with given sizes & update Ui
      * @param {number} sizeX
      * @param {number} sizeY
-     * @param mission
+     * @param missionName
      */
-    public startedGame(sizeX: number, sizeY: number, mission: IMission): void {
+    public startedGame(sizeX: number, sizeY: number, missionName: string): void {
         const grid = Grid.createGrid(sizeX, sizeY, this);
-        this._localPlayer.mission = mission;
+        this._localPlayer.mission = MissionDistributer.getMission(missionName);
         console.log("MISSION:" + this._localPlayer.mission);
         this._localPlayer.room.startedGame(grid);
         this._ui.updateGameInfo("Room has been started!");

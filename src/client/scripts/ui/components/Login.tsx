@@ -72,41 +72,17 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     public render() {
         const {fireRedirect} = this.state;
 
-        const divStyle = {
-            "width": "fit-content",
-            "text-align": "center",
-            "vertical-align": "center",
-            "font-size": "1.25em",
-            "margin-bottom": "3em",
-        };
-
-        const inputStyle = {
-            "width": "fit-content",
-            "padding": "5px",
-            "backgroundColor": "#162856",
-            "border": "3px solid #7887AB",
-            "font-size": "0.75em",
-            "color": "White",
-            "text-align": "center"
-        };
-
-        const submitStyle = {
-            "backgroundColor": "#162856",
-            "border": "3px solid #7887AB",
-            "font-size": "0.75em",
-            "color": "White",
-            "margin": "5px",
-            "padding-top": "5px",
-            "text-align": "center"
-        };
-
         return (
-            <div style={divStyle} className="Login">
+            <div className={"content"}>
                 <form onSubmit={this.handleSubmit}>
-                    <h1>USERNAME</h1>
-                    <input style={inputStyle} type="text" value={this.state.username} onChange={this.handleChange}/>
-                    <br/>
-                    <input style={submitStyle} type="submit" disabled={!this.validateForm()} value="OK"/>
+                    <h3 className={"description"}>username:</h3>
+                    <div className={"content"}>
+                        <span id={"empty"}></span>
+                        <input className={"input"} type="text"
+                               value={this.state.username} onChange={this.handleChange}/>
+                        <input className={"button"} type="submit"
+                               disabled={!this.validateForm()} value="OK"/>
+                    </div>
                 </form>
                 {fireRedirect && (
                     <Redirect to={Routes.linkToLobby(this.state.username)}/>
