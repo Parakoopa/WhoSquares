@@ -39,16 +39,22 @@ export class App extends React.Component<IAppProps, IAppState> {
         ];
 
         return <div className={"app"}>
-            <Header />
-            {routes.map((route, index) => (
-                <Route
-                    key={index}
-                    path={route.path}
-                    exact={route.exact}
-                    component={route.component}
-                />
-            ))}
-            <Footer/>
+            <div id={"header"}>
+                <Header />
+            </div>
+            <div id={"body"}>
+                {routes.map((route, index) => (
+                    <Route
+                        key={index}
+                        path={route.path}
+                        exact={route.exact}
+                        component={route.component}
+                    />
+                ))}
+            </div>
+            <div id={"footer"}>
+                <Footer/>
+            </div>
         </div>;
     }
 }

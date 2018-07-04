@@ -128,30 +128,33 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         };
 
         return <div className={"content"}>
-            <div>
-                <label>RoomID: {this.props.roomid}</label>
-            </div>
-            <div>
-                <label>Winner: {this.getWinnerName()}</label>
-            </div>
-            <div>
-                <label>Players: </label>
-                {playerlist}
-            </div>
-            <div>
-                <label>TurnInfo: </label>
-                <label style={styleTurnInfo}>
-                    {this.getActivePlayerName()}
-                </label>
-            </div>
-            <div>
-                <button onClick={this.startGame}>Start Game</button>
-            </div>
-            <div>
-                <label>GameInfo: {this.state.gameInfo}</label>
-            </div>
             <div id="game" className={"game"}/>
-            <button className={"button"} onClick={this.leaveRoom}>Leave Room</button>
+            <div id={"buttons"}>
+                <button className={"button"} onClick={this.startGame}>Start Game</button>
+                <button className={"button"} onClick={this.leaveRoom}>Leave Room</button>
+            </div>
+            <div className={"info"}>
+                <div>
+                    <label>Current Room: {this.props.roomid}</label>
+                </div>
+                <div>
+                    <label>Winner: {this.getWinnerName()}</label>
+                </div>
+                <div>
+                    <label>Players: </label>
+                    {playerlist}
+                </div>
+                <br/>
+                <div>
+                    <label>Turn Info: </label>
+                    <label style={styleTurnInfo}>
+                        {this.getActivePlayerName()}
+                    </label>
+                </div>
+                <div>
+                    <label>Game Info: {this.state.gameInfo}</label>
+                </div>
+            </div>
         </div>;
     }
 }

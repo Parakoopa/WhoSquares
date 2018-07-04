@@ -43,6 +43,7 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
                 <form onSubmit={this.handleSubmit}>
                     <h3 className={"description"}>username:</h3>
                     <div className={"content"}>
+                        <span id={"empty"}></span>
                         <input className={"input"} type="text"
                                value={this.state.username} onChange={this.handleChange}/>
                         <input className={"button"} type="submit"

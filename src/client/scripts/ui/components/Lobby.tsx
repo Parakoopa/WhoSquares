@@ -27,7 +27,7 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
         ].map((name) =>
             <div key={name}>
                 <Link to={this.getGameURL(name)}>
-                    <button className={"button"}>
+                    <button className={"room"}>
                         {name}
                     </button>
                 </Link>

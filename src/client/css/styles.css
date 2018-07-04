@@ -4,6 +4,8 @@ html, body {
     color: White;
     margin: 0;
     padding: 0;
+    height: 100%;
+    width: 100%;
 }
 
 body * {
@@ -14,14 +16,7 @@ body * {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 0.5em 0em 1em 0em;
-}
-
-.footer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-top: 1em;
+    margin: 0.5em 0em 0em 0em;
 }
 
 .app {
@@ -31,6 +26,30 @@ body * {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+#mainapp {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+#header {
+    flex-grow: 5;
+    flex-shrink: 3;
+    flex-basis: auto;
+}
+
+#body {
+    flex-grow: 10;
+    flex-shrink: 1;
+    flex-basis: available;
+}
+
+#footer {
+    flex-basis: auto;
+    flex-grow: 1;
+    flex-shrink: 5;
 }
 
 .view {
@@ -46,32 +65,52 @@ body * {
 }
 
 .description {
-    margin-bottom: 0;
+    margin-bottom: 0.25em;
 }
 
 .button {
     background-color: #162856;
     border: 3px solid #7887AB;
-    font-size: 0.75em;
+    font-size: 0.85em;
     color: White;
     margin: 0.25em;
     padding: 0.25em 0.75em 0.25em 0.75em;
     text-align: center;
 }
 
+.room {
+    min-width: 12em;
+    background-color: #162856;
+    border: 3px solid #7887AB;
+    font-size: 0.85em;
+    color: White;
+    margin: 0.5em;
+    padding: 0.25em 0.75em 0.25em 0.75em;
+    text-align: center;
+}
+
 .input {
     width: fit-content;
+    margin: 0.5em;
     padding: 0.25em;
     color: White;
     background-color: #061539;
     border: 3px solid #4F618F;
-    font-size: 0.75em;
+    font-size: 0.85em;
     text-align: center;
 }
 
+#empty {
+    padding: 0 1.5em 0 1.5em;
+}
+
+.info {
+    margin-top: 1.1em;
+}
+
 .game {
-    width: 15em;
-    height: 15em;
+    width: 12em;
+    height: 12em;
     alignment: center;
     margin: 0 auto;
 }
