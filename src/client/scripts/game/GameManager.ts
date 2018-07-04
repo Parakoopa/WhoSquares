@@ -142,6 +142,7 @@ export class GameManager {
         console.log("MISSION:" + this._localPlayer.mission);
         this._localPlayer.room.startedGame(grid);
         this._ui.updateGameInfo("Room has been started!");
+        this._ui.updateMission( this._localPlayer.mission);
     }
 
     /**

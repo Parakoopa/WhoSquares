@@ -15,6 +15,7 @@ export interface IRoomState {
     activePlayer: IPlayer;
     gameInfo: string;
     winner: IPlayer;
+    mission: IMission;
 }
 
 export class Room extends React.Component<IRoomProps, IRoomState> implements IUserInterface {
@@ -34,7 +35,8 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
             players: [],
             activePlayer: null,
             gameInfo: "",
-            winner: null
+            winner: null,
+            mission: null
         };
     }
 
@@ -63,6 +65,10 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         this.setState({gameInfo});
     }
 
+    public updateMission(mission: IMission): void {
+        this.setState({mission});
+    }
+
     public updateWinner(winner: IPlayer): void {
         this.setState({winner});
     }
@@ -89,6 +95,27 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
             return "";
         else
             return this.state.winner.name;
+    }
+
+    public getMissionName(): string {
+        if (this.state.mission == null)
+            return "";
+        else
+            return this.state.mission.name();
+    }
+
+    public getMissionDesc(): string {
+        if (this.state.mission == null)
+            return "";
+        else
+            return this.state.mission.description();
+    }
+
+    public getMissionImgPath(): string {
+        if (this.state.mission == null)
+            return "";
+        else
+            return this.state.mission.imgpath();
     }
 
     public startGame() {
@@ -154,6 +181,15 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
                 </div>
                 <div>
                     <label>Game Info: {this.state.gameInfo}</label>
+                </div>
+                <div>
+                    <label>Mission: {this.getMissionName()}</label>
+                </div>
+                <div>
+                    <label>{this.getMissionDesc()}</label>
+                </div>
+                <div>
+                    <img src={this.getMissionImgPath()}/>
                 </div>
             </div>
         </div>;
