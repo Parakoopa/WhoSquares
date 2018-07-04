@@ -42,7 +42,7 @@ export class RoomEvents {
     public startEvent(clients: Client[], roomName: string, sizeX: number, sizeY: number): IEvent[] {
         const startEvents: IEvent[] = [];
         for (const client of clients) {
-            const response: IStartGameResponse = {roomName, sizeX, sizeY, mission: client.mission};
+            const response: IStartGameResponse = {roomName, sizeX, sizeY, missionName: client.mission.constructor.name};
             startEvents.push({clients: [client], name: "startGame", response});
         }
         return startEvents;
@@ -53,7 +53,7 @@ export class RoomEvents {
      * have to be notified of him via IOtherJoinedRoomResponse
      * @param {Client[]} clients
      * @param {string} roomName
-     * @param {LocalPlayer} localPlayer
+     * @param otherPlayer
      * @returns {IEvent}
      */
     public otherJoinedEvent(clients: Client[], roomName: string, otherPlayer: IPlayer): IEvent {
