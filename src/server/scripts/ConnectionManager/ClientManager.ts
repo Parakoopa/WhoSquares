@@ -59,9 +59,14 @@ export class ClientManager {
     public setUserName(socket: Socket, req: IUserNameRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
+        const events: IEvent[] = [];
         // Reconnect client if the client logging in already owns the name
         if (client.player) {
-            if (client.player.name === req.playerName) return this.reconnectClient(client);
+            if (client.player.name === req.playerName) {
+                const response: IUserNameResponse = {player: client.player};
+                events.push({clients: [client], name: "userName", response});
+                return events.concat(this.reconnectClient(client));
+            }
         }
         if (this.isAvailableName(req.playerName)) {
             client.player = new Player(req.playerName, null, true);
@@ -79,7 +84,7 @@ export class ClientManager {
      * @param {SocketIO.Socket} socket
      * @param {IJoinRoomRequest} req
      */
-    public joinRoom(socket: Socket, req: IJoinRoomRequest): IEvent[]{
+    public joinRoom(socket: Socket, req: IJoinRoomRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
         return this._lobby.joinRoom(client, req);
@@ -134,7 +139,7 @@ export class ClientManager {
 
     private isAvailableName(name: string): boolean {
        for (const client of this._clients) {
-           if( client.player === undefined )
+           if (client.player === undefined )
                continue;
 
            if (client.player.name === name) return false;
