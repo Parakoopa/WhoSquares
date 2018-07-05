@@ -10,6 +10,10 @@ export class ExpandMission implements IMission {
         return "Capture 40%";
     }
 
+    public imgpath(): string {
+        return "img/Mission.jpg";
+    }
+
     public check(player: IPlayer, grid: IPlayer[][]): boolean {
         let tileCount: number = 0;
 

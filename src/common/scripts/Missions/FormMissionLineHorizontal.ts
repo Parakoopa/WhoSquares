@@ -3,11 +3,15 @@ import {FormMission} from "./FormMission";
 export class FormMissionLineHorizontal extends FormMission {
 
     public description(): string {
-        return "Just create a circle with your tiled!";
+        return "Just create a horizontal line!";
     }
 
     public name(): string {
-        return "Form Circle";
+        return "Horizontal line";
+    }
+
+    public imgpath(): string {
+        return "img/Mission.jpg";
     }
 
     public getForm(): number[][] {

@@ -56,4 +56,5 @@ export abstract class FormMission implements IMission {
     public abstract getForm(): number[][];
     public abstract description(): string;
     public abstract name(): string;
+    public abstract imgpath(): string;
 }

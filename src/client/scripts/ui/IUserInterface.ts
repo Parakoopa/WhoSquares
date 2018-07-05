@@ -12,4 +12,5 @@ export interface IUserInterface {
     getUsername(): string;
     getRoomID(): string;
     roomMessage(player: IPlayer, message: string): void;
+    updateMission(mission: IMission): void;
 }
