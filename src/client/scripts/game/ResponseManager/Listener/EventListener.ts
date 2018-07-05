@@ -14,7 +14,8 @@ export class EventListener {
         socket.on("connected", (resp: IConnectedResponse) => {
             console.log("connected and got key:" + resp.key);
             localStorage["who-squares-private-key"] = resp.key; // only strings
-            gameMan.addLocalPlayer(resp.player, resp.key);
+            // ToDo Disabled and logicto be moved into react socket management
+            // ToDo gameMan.addLocalPlayer(resp.key);
         });
 
         // Actions

@@ -43,8 +43,31 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     }
 
     private login(): void {
-        const ok = Connection.login(this.state.username, () => {
-            window.location.href = Routes.linkToLobbyHREF(Connection.getUsername());
+        const username = this.state.username;
+
+        if (username === undefined)
+            App._socket = io();
+        else {
+            console.log("send key:" + username);
+            App._socket = io({
+                transportOptions: {
+                    polling: {
+                        extraHeaders: {
+                            username
+                        }
+                    }
+                }
+            });
+        }
+
+        App._socket.once("connected", (resp: IConnectedResponse) => {
+            console.log("connected and got key:" + resp.key);
+            localStorage["who-squares-private-key"] = resp.key; // only strings
+
+            App._key = resp.key;
+
+            // Go to Lobby
+            this.setState({ fireRedirect: true });
         });
 
         if (!ok)

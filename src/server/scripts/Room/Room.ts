@@ -153,26 +153,20 @@ export class Room extends RoomEvents implements IRoom {
     /**
      * Create a player that may not interact with the active game
      * @param {Client} client
-     * @returns {LocalPlayer}
      */
     private createObserver(client: Client): void {
-        const color = this._colorDistr.getFreeColor();
-        const player: Player = new Player(client.name, color);
-        player.isObserver = true;
-        client.player = player;
+        client.player.color = this._colorDistr.getFreeColor();
+        client.player.isObserver = true;
     }
 
     /**
      * Create a player that may interact with an active game
      * Assining color, turn order and mission
      * @param {Client} client
-     * @returns {LocalPlayer}
      */
     private createPlayer(client: Client): void {
-        const color = this._colorDistr.getFreeColor();
-        const player: Player = new Player(client.name, color);
-        player.isObserver = true;
-        client.player = player;
+        client.player.color = this._colorDistr.getFreeColor();
+        client.player.isObserver = true;
         client.mission = this._missionDistr.getMission();
     }
 
