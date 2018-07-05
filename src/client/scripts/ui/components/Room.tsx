@@ -4,6 +4,13 @@ import {GameManager} from "../../game/GameManager";
 import {OtherPlayer} from "../../game/OtherPlayer";
 import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
+import {Game} from "./room/Game";
+import {GameAlerts} from "./room/GameAlerts";
+import {GameControl} from "./room/GameControl";
+import {PlayerList} from "./room/PlayerList";
+import {RoomInfo} from "./room/RoomInfo";
+import {TurnInfo} from "./room/TurnInfo";
+import {WinnerInfo} from "./room/WinnerInfo";
 
 export interface IRoomProps {
     roomid: string;
@@ -72,30 +79,6 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IRo
     public updateMission(mission: IMission): void {
     }
 
-    public getActivePlayerColorHtml(): string {
-        let color;
-        if (this.state.activePlayer == null)
-            color = 0;
-        else
-            color = this.state.activePlayer.color;
-
-        return "#" + color.toString(16);
-    }
-
-    public getActivePlayerName(): string {
-        if (this.state.activePlayer == null)
-            return "";
-        else
-            return this.state.activePlayer.name;
-    }
-
-    public getWinnerName(): string {
-        if (this.state.winner == null)
-            return "";
-        else
-            return this.state.winner.name;
-    }
-
     public startGame() {
         if (this.state.gameManager !== null)
             this.state.gameManager.actionStartGame();
@@ -118,46 +101,15 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IRo
     }
 
     public render() {
-        const playerlist = this.state.players.map((player, i) =>
-            <li key={i}>{player.name}</li>
-        );
-
-        const styleTurnInfo = {
-            color: this.getActivePlayerColorHtml(),
-            fontWeight: 900,
-        };
-
         return <div className={"content"}>
-            <div id="game" className={"game"}/>
-            <div id={"buttons"}>
-                <button className={"button"} onClick={this.startGame}>
-                    Start Game
-                </button>
-                <button className={"button"} onClick={this.leaveRoom}>
-                    Leave Room
-                </button>
-            </div>
+            <Game/>
+            <GameControl actionStartGame={this.startGame} actionLeaveRoom={this.leaveRoom}/>
             <div className={"info"}>
-                <div>
-                    <label>Current Room: {this.props.roomid}</label>
-                </div>
-                <div>
-                    <label>Winner: {this.getWinnerName()}</label>
-                </div>
-                <div>
-                    <label>Players: </label>
-                    {playerlist}
-                </div>
-                <br/>
-                <div>
-                    <label>Turn Info: </label>
-                    <label style={styleTurnInfo}>
-                        {this.getActivePlayerName()}
-                    </label>
-                </div>
-                <div>
-                    <label>Game Info: {this.state.gameInfo}</label>
-                </div>
+                <RoomInfo roomid={this.props.roomid}/>
+                <WinnerInfo winner={this.state.winner}/>
+                <PlayerList players={this.state.players}/>
+                <TurnInfo player={this.state.activePlayer}/>
+                <GameAlerts alert={this.state.gameInfo}/>
             </div>
         </div>;
     }
