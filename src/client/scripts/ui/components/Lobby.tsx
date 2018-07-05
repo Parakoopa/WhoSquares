@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {Routes} from "../Routes";
 import {App} from "../App";
 import {GameManager} from "../../game/GameManager";
+import {Connection} from "../../Connection";
 
 export interface ILobbyProps {
     username: string;
@@ -20,13 +21,18 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.joinRoom = this.joinRoom.bind(this);
 
         this.state = {roomlist: [], roomnameNew: "Room"};
 
-        App._socket.emit("joinLobby");
-        App._socket.once("joinLobby", (resp: IJoinLobbyEvent) => {
-            this.setState({roomlist : resp.rooms});
+        const ok = Connection.joinLobby((resp: IJoinLobbyEvent) => {
+            this.setState({roomlist: resp.rooms});
         });
+
+        if (!ok) {
+            window.location.href = Routes.linkToLoginHREF();
+            return;
+        }
     }
 
     private getGameURL(roomid: string) {
@@ -40,7 +46,14 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
     }
 
     private createRoom() {
-        window.location.href = Routes.linkToGameHREF( this.props.username, this.state.roomnameNew);
+        this.joinRoom(this.state.roomnameNew);
+    }
+
+    private joinRoom(roomname: string) {
+        Connection.joinRoom(roomname, () => {
+            console.log( "CAllback!!!!");
+            window.location.href = Routes.linkToGameHREF(this.props.username, roomname);
+        });
     }
 
     private validateForm() {
@@ -51,20 +64,15 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
         this.setState({roomnameNew: event.target.value});
     }
 
-    public componentDidMount() {
-    }
-
     public render() {
 
         let roomlist;
-        if (this.state.roomlist === null || this.state.roomlist.length !== 0 ) {
+        if (this.state.roomlist === null || this.state.roomlist.length !== 0) {
             roomlist = this.state.roomlist.map((name, i) =>
                 <div key={i}>
-                    <Link to={this.getGameURL(name)}>
-                        <button className={"button"}>
-                            {name}
-                        </button>
-                    </Link>
+                    <button className={"button"} onClick={(e) => {this.joinRoom(name); }}>
+                        {name}
+                    </button>
                 </div>
             );
         } else {

@@ -4,6 +4,7 @@ import {OtherPlayer} from "../../game/OtherPlayer";
 import {IUserInterface} from "../IUserInterface";
 import {Routes} from "../Routes";
 import {App} from "../App";
+import {Connection} from "../../Connection";
 
 export interface IRoomProps {
     roomid: string;
@@ -15,11 +16,10 @@ export interface IRoomState {
     activePlayer: IPlayer;
     gameInfo: string;
     winner: IPlayer;
+    gameManager: GameManager;
 }
 
 export class Room extends React.Component<IRoomProps, IRoomState> implements IUserInterface {
-
-    private gameManager: GameManager;
 
     constructor(props: IRoomProps) {
         super(props);
@@ -34,8 +34,11 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
             players: [],
             activePlayer: null,
             gameInfo: "",
-            winner: null
+            winner: null,
+            gameManager: null
         };
+
+        Connection.setRoomname(this.props.roomid);
     }
 
     public getUsername() {
@@ -47,8 +50,8 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
     }
 
     public leaveRoom() {
-        if (this.gameManager !== undefined)
-            this.gameManager.actionLeaveRoom();
+        if (this.state.gameManager !== null)
+            this.state.gameManager.actionLeaveRoom();
     }
 
     public updatePlayerlist(players: OtherPlayer[]) {
@@ -65,6 +68,9 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
 
     public updateWinner(winner: IPlayer): void {
         this.setState({winner});
+    }
+
+    public updateMission(mission: IMission): void {
     }
 
     public getActivePlayerColorHtml(): string {
@@ -92,8 +98,8 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
     }
 
     public startGame() {
-        if (this.gameManager !== undefined)
-            this.gameManager.actionStartGame();
+        if (this.state.gameManager !== null)
+            this.state.gameManager.actionStartGame();
     }
 
     public leftRoom() {
@@ -105,17 +111,11 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         // ToDo Update Chat Window
     }
 
-    public joinLobby(rooms: string[]): void {
-        console.log("rooms" + ": ");
-        for (const room of rooms) {
-            console.log(room);
-        }
-        // ToDo Display room list to user
-    }
-
     public componentDidMount(): void {
-        // Init game
-        this.gameManager = new GameManager(App._socket, this);
+        Connection.getSocket((socket: SocketIOClient.Socket) => {
+            console.log("New Manager!");
+            this.setState({gameManager: new GameManager(socket, this)});
+        });
     }
 
     public render() {
@@ -131,8 +131,12 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
         return <div className={"content"}>
             <div id="game" className={"game"}/>
             <div id={"buttons"}>
-                <button className={"button"} onClick={this.startGame}>Start Game</button>
-                <button className={"button"} onClick={this.leaveRoom}>Leave Room</button>
+                <button className={"button"} onClick={this.startGame}>
+                    Start Game
+                </button>
+                <button className={"button"} onClick={this.leaveRoom}>
+                    Leave Room
+                </button>
             </div>
             <div className={"info"}>
                 <div>
