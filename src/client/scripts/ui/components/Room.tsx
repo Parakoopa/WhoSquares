@@ -1,10 +1,9 @@
 import * as React from "react";
+import {Connection} from "../../Connection";
 import {GameManager} from "../../game/GameManager";
 import {OtherPlayer} from "../../game/OtherPlayer";
-import {IUserInterface} from "../IUserInterface";
+import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
-import {App} from "../App";
-import {Connection} from "../../Connection";
 
 export interface IRoomProps {
     roomid: string;
@@ -19,7 +18,7 @@ export interface IRoomState {
     gameManager: GameManager;
 }
 
-export class Room extends React.Component<IRoomProps, IRoomState> implements IUserInterface {
+export class Room extends React.Component<IRoomProps, IRoomState> implements IRoomUI {
 
     constructor(props: IRoomProps) {
         super(props);

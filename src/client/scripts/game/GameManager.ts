@@ -1,12 +1,11 @@
 import Game = Phaser.Game;
-import {IUserInterface} from "../ui/IUserInterface";
+import {Connection} from "../Connection";
+import {IRoomUI} from "../ui/interfaces/IRoomUI";
 import {Grid} from "./Grid";
 import {InputManager} from "./InputManager";
 import {LocalPlayer} from "./LocalPlayer";
 import {MissionDistributer} from "./MissionDistributer";
 import {ResponseManager} from "./ResponseManager/ResponseManager";
-import {App} from "../ui/App";
-import {Connection} from "../Connection";
 
 export class GameManager {
 
@@ -15,7 +14,7 @@ export class GameManager {
     public _inputManager: InputManager;
     public _localPlayer: LocalPlayer;
     private _eventListener: ResponseManager;
-    private _ui: IUserInterface;
+    private _ui: IRoomUI;
     private _username: string;
 
     /**
@@ -24,7 +23,7 @@ export class GameManager {
      * Initialize ResponseReceiver
      * Start UpdateLoop (Client only Updates UI & Logic stuff only by Server Events)
      */
-    constructor(socket: SocketIOClient.Socket, ui: IUserInterface) {
+    constructor(socket: SocketIOClient.Socket, ui: IRoomUI) {
         this._ui = ui;
         this._username = ui.getUsername();
         this._socket = socket;

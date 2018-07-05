@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Connection} from "../../Connection";
+import {ILoginUI} from "../interfaces/ILoginUI";
 import {Routes} from "../Routes";
 
 export interface ILoginProps {
@@ -9,7 +10,7 @@ export interface ILoginState {
     username: string;
 }
 
-export class Login extends React.Component<ILoginProps, ILoginState> {
+export class Login extends React.Component<ILoginProps, ILoginState> implements ILoginUI {
 
     constructor(props: ILoginProps) {
         super(props);

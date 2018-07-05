@@ -1,6 +1,6 @@
-import {OtherPlayer} from "../game/OtherPlayer";
+import {OtherPlayer} from "../../game/OtherPlayer";
 
-export interface IUserInterface {
+export interface IRoomUI {
 
     leaveRoom(): void;
     leftRoom(): void;

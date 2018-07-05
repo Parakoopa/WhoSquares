@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {IUserInterface} from "../../../ui/IUserInterface";
+import {IRoomUI} from "../../../ui/interfaces/IRoomUI";
 
 // ToDo rename into messageListener or smth like that
 export class ErrorListener {
@@ -9,7 +9,7 @@ export class ErrorListener {
      * @param {SocketIOClient.Socket} socket
      * @param {UiManager} _ui
      */
-    public static listen(socket: Socket, _ui: IUserInterface) {
+    public static listen(socket: Socket, _ui: IRoomUI) {
 
         // Error Feedback
         socket.on("nameUnavailable", () => {
