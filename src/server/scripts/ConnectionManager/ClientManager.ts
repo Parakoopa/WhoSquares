@@ -33,8 +33,10 @@ export class ClientManager {
         const newClient = this.clientByKey(key);
         console.log("private key of connected client: " + key);
         if (!newClient) {
+            console.log("CONNECTING");
             return this.addClient(socket);
         } else {
+            console.log("RECONNECTING");
             newClient.socket = socket;
             return this.reconnectClient(newClient);
         }
@@ -57,6 +59,10 @@ export class ClientManager {
     public setUserName(socket: Socket, req: IUserNameRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
+        // Reconnect client if the client logging in already owns the name
+        if (client.player) {
+            if (client.player.name === req.playerName) return this.reconnectClient(client);
+        }
         if (this.isAvailableName(req.playerName)) {
             client.player = new Player(req.playerName, null, true);
             const response: IUserNameResponse = {player: client.player};
@@ -170,13 +176,11 @@ export class ClientManager {
      */
     private reconnectClient(client: Client): IEvent[] {
         // ToDo Replace with a stored name that has been set by the player
-        const player: IPlayer = new Player("" + this.connectionCounter++);
-        const response =  {response: "connected", player, key: client.key} as IConnectedResponse;
+        const response =  {response: "connected", player: client.player, key: client.key} as IConnectedResponse;
         const reconnectionEvent: IEvent = {clients: [client], name: "connected", response};
         const room = client.room;
         if (!room) {
             const joinLobbyEvent = this._lobby.joinLobby(client);
-            console.log("no room");
             return [reconnectionEvent, joinLobbyEvent];
         }
         return [reconnectionEvent, ...room.reconnectClient(client)];
