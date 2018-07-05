@@ -33,8 +33,10 @@ export class ClientManager {
         const newClient = this.clientByKey(key);
         console.log("private key of connected client: " + key);
         if (!newClient) {
+            console.log("CONNECTING");
             return this.addClient(socket);
         } else {
+            console.log("RECONNECTING");
             newClient.socket = socket;
             return this.reconnectClient(newClient);
         }
@@ -57,6 +59,15 @@ export class ClientManager {
     public setUserName(socket: Socket, req: IUserNameRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
+        const events: IEvent[] = [];
+        // Reconnect client if the client logging in already owns the name
+        if (client.player) {
+            if (client.player.name === req.playerName) {
+                const response: IUserNameResponse = {player: client.player};
+                events.push({clients: [client], name: "userName", response});
+                return events.concat(this.reconnectClient(client));
+            }
+        }
         if (this.isAvailableName(req.playerName)) {
             client.player = new Player(req.playerName, null, true);
             const response: IUserNameResponse = {player: client.player};
@@ -73,7 +84,7 @@ export class ClientManager {
      * @param {SocketIO.Socket} socket
      * @param {IJoinRoomRequest} req
      */
-    public joinRoom(socket: Socket, req: IJoinRoomRequest): IEvent[]{
+    public joinRoom(socket: Socket, req: IJoinRoomRequest): IEvent[] {
         const client = this.isValidClient(socket);
         if (!client) return;
         return this._lobby.joinRoom(client, req);
@@ -128,7 +139,7 @@ export class ClientManager {
 
     private isAvailableName(name: string): boolean {
        for (const client of this._clients) {
-           if( client.player === undefined )
+           if (client.player === undefined )
                continue;
 
            if (client.player.name === name) return false;
@@ -170,13 +181,11 @@ export class ClientManager {
      */
     private reconnectClient(client: Client): IEvent[] {
         // ToDo Replace with a stored name that has been set by the player
-        const player: IPlayer = new Player("" + this.connectionCounter++);
-        const response =  {response: "connected", player, key: client.key} as IConnectedResponse;
+        const response =  {response: "connected", player: client.player, key: client.key} as IConnectedResponse;
         const reconnectionEvent: IEvent = {clients: [client], name: "connected", response};
         const room = client.room;
         if (!room) {
             const joinLobbyEvent = this._lobby.joinLobby(client);
-            console.log("no room");
             return [reconnectionEvent, joinLobbyEvent];
         }
         return [reconnectionEvent, ...room.reconnectClient(client)];
