@@ -3,39 +3,55 @@ import {Routes} from "./ui/Routes";
 
 export class Connection {
 
-    private static _socket: SocketIOClient.Socket;
+    public static _socket: SocketIOClient.Socket;
     private static _localPlayer: IPlayer;
-    private static _key: string;
 
-    public static getSocket(callback: any): void {
-        if (this.joinRoom(this.getRoomname(), () => {})) {
+    public static initSocket(callback: any) {
+        const key = this.getKey();
 
-            console.log("GetSocket worked! : " + this._socket );
-            callback(this._socket);
+        if (!key) {
+            this._socket = io();
+        } else {
+            this._socket = io({
+                transportOptions: {
+                    polling: {
+                        extraHeaders: {key}
+                    }
+                }
+            });
         }
+
+        this._socket.once("connected", (resp: IConnectedResponse) => {
+            this.setKey(resp.key);
+
+            if (callback)
+                callback();
+        });
     }
 
     public static login(username: string, callback: any): boolean {
-        if (username === undefined)
+        if (!username)
             return false;
         else {
-            console.log("send key:" + username);
-            this._socket = this.initSocket(username);
+            this.initSocket(() => {
+
+                console.log("UserLogin!");
+
+                this._socket.emit("userName", {playerKey: this.getKey(), playerName: username});
+
+                this._socket.once("nameUnavailable", () => {
+                    alert("Name unavailable!");
+                    window.location.href = Routes.linkToLoginHREF();
+                });
+                this._socket.once("userName", (resp: IUserNameResponse) => {
+                    this.setLocalPlayer(resp.player);
+                    this.setUsername(resp.player.name);
+
+                    if (callback)
+                        callback();
+                });
+            });
         }
-
-        if (this._socket === undefined)
-            return false;
-
-        this._socket.once("connected", (resp: IConnectedResponse) => {
-            console.log("connected and got key:" + resp.key);
-            this.setUsername(resp.key); // only strings
-
-            this._localPlayer = resp.player;
-            this._key = resp.key;
-
-            if (callback !== null)
-                callback();
-        });
 
         return true;
     }
@@ -43,14 +59,10 @@ export class Connection {
     public static joinLobby(callback: any): boolean {
         const username = this.getUsername();
 
-        console.log("JoinLobby username:" + username);
-
-        if (username === null)
+        if (!username)
             return false;
 
-
-        console.log("JoinLobby Test if socket is online:" + this._socket === null);
-        const ok = this._socket !== undefined || this.login(username, null);
+        const ok = this._socket || this.login(username, null);
 
         if (!ok)
             return false;
@@ -60,44 +72,54 @@ export class Connection {
         return true;
     }
 
-    public static joinRoom(newRoomname: string, callback: any): boolean {
+    public static joinRoom(callback: any): boolean {
         const username = this.getUsername();
-        let roomname = this.getRoomname();
-        if (username === null || newRoomname === null || roomname === null)
+        if (!username) {
+            window.location.href = Routes.linkToLoginHREF();
             return false;
-
-        if (newRoomname !== roomname) {
-            this.setRoomname(newRoomname);
-            roomname = newRoomname;
         }
 
-        const ok = this._socket !== undefined || this.login(username, null);
-
-        if (!ok)
+        if (!this._socket && !this.login(username, null)) {
+            alert("Can't establish connection!");
             return false;
+        }
 
-        callback();
+        const roomname = this.getRoomname();
+        if (!roomname) {
+            alert("No Roomname available!");
+            return false;
+        }
+
+        if (callback)
+            callback();
 
         return true;
     }
 
-    public static initSocket(username: string): SocketIOClient.Socket {
-        return io({
-            transportOptions: {
-                polling: {
-                    extraHeaders: {
-                        username
-                    }
-                }
-            }
-        });
+    public static getSocket(callback: any): boolean {
+        const ok = this.joinRoom(null);
+
+        if (!ok)
+            return false;
+
+        console.log("GetSocket worked! : " + this._socket);
+        callback(this._socket);
+    }
+
+    public static getKey(): string {
+        return localStorage["who-squares-secret-key"];
+    }
+
+    public static setKey(key: string): void {
+        localStorage["who-squares-secret-key"] = key;
     }
 
     public static getUsername(): string {
         return localStorage["who-squares-username"];
     }
 
-    public static setUsername(username: string): void {
+    public static setUsername(username: string):
+        void {
         localStorage["who-squares-username"] = username;
     }
 
@@ -107,6 +129,10 @@ export class Connection {
 
     public static getRoomname(): string {
         return localStorage["who-squares-roomname"];
+    }
+
+    public static setLocalPlayer(player: IPlayer): void {
+        this._localPlayer = player;
     }
 
     public static getLocalPlayer(): IPlayer {

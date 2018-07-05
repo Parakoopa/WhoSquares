@@ -25,18 +25,17 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
 
         this.state = {roomlist: [], roomnameNew: "Room"};
 
+        console.log( "Join lobby!");
         const ok = Connection.joinLobby((resp: IJoinLobbyEvent) => {
+            console.log( "updated roomlist");
             this.setState({roomlist: resp.rooms});
         });
 
         if (!ok) {
+            console.log( "Back to Login!");
             window.location.href = Routes.linkToLoginHREF();
             return;
         }
-    }
-
-    private getGameURL(roomid: string) {
-        return Routes.linkToGame(this.props.username, roomid);
     }
 
     private handleSubmit(event: any) {
@@ -50,9 +49,9 @@ export class Lobby extends React.Component<ILobbyProps, ILobbyState> {
     }
 
     private joinRoom(roomname: string) {
-        Connection.joinRoom(roomname, () => {
-            console.log( "CAllback!!!!");
-            window.location.href = Routes.linkToGameHREF(this.props.username, roomname);
+        Connection.setRoomname( roomname );
+        Connection.joinRoom( () => {
+            window.location.href = Routes.linkToGameHREF(roomname);
         });
     }
 

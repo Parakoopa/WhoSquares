@@ -1,8 +1,5 @@
 import * as React from "react";
-import {render} from "react-dom";
-import {Redirect} from "react-router-dom";
 import {Connection} from "../../Connection";
-import {App, IAppProps} from "../App";
 import {Routes} from "../Routes";
 
 export interface ILoginProps {
@@ -43,31 +40,8 @@ export class Login extends React.Component<ILoginProps, ILoginState> {
     }
 
     private login(): void {
-        const username = this.state.username;
-
-        if (username === undefined)
-            App._socket = io();
-        else {
-            console.log("send key:" + username);
-            App._socket = io({
-                transportOptions: {
-                    polling: {
-                        extraHeaders: {
-                            username
-                        }
-                    }
-                }
-            });
-        }
-
-        App._socket.once("connected", (resp: IConnectedResponse) => {
-            console.log("connected and got key:" + resp.key);
-            localStorage["who-squares-private-key"] = resp.key; // only strings
-
-            App._key = resp.key;
-
-            // Go to Lobby
-            this.setState({ fireRedirect: true });
+        const ok = Connection.login(this.state.username, () => {
+            window.location.href = Routes.linkToLobbyHREF();
         });
 
         if (!ok)

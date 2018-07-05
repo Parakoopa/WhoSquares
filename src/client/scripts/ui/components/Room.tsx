@@ -103,7 +103,7 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IUs
     }
 
     public leftRoom() {
-        window.location.href = Routes.linkToLobbyHREF(this.props.username);
+        window.location.href = Routes.linkToLobbyHREF();
     }
 
     public roomMessage(player: IPlayer, message: string): void {

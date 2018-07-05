@@ -128,6 +128,9 @@ export class ClientManager {
 
     private isAvailableName(name: string): boolean {
        for (const client of this._clients) {
+           if( client.player === undefined )
+               continue;
+
            if (client.player.name === name) return false;
        }
        return true;
