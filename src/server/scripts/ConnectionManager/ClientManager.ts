@@ -60,7 +60,9 @@ export class ClientManager {
         if (this.isAvailableName(req.playerName)) {
             client.player = new Player(req.playerName, null, true);
             const response: IUserNameResponse = {player: client.player};
-            return [{clients: [client], name: "userName", response}];
+            const usernameEvent = {clients: [client], name: "userName", response};
+            const joinLobbyEvent = this._lobby.joinLobby(client);
+            return [usernameEvent, joinLobbyEvent];
         }
         return [{clients: [client], name: "nameUnavailable", response: {}}];
     }
@@ -149,15 +151,12 @@ export class ClientManager {
      * @param socket
      */
     private addClient(socket: Socket): IEvent[] {
-        console.log("new client");
         const key = Utility.getGUID();
-        const player: IPlayer = new Player("" + this.connectionCounter++);
         const client: Client = new Client(socket, key, key); // Todo make key -> name
         this._clients.push(client);
-        const response =  {response: "connected", player, key} as IConnectedResponse;
+        const response =  {response: "connected", key} as IConnectedResponse;
         const connectedEvent = {clients: [client], name: "connected", response};
-        const joinLobbyEvent = this._lobby.joinLobby(this.clientBySocket(socket));
-        return [connectedEvent, joinLobbyEvent];
+        return [connectedEvent];
     }
 
     /**
