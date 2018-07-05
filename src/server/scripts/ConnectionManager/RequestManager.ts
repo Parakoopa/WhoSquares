@@ -32,6 +32,9 @@ export class RequestManager extends ResponseEmitter {
             socket.on("disconnect", () => {
                 this.emitEvents(this._clientManager.disconnect(socket));
             });
+            socket.on("userName", (req: IUserNameRequest) => {
+                this.emitEvents(this._clientManager.setUserName(socket, req));
+            });
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
                 this.emitEvents(this._clientManager.joinRoom(socket, req));
             });

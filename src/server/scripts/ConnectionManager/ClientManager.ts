@@ -51,6 +51,21 @@ export class ClientManager {
     }
 
     /**
+     * Returnn IUserNameResponse with IPlayer and asssigned name
+     * if name is available otherwise send INameUnavailableResponse
+     */
+    public setUserName(socket: Socket, req: IUserNameRequest): IEvent[] {
+        const client = this.isValidClient(socket);
+        if (!client) return;
+        if (this.isAvailableName(req.playerName)) {
+            client.player = new Player(req.playerName, null, true);
+            const response: IUserNameResponse = {player: client.player};
+            return [{clients: [client], name: "userName", response}];
+        }
+        return [{clients: [client], name: "nameUnavailable", response: {}}];
+    }
+
+    /**
      * Add Client to room if he is not yet in a room
      * Informs client and other clients in room that he joined
      * @param {SocketIO.Socket} socket
@@ -107,6 +122,13 @@ export class ClientManager {
         const room = this._lobby.roomByKey(req.roomKey);
         if (!room) return; // Todo return invalid roomkey response
         return room.chatMessage(client, req.message);
+    }
+
+    private isAvailableName(name: string): boolean {
+       for (const client of this._clients) {
+           if (client.player.name === name) return false;
+       }
+       return true;
     }
 
     /**

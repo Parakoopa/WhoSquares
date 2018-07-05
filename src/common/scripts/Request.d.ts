@@ -8,6 +8,11 @@ interface IRequest {
     response: string;
 }
 
+interface IUserNameRequest extends IRequest {
+    playerKey: string;
+    playerName: string;
+}
+
 interface IJoinRoomRequest extends IRequest {
     playerKey: string;
     roomName: string;

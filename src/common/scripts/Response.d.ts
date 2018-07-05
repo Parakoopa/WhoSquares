@@ -5,8 +5,11 @@
 interface IResponse {}
 
 interface IConnectedResponse extends IResponse {
-    player: IPlayer;
     key: string;
+}
+
+interface IUserNameResponse extends IResponse {
+    player: IPlayer;
 }
 
 interface IJoinLobbyEvent extends IResponse {
@@ -65,8 +68,11 @@ interface IRoomMessageResponse extends IResponse {
     message: string;
 }
 
-interface IRoomIsFullResponse extends IResponse {
-    roomName: string;
+interface INameUnavailable extends IResponse {
+}
+
+interface IUserNameResponse extends IResponse {
+    player: IPlayer;
 }
 
 interface IInvalidPlacement extends IResponse {

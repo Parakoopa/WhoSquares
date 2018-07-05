@@ -11,6 +11,15 @@ export class RequestEmitter {
     constructor(private _socket: Socket, private _localPlayer: LocalPlayer) {}
 
     /**
+     * Send IUserNameRequest to try to rserve given name for this client/player
+     * @param {string} playerName
+     */
+    public setUserName(playerName: string): void {
+        const playerKey = this._localPlayer.key;
+        this._socket.emit("userName", {playerKey, playerName});
+    }
+
+    /**
      * Send JoinRoomRequest to join a specific room by Name
      * @param {string} roomName
      */

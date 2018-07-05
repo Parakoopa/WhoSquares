@@ -12,6 +12,9 @@ export class ErrorListener {
     public static listen(socket: Socket, _ui: IUserInterface) {
 
         // Error Feedback
+        socket.on("nameUnavailable", () => {
+            _ui.updateGameInfo("This name is unavailable. Choose again.");
+        });
         socket.on("roomIsFull", () => {
             _ui.updateGameInfo("Room is full!");
         });
