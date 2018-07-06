@@ -34,6 +34,7 @@ export class Lobby {
      * Tell room that localPlayer left & update Ui
      */
     public leftRoom(): void {
+        this.localPlayer.room = null;
         this._room.destroyGrid();
         this._room = null;
         this._ui.updateGameInfo("left room");

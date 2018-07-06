@@ -3,6 +3,7 @@ import {Grid} from "./Grid";
 import {LocalPlayer} from "./LocalPlayer";
 import {MissionDistributer} from "./MissionDistributer";
 import {OtherPlayer} from "./OtherPlayer";
+import {PhaserGame} from "./PhaserGame";
 
 export class Room {
 
@@ -27,6 +28,7 @@ export class Room {
     ) {
         this._otherPlayers = this.toOtherPlayers(otherPlayers);
         this._ui.updatePlayerList(this._otherPlayers);
+        _localPlayer.room = this;
     }
 
     public get key(): string {

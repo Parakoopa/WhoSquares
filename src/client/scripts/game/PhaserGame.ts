@@ -23,14 +23,10 @@ export class PhaserGame {
                 game.load.image("gridTile", "./img/square32_grey.png");
             },
             create() {
-
+                this._inputManager = new InputManager(this.game);
             }
         }, true);
         this._game = game;
-    }
-
-    public set inputManager(val: InputManager) {
-        this._inputManager = val;
     }
 
     public get inputManager(): InputManager {

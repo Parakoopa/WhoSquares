@@ -68,7 +68,7 @@ export class Grid {
      * @returns {Grid}
      */
     public static createGridByInfo(gridInfo: IPlayer[][], overColor: number, phaserGame: PhaserGame): Grid {
-        const grid = this.createGrid(gridInfo[0].length, gridInfo.length, overColor, phaserGame);
+        const grid = this.createGrid(gridInfo[0].length, gridInfo.length, overColor);
         grid.placedTiles(gridInfo);
         return grid;
     }
@@ -82,7 +82,8 @@ export class Grid {
      * @param phaserGame
      * @returns {Grid}
      */
-    public static createGrid(sizeX: number, sizeY: number, overColor: number, phaserGame: PhaserGame): Grid {
+    public static createGrid(sizeX: number, sizeY: number, overColor: number): Grid {
+        const phaserGame = new PhaserGame();
         const grid = new Grid(phaserGame.game, phaserGame.inputManager);
         grid.createGrid("gridTile", sizeX, sizeY, 40, overColor);
         return grid;
@@ -104,7 +105,6 @@ export class Grid {
         this._sizeX = sizeX;
         this._sizeY = sizeY;
         this._overColor = overColor;
-    //    const self = this;
 
         const offset = this._sizeX * cellSize / 2.0;
         const xOffset: number = this._game.world.centerX - offset;

@@ -1,22 +1,12 @@
-import Game = Phaser.Game;
 import Socket = SocketIOClient.Socket;
 import {ILoginUI} from "../ui/interfaces/ILoginUI";
 import {InputManager} from "./InputManager";
 import {LocalPlayer} from "./LocalPlayer";
-import {PhaserGame} from "./PhaserGame";
 
 export class Login {
 
-    public _game: Game;
     public _inputManager: InputManager;
-    private _phaserGame: PhaserGame;
     constructor(private _ui: ILoginUI, private _localPlayer: LocalPlayer = null) {
-    }
-
-    public createPhaser() {
-        this._phaserGame = new PhaserGame();
-        this._inputManager = new InputManager(this._phaserGame.game);
-        this._phaserGame.inputManager = this._inputManager;
     }
 
     // ToDo move

@@ -2,6 +2,7 @@ import {Room} from "./Room";
 
 export class LocalPlayer {
     private _mission: IMission;
+    private _room: Room;
 
     /**
      * Represents the Client in rooms & games
@@ -45,6 +46,14 @@ export class LocalPlayer {
 
     public set mission(val: IMission) {
         this._mission = val;
+    }
+
+    public get room(): Room {
+        return this._room;
+    }
+
+    public set room(val: Room) {
+        this._room = val;
     }
 
 }
