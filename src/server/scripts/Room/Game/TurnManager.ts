@@ -1,12 +1,12 @@
 /**
  * Stores all players of an active game in a chronological order
  */
-import {Client} from "../../Client/Client";
+import {Player} from "../Player";
 
 export class TurnManager {
 
     private _index: number = 0;
-    private _clients: Client[];
+    private _clients: Player[];
 
     constructor() {
         this._clients = [];
@@ -24,7 +24,7 @@ export class TurnManager {
      * add player to the end of the turn order
      * @param client
      */
-    public addClient(client: Client): void {
+    public addClient(client: Player): void {
         this._clients.push(client);
     }
 
@@ -32,7 +32,7 @@ export class TurnManager {
      * Remove player from turn ordner
      * @param client
      */
-    public removeClient(client: Client): void {
+    public removeClient(client: Player): void {
         const index: number = this._clients.indexOf(client);
         if (index < 0) return;
         this._clients.splice(index, 1);
@@ -43,7 +43,7 @@ export class TurnManager {
      * Return player at turn
      * @returns Client
      */
-    public curClient(): Client {
+    public curClient(): Player {
         return this._clients[this._index];
     }
 

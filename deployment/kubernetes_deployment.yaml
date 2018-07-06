@@ -22,6 +22,11 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
+          env:
+          - name: DB_HOST
+            value: mongodb
+          - name: DB_NAME
+            value: whosquares
           resources:
             requests:
               memory: "500Mi"
@@ -74,3 +79,7 @@ spec:
         backend:
             serviceName: who-squares
             servicePort: 8080
+      - path: /db-admin/
+        backend:
+            serviceName: adminmongo
+            servicePort: 1234

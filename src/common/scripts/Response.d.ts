@@ -4,13 +4,8 @@
 
 interface IResponse {}
 
-interface IConnectedResponse extends IResponse {
-    player: IPlayer;
+interface IRegisteredResponse extends IResponse {
     key: string;
-}
-
-interface IJoinLobbyEvent extends IResponse {
-    rooms: string[];
 }
 
 interface IJoinedResponse extends IResponse {
@@ -92,7 +87,4 @@ interface INotInRoomResponse extends IResponse {
 }
 
 interface IRefreshResponse extends IResponse {
-}
-
-interface IAlreadyInRoomResponse extends IResponse {
 }
