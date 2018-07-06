@@ -182,7 +182,7 @@ export class Room extends RoomEvents implements IRoom {
         const otherClients = this.getPlayerSocketsExcept(player.socket);
         const otherJoinedEvent = this.otherJoinedEvent(otherClients, this.name, player);
         if (this._serverGrid == null) return [joinedEvent, otherJoinedEvent]; // No Grid (running game) => no TurnEvents
-        const informTurnEvent = this.informTurnEvent(this._players.map((pl) => pl.socket), this._turnManager.curClient());
+        const informTurnEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
         return [joinedEvent, otherJoinedEvent, informTurnEvent];
     }
 
@@ -217,14 +217,15 @@ export class Room extends RoomEvents implements IRoom {
      * @constructor
      */
     public removeClient(client: Socket): IPlayer {
-        if (client.player === undefined) return null; // todo think of spectators
+        const player = this.getPlayerForSocket(client);
+        if (!player) return null; // todo think of spectators
         // ToDo somehow flag disconnected players for client to be displayed that way
-        if (this._serverGrid) this._serverGrid.removePlayer(client.player);
+        if (this._serverGrid) this._serverGrid.removePlayer(player);
         // remove client from room
-        const index = this._players.indexOf(client);
+        const index = this._players.indexOf(player);
         if (index > -1)this._players.splice(index);
-        if (this._owner === client) this.assignNewOwner();
-        return client.player;
+        if (this._owner === player) this.assignNewOwner();
+        return player;
     }
 
     /**
@@ -288,7 +289,7 @@ export class Room extends RoomEvents implements IRoom {
         this._serverGrid = new ServerGrid(sizeX, sizeY);
         this.assignMissions();
         const startEvents: IEvent[] = this.startEvent(this._players, this.name, sizeX, sizeY);
-        const informTurnEvent: IEvent = this.informTurnEvent(this._players, this._turnManager.curClient().player);
+        const informTurnEvent: IEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
         startEvents.push(informTurnEvent);
         return startEvents;
     }
@@ -306,7 +307,7 @@ export class Room extends RoomEvents implements IRoom {
     private observerToPlayer(): void {
         for (const player of this._players) {
             player.isObserver = false;
-            this._turnManager.addClient(player);
+            this._turnManager.addPlayer(player);
         }
     }
 
@@ -322,23 +323,25 @@ export class Room extends RoomEvents implements IRoom {
      */
     public placeTile(client: Socket, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
         if (this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
-        const player: IPlayer = client.player;
+        const player: Player = this.getPlayerForSocket(client);
+        if (!player) return [this.invalidPlayerEvent(client, this.name)];
         if (player.isObserver) {
             return [this.observerEvent(client)];
         }
-        if (client !== this._turnManager.curClient()) {
+        if (player !== this._turnManager.curPlayer()) {
             return [this.notYourTurnEvent(client, this.name)];
         }
+        const sockets = this.getAllSockets();
         if (this._serverGrid.placeTile(player, y, x)) {
-            const placedEvent: IEvent = this.placedEvent(this._players, this.name, player, y, x); // Also sets next client
-            if (client.mission.check(player, this._serverGrid.gridInfo)) {
+            const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
+            if (player.mission.check(player, this._serverGrid.gridInfo)) {
                 console.log("Client won his mission: " + player.color);
                 this._gameEnded = true;
-                return [placedEvent, this.winGameEvent(this._players, this.name, player)];
+                return [placedEvent, this.winGameEvent(sockets, this.name, player)];
             }
-            this._turnManager.setNextClient();
-            const curPlayer = this._turnManager.curClient().player;
-            const informTurnEvent = this.informTurnEvent(this._players, curPlayer); // inform for next player color
+            this._turnManager.setNextPlayer();
+            const curPlayer = this._turnManager.curPlayer();
+            const informTurnEvent = this.informTurnEvent(sockets, curPlayer); // inform for next player color
             return [placedEvent, informTurnEvent];
         } else {
              return [this.invalidPlacement(client, this.name)]; // ToDo change to cheat Response
@@ -346,8 +349,9 @@ export class Room extends RoomEvents implements IRoom {
     }
 
     public chatMessage(client: Socket, message: string): IEvent[] {
-        const player: IPlayer = client.player;
-        return [this.roomMessageEvent(this._players, this._name, player, message)];
+        const player: IPlayer = this.getPlayerForSocket(client);
+        if (!player) return [this.invalidPlayerEvent(client, this.name)];
+        return [this.roomMessageEvent(this.getAllSockets(), this._name, player, message)];
     }
 
     /**
@@ -356,5 +360,9 @@ export class Room extends RoomEvents implements IRoom {
      */
     public size(): number {
         return this._players.length;
+    }
+
+    private getAllSockets() {
+        return this._players.map((pl) => pl.socket);
     }
 }

@@ -25,7 +25,7 @@ export class RoomEvents {
             roomName,
             roomKey,
             color,
-            otherPlayers,
+            otherPlayers: otherPlayers.map((op) => RoomEvents.stripPlayer(op)),
             gridInfo
         };
         return{clients: [client], name: "joinedRoom", response};
@@ -58,7 +58,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public otherJoinedEvent(clients: Socket[], roomName: string, otherPlayer: IPlayer): IEvent {
-        const response: IOtherJoinedResponse = {roomName, otherPlayer};
+        const response: IOtherJoinedResponse = {roomName, otherPlayer: RoomEvents.stripPlayer(otherPlayer)};
         return {clients, name: "otherJoinedRoom", response};
     }
 
@@ -79,7 +79,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public informTurnEvent(clients: Socket[], player: IPlayer): IEvent {
-        return {clients, name: "informTurn", response: {player}};
+        return {clients, name: "informTurn", response: {player: RoomEvents.stripPlayer(player)}};
     }
 
     /**
@@ -93,12 +93,12 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public placedEvent(clients: Socket[], roomName: string, player: IPlayer, y: number, x: number): IEvent {
-        const response: IPlacedTileResponse = {roomName, player, y, x};
+        const response: IPlacedTileResponse = {roomName, player: RoomEvents.stripPlayer(player), y, x};
         return {clients, name: "placedTile", response};
     }
 
     public roomMessageEvent(clients: Socket[], roomName: string, player: IPlayer, message: string ): IEvent {
-        const response: IRoomMessageResponse = {roomName, player, message};
+        const response: IRoomMessageResponse = {roomName, player: RoomEvents.stripPlayer(player), message};
         return {clients, name: "roomMessage", response};
     }
 
@@ -121,7 +121,7 @@ export class RoomEvents {
      * @returns {IEvent}
      */
     public winGameEvent(clients: Socket[], roomName: string, player: IPlayer): IEvent {
-        const response: IWinGameResponse = {roomName, player};
+        const response: IWinGameResponse = {roomName, player: RoomEvents.stripPlayer(player)};
         return {clients, name: "winGame", response};
     }
 
@@ -150,4 +150,23 @@ export class RoomEvents {
         return {clients: [client], name: "notOwner", response: {roomName}};
     }
 
+    /**
+     * Return InvalidPlayerEvent
+     * @param {Socket} client
+     * @param {string} roomName
+     * @returns {IEvent}
+     */
+    public invalidPlayerEvent(client: Socket, roomName: string): IEvent {
+        return {clients: [client], name: "invalidPlayer", response: {roomName}};
+    }
+
+    /**
+     * Remove everything from the IPlayer object that is NOT part of the interface
+     * returns a new object
+     * @param {IPlayer} player
+     * @returns {IPlayer}
+     */
+    private static stripPlayer(player: IPlayer): IPlayer {
+        return {name: player.name, color: player.color, isObserver: player.isObserver};
+    }
 }
