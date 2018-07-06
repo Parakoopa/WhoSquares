@@ -2,12 +2,12 @@ import {IRoomUI} from "../../ui/interfaces/IRoomUI";
 import {RequestEmitter} from "../Emitter/RequestEmitter";
 import {RequestManager} from "../Emitter/RequestManager";
 import {LocalPlayer} from "../LocalPlayer";
-import {MissionDistributer} from "../MissionDistributer";
 import {OtherPlayer} from "../OtherPlayer";
 import {ResponseManager} from "../ResponseManager/ResponseManager";
 import {Grid} from "./grid/Grid";
 import {GridFactory} from "./grid/GridFactory";
 import {Utility} from "../Utility";
+import {Missions} from "../../../../common/scripts/Missions/Missions";
 
 export class Room {
 
@@ -83,7 +83,7 @@ export class Room {
     public startedGame(sizeX: number, sizeY: number, missionName: string): void {
         if (this._grid) this.destroyGrid();
         this._grid = GridFactory.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
-        this._localPlayer.mission = MissionDistributer.getMission(missionName);
+        this._localPlayer.mission = Missions.getMission(missionName);
         this.updateMission( this._localPlayer.mission);
     }
 

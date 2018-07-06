@@ -3,6 +3,8 @@ import SocketIO = require("socket.io");
 import {IEvent} from "../Event";
 import {Lobby} from "../Lobby/Lobby";
 import {Utility} from "../Utility";
+import {User} from "../User/User";
+import {UserRepository} from "../User/UserRepository";
 
 /**
  * Used to manage login/room list/register etc. requests
@@ -12,11 +14,17 @@ import {Utility} from "../Utility";
 export class SessionManager {
 
     private _lobby: Lobby;
-    private _registeredNames: Map<string, string>; // Secretkey -> Name // TODO: Datenbank
+    private _registeredNames: Map<string, User>; // Secretkey -> User object
 
     constructor() {
         this._lobby = new Lobby();
         this._registeredNames = new Map();
+        // Load existing users
+        UserRepository.instance.getAll().then((users) => {
+            users.forEach((user) => {
+                this._registeredNames.set(user.key, user);
+            });
+        });
     }
 
     /**
@@ -26,9 +34,9 @@ export class SessionManager {
      * @param {IJoinRoomRequest} req
      */
     public joinRoom(socket: Socket, req: IJoinRoomRequest): IEvent[] {
-        const playerName = this._registeredNames.get(req.playerKey);
-        if (!playerName) return [this._lobby.nameNotRegisteredEvent(socket)];
-        return this._lobby.joinRoom(socket, req, playerName);
+        const userObject = this._registeredNames.get(req.playerKey);
+        if (!userObject) return [this._lobby.nameNotRegisteredEvent(socket)];
+        return this._lobby.joinRoom(socket, req, userObject);
     }
 
     /**
@@ -80,7 +88,9 @@ export class SessionManager {
     public registerClient(socket: Socket, req: IRegisterRequest): IEvent[] {
         console.log("new client");
         const key = Utility.getGUID();
-        this._registeredNames.set(key, req.name);
+        const newUser = new User(req.name, key);
+        this._registeredNames.set(key, newUser);
+        UserRepository.instance.save(newUser);
         console.log(key);
         console.log(req.name);
         console.log(this._registeredNames.get(key));
