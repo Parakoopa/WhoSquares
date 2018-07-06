@@ -1,7 +1,7 @@
 import * as React from "react";
 import {RouteComponentProps} from "react-router-dom";
 import {Connection} from "../../Connection";
-import {GameManager} from "../../game/GameManager";
+import {Login} from "../../game/components/Login";
 import {OtherPlayer} from "../../game/OtherPlayer";
 import {ChatInput} from "../components/room/ChatInput";
 import {ChatMessage} from "../components/room/ChatMessage";
@@ -24,11 +24,12 @@ export interface IRoomViewState {
     players: OtherPlayer[];
     activePlayer: IPlayer;
     winner: IPlayer;
-    gameManager: GameManager;
+    login: Login;
     messages: ChatMessage[];
 }
 
 export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> implements IRoomUI {
+    // ToDo create Room
 
     constructor(props: IRoomViewProps) {
         super(props);
@@ -37,13 +38,13 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             players: [],
             activePlayer: null,
             winner: null,
-            gameManager: null,
+            login: null,
             messages: []
         };
 
         this.leaveRoom = this.leaveRoom.bind(this);
         this.startGame = this.startGame.bind(this);
-        this.updatePlayerlist = this.updatePlayerlist.bind(this);
+        this.updatePlayerList = this.updatePlayerList.bind(this);
         this.updateGameInfo = this.updateGameInfo.bind(this);
         this.updateWinner = this.updateWinner.bind(this);
         this.sendRoomMessage = this.sendRoomMessage.bind(this);
@@ -60,11 +61,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public leaveRoom() {
-        if (this.state.gameManager !== null)
-            this.state.gameManager.actionLeaveRoom();
+        if (this.state.login !== null)
+            this.state.login.actionLeaveRoom(); // ToDo now part of lobby (lobbyView is responsible)?
     }
 
-    public updatePlayerlist(players: OtherPlayer[]) {
+    public updatePlayerList(players: OtherPlayer[]) {
         this.setState({players});
     }
 
@@ -90,8 +91,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public startGame() {
-        if (this.state.gameManager)
-            this.state.gameManager.actionStartGame();
+        if (this.state.login)
+            this.state.login.actionStartGame(); // ToDo now part of room
     }
 
     public leftRoom() {
@@ -109,14 +110,14 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     public sendRoomMessage(text: string) {
         console.log("Send text:" + text + " | " + this.state);
 
-        if (this.state.gameManager)
-            this.state.gameManager.actionSendRoomMessage(text);
+        if (this.state.login)
+            this.state.login.actionSendRoomMessage(text); // ToDo now part of room
     }
 
     public componentDidMount(): void {
         Connection.getSocket((socket: SocketIOClient.Socket) => {
             console.log("New Manager!");
-            this.setState({gameManager: new GameManager(socket, this)});
+            this.setState({login: new Login(socket, this)}); // ToDo now needs socket to create RequestEmitter
         });
     }
 

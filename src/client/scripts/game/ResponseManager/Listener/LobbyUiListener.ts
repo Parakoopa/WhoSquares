@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {Lobby} from "../../Lobby";
+import {Lobby} from "../../components/Lobby";
 
 // ToDo rename into messageListener or smth like that
 export class LobbyUiListener {
@@ -22,6 +22,7 @@ export class LobbyUiListener {
         socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
             lobby.otherJoinedRoom(resp.otherPlayer);
         });
+
     }
 
 }

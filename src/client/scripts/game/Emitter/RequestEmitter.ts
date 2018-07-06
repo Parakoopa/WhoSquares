@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {LocalPlayer} from "./LocalPlayer";
+import {LocalPlayer} from "../LocalPlayer";
 
 export class RequestEmitter {
 

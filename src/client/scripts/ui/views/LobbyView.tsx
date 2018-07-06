@@ -9,22 +9,23 @@ export interface ILobbyViewProps {
 }
 
 export interface ILobbyViewState {
-    roomlist: string[];
+    roomList: string[];
 }
 
 export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState> {
+    // ToDo create Lobby
 
     constructor(props: ILobbyViewProps) {
         super(props);
 
         this.joinRoom = this.joinRoom.bind(this);
 
-        this.state = {roomlist: [] };
+        this.state = {roomList: [] };
 
         console.log( "Join lobby!");
         const ok = Connection.joinLobby((resp: IJoinLobbyEvent) => {
-            console.log( "updated roomlist");
-            this.setState({roomlist: resp.rooms});
+            console.log( "updated roomList");
+            this.setState({roomList: resp.rooms});
         });
 
         if (!ok) {
@@ -44,7 +45,7 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
     public render() {
         return <div className={"content"}>
             <h3 className={"description"}> Available Rooms: </h3>
-            <RoomList roomlist={this.state.roomlist} actionJoinRoom={this.joinRoom}/>
+            <RoomList roomList={this.state.roomList} actionJoinRoom={this.joinRoom}/>
             <NewRoomForm actionCreate={this.joinRoom}/>
         </div>;
     }

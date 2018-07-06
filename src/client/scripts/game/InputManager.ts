@@ -1,7 +1,5 @@
 import Game = Phaser.Game;
-import Socket = SocketIOClient.Socket;
-import {LocalPlayer} from "./LocalPlayer";
-import {RequestEmitter} from "./RequestEmitter";
+import {RequestEmitter} from "./Emitter/RequestEmitter";
 
 export class InputManager {
 
@@ -12,34 +10,6 @@ export class InputManager {
      */
     constructor(private _game: Game, private _requestEmitter: RequestEmitter = null) {
         _game.input.mouse.capture = true;
-    }
-
-    /**
-     * InputManager exists before RequestEmitter,
-     * thus has to be assigned afterwards
-     * @param {SocketIOClient.Socket} socket
-     * @param {LocalPlayer} localPlayer
-     */
-    public createRequestEmitter(socket: Socket, localPlayer: LocalPlayer) {
-        console.log( "Request Emitter erstellt!");
-        this._requestEmitter = new RequestEmitter(socket, localPlayer);
-    }
-
-    /**
-     * Check Mouse: OnLeftButtonDown
-     */
-    public checkMouse() {
-        if (this._game.input.activePointer.leftButton.onDown) {
-            // example
-        }
-    }
-
-    /**
-     * Tell RequestEmitter to join given room
-     * @param {string} roomName
-     */
-    public joinRoom(roomName: string): void {
-        this._requestEmitter.joinRoom(roomName);
     }
 
     /**
@@ -55,22 +25,6 @@ export class InputManager {
      */
     public startGame() {
         this._requestEmitter.startGame(5, 5);
-    }
-
-    /**
-     * Tell RequestEmitter to send a Message
-     */
-    public sendRoomMessage( message: string) {
-        this._requestEmitter.roomMessage( message );
-    }
-
-    /**
-     * Tell RequestEmitter to place Tile by ths player
-     * @param {number} x
-     * @param {number} y
-     */
-    public placeTile(y: number, x: number): void {
-        this._requestEmitter.placeTile(y, x);
     }
 
 }

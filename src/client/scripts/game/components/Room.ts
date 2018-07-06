@@ -1,13 +1,16 @@
-import {IRoomUI} from "../ui/interfaces/IRoomUI";
+import {IRoomUI} from "../../ui/interfaces/IRoomUI";
 import {Grid} from "./Grid";
-import {LocalPlayer} from "./LocalPlayer";
-import {MissionDistributer} from "./MissionDistributer";
-import {OtherPlayer} from "./OtherPlayer";
-import {PhaserGame} from "./PhaserGame";
+import {LocalPlayer} from "../LocalPlayer";
+import {MissionDistributer} from "../MissionDistributer";
+import {OtherPlayer} from "../OtherPlayer";
+import {RequestManager} from "../Emitter/RequestManager";
+import {RequestEmitter} from "../Emitter/RequestEmitter";
+import {ResponseManager} from "../ResponseManager/ResponseManager";
 
 export class Room {
 
     private _otherPlayers: OtherPlayer[];
+    private readonly _requestEmitter: RequestEmitter;
 
     /**
      * Room has a secret key, a name, and a list of otherPlayers
@@ -29,6 +32,8 @@ export class Room {
         this._otherPlayers = this.toOtherPlayers(otherPlayers);
         this._ui.updatePlayerList(this._otherPlayers);
         _localPlayer.room = this;
+        this._requestEmitter = RequestManager.requestEmitter;
+        ResponseManager.createRoomUIListener(this);
     }
 
     public get key(): string {
@@ -55,6 +60,14 @@ export class Room {
         return this._otherPlayers;
     }
 
+    public actionStartGame(x: number, y: number): void {
+        this._requestEmitter.startGame(x, y);
+    }
+
+    public actionSendRoomMessage(message: string) {
+        this._requestEmitter.roomMessage(message);
+    }
+
     /**
      * Tell room to create game with given sizes & update Ui
      * @param {number} sizeX
@@ -62,7 +75,7 @@ export class Room {
      * @param missionName
      */
     public startedGame(sizeX: number, sizeY: number, missionName: string): void {
-        this._grid = Grid.createGrid(sizeX, sizeY, this._localPlayer.color);
+        this._grid = Grid.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
         this._localPlayer.mission = MissionDistributer.getMission(missionName);
         this.updateMission( this._localPlayer.mission);
     }
@@ -192,7 +205,7 @@ export class Room {
     }
 
     public roomMessage(player: IPlayer, message: string): void {
-        this._ui.roomMessage(player, message);
+        this._ui.actionSendRoomMessage(player, message);
     }
 
 }

@@ -1,6 +1,7 @@
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
-import {InputManager} from "./InputManager";
+import {RequestEmitter} from "../Emitter/RequestEmitter";
+import {InputManager} from "../InputManager";
 import {PhaserGame} from "./PhaserGame";
 
 export class Grid {
@@ -13,9 +14,9 @@ export class Grid {
     /**
      * Players are talked to via socket and identified via unique id guid
      * @param _game
-     * @param _inputManager
+     * @param _requestEmitter
      */
-    constructor(private _game: Game, private _inputManager: InputManager) {}
+    constructor(private _game: Game, private _requestEmitter: RequestEmitter) {}
 
     /**
      * @returns {number}
@@ -65,10 +66,11 @@ export class Grid {
      * @param {IPlayer[][]} gridInfo
      * @param overColor
      * @param phaserGame
+     * @param requestEmitter
      * @returns {Grid}
      */
-    public static createGridByInfo(gridInfo: IPlayer[][], overColor: number, phaserGame: PhaserGame): Grid {
-        const grid = this.createGrid(gridInfo[0].length, gridInfo.length, overColor);
+    public static createGridByInfo(gridInfo: IPlayer[][], overColor: number, phaserGame: PhaserGame, requestEmitter: RequestEmitter): Grid {
+        const grid = this.createGrid(gridInfo[0].length, gridInfo.length, overColor, requestEmitter);
         grid.placedTiles(gridInfo);
         return grid;
     }
@@ -79,12 +81,12 @@ export class Grid {
      * @param {number} sizeX
      * @param {number} sizeY
      * @param overColor
-     * @param phaserGame
+     * @param requestEmitter
      * @returns {Grid}
      */
-    public static createGrid(sizeX: number, sizeY: number, overColor: number): Grid {
+    public static createGrid(sizeX: number, sizeY: number, overColor: number, requestEmitter: RequestEmitter): Grid {
         const phaserGame = new PhaserGame();
-        const grid = new Grid(phaserGame.game, phaserGame.inputManager);
+        const grid = new Grid(phaserGame.game, requestEmitter);
         grid.createGrid("gridTile", sizeX, sizeY, 40, overColor);
         return grid;
     }
@@ -180,6 +182,6 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     public onDown(sprite: Sprite) {
-        this._inputManager.placeTile(sprite.data.y, sprite.data.x);
+        this._requestEmitter.placeTile(sprite.data.y, sprite.data.x);
     }
 }

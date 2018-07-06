@@ -1,5 +1,6 @@
 import * as React from "react";
 import {Routes} from "./ui/Routes";
+import {ResponseManager} from "./game/ResponseManager/ResponseManager";
 
 export class Connection {
 
@@ -11,6 +12,7 @@ export class Connection {
 
         if (!key) {
             this._socket = io();
+            ResponseManager.setSocket(this._socket);
         } else {
             this._socket = io({
                 transportOptions: {
@@ -36,7 +38,7 @@ export class Connection {
             this.initSocket(() => {
 
                 console.log("UserLogin!");
-
+                ResponseManager.createLoginListener(); // Need to listen for login Response
                 this._socket.emit("userName", {playerKey: this.getKey(), playerName: username});
 
                 this._socket.once("nameUnavailable", () => {

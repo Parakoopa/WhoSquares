@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {Login} from "../../Login";
+import {Login} from "../../components/Login";
 
 // ToDo rename into messageListener or smth like that
 export class LoginUiListener {
@@ -7,7 +7,6 @@ export class LoginUiListener {
     /**
      * Listen for ErrorResponses on socket to be displayed via UiManager
      * @param {SocketIOClient.Socket} socket
-     * @param login
      */
     public listen(socket: Socket, login: Login) {
         // Initial Connection
@@ -44,7 +43,6 @@ export class LoginUiListener {
         socket.on("gameAlreadyEnded", () => {
             login.updateGameInfo("the game already ended");
         });
-
     }
 
 }

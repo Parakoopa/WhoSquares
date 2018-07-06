@@ -1,13 +1,20 @@
-import {ILobbyUI} from "../ui/interfaces/ILobbyUI";
-import {IRoomUI} from "../ui/interfaces/IRoomUI";
-import {LocalPlayer} from "./LocalPlayer";
+import {ILobbyUI} from "../../ui/interfaces/ILobbyUI";
+import {IRoomUI} from "../../ui/interfaces/IRoomUI";
+import {RequestEmitter} from "../Emitter/RequestEmitter";
+import {RequestManager} from "../Emitter/RequestManager";
+import {LocalPlayer} from "../LocalPlayer";
+import {ResponseManager} from "../ResponseManager/ResponseManager";
 import {Room} from "./Room";
 
 export class Lobby {
 
     private _room: Room;
+    private _requestEmitter: RequestEmitter;
 
-    constructor(private _ui: ILobbyUI, private _roomUi: IRoomUI, private _localPlayer: LocalPlayer) {}
+    constructor(private _ui: ILobbyUI, private _roomUi: IRoomUI, private _localPlayer: LocalPlayer) {
+        this._requestEmitter = RequestManager.requestEmitter;
+        ResponseManager.createLobbyListener(this);
+    }
 
     public get localPlayer(): LocalPlayer {
         return this._localPlayer;
@@ -15,6 +22,10 @@ export class Lobby {
 
     public get room(): Room {
         return this._room;
+    }
+
+    public actionLeaveRoom(): void {
+        this._requestEmitter.leaveRoom();
     }
 
     /**

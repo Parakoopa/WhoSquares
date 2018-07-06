@@ -1,4 +1,4 @@
-import {Room} from "./Room";
+import {Room} from "./components/Room";
 
 export class LocalPlayer {
     private _mission: IMission;

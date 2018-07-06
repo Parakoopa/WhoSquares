@@ -1,10 +1,10 @@
 import Game = Phaser.Game;
-import {InputManager} from "./InputManager";
+import {InputManager} from "../InputManager";
+import {RequestEmitter} from "../Emitter/RequestEmitter";
 
 export class PhaserGame {
 
     private readonly _game: Game;
-    private _inputManager: InputManager;
 
     /**
      * Create Room, Layout Room, Load Images
@@ -23,14 +23,10 @@ export class PhaserGame {
                 game.load.image("gridTile", "./img/square32_grey.png");
             },
             create() {
-                this._inputManager = new InputManager(this.game);
+
             }
         }, true);
         this._game = game;
-    }
-
-    public get inputManager(): InputManager {
-        return this._inputManager;
     }
 
     public get game(): Game {
