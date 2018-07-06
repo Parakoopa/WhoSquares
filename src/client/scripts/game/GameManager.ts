@@ -99,6 +99,13 @@ export class GameManager {
     }
 
     /**
+     * Action for sending a Messsage
+     */
+    public actionSendRoomMessage( message: string ): void {
+        this._inputManager.sendRoomMessage(message);
+    }
+
+    /**
      * Tell room that localPlayer left & update Ui
      */
     public leftRoom(): void {
