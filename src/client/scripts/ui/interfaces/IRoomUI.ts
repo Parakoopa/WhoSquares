@@ -2,14 +2,14 @@ import {OtherPlayer} from "../../game/OtherPlayer";
 
 export interface IRoomUI {
 
-    leaveRoom(): void;
-    leftRoom(): void;
-    startGame(): void;
-    updatePlayerlist( players: OtherPlayer[] ): void;
+    startedGame(sizeX: number, sizeY: number, missionName: string): void;
+    placedTile(y: number, x: number, player: IPlayer): void;
+    updatePlayerList(): void;
+    updatePlayerList(players: OtherPlayer[] ): void;
     updateTurnInfo( player: IPlayer): void;
-    updateGameInfo( gameInfo: string ): void;
     updateWinner( winner: IPlayer): void;
-    getUsername(): string;
-    getRoomID(): string;
+    updateMission( mission: IMission): void;
+    key: string;
     roomMessage(player: IPlayer, message: string): void;
+
 }

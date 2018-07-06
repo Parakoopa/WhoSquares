@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Connection} from "../../Connection";
-import {GameManager} from "../../game/GameManager";
+import {LoginManager} from "../../game/GameManager";
 import {OtherPlayer} from "../../game/OtherPlayer";
 import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
@@ -22,7 +22,7 @@ export interface IRoomState {
     activePlayer: IPlayer;
     gameInfo: string;
     winner: IPlayer;
-    gameManager: GameManager;
+    gameManager: LoginManager;
 }
 
 export class Room extends React.Component<IRoomProps, IRoomState> implements IRoomUI {
@@ -32,7 +32,7 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IRo
 
         this.leaveRoom = this.leaveRoom.bind(this);
         this.startGame = this.startGame.bind(this);
-        this.updatePlayerlist = this.updatePlayerlist.bind(this);
+        this.updatePlayerList = this.updatePlayerList.bind(this);
         this.updateGameInfo = this.updateGameInfo.bind(this);
         this.updateWinner = this.updateWinner.bind(this);
 
@@ -60,7 +60,7 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IRo
             this.state.gameManager.actionLeaveRoom();
     }
 
-    public updatePlayerlist(players: OtherPlayer[]) {
+    public updatePlayerList(players: OtherPlayer[]) {
         this.setState({players});
     }
 
@@ -96,7 +96,7 @@ export class Room extends React.Component<IRoomProps, IRoomState> implements IRo
     public componentDidMount(): void {
         Connection.getSocket((socket: SocketIOClient.Socket) => {
             console.log("New Manager!");
-            this.setState({gameManager: new GameManager(socket, this)});
+            this.setState({gameManager: new LoginManager(socket, this)});
         });
     }
 

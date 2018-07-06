@@ -1,20 +1,37 @@
 import Socket = SocketIOClient.Socket;
-import {IRoomUI} from "../../ui/interfaces/IRoomUI";
-import {GameManager} from "../GameManager";
-import {ErrorListener} from "./Listener/ErrorListener";
-import {EventListener} from "./Listener/EventListener";
+import {Lobby} from "../Lobby";
+import {Login} from "../Login";
+import {Room} from "../Room";
+import {LobbyUiListener} from "./Listener/LobbyUiListener";
+import {LoginUiListener} from "./Listener/LoginUiListener";
+import {RoomUiListener} from "./Listener/RoomUiListener";
 
 export class ResponseManager {
 
+    private _loginUiListener: LoginUiListener;
+    private _lobbyUiListener: LobbyUiListener;
+    private _roomUiListener: RoomUiListener;
+
     /**
      * Start EventListener for Events & Errors
-     * @param {GameManager} _gameMan
      * @param {SocketIOClient.Socket} _socket
-     * @param {IRoomUI} _ui
      */
-    constructor(private _gameMan: GameManager, private _socket: Socket, private _ui: IRoomUI) {
-        EventListener.listen(_socket, _gameMan);
-        ErrorListener.listen(_socket, _ui);
+    constructor(private _socket: Socket) {
+    }
+
+    public createLoginListener(login: Login) {
+        if (!this._loginUiListener) this._loginUiListener = new LoginUiListener();
+        this._loginUiListener.listen(this._socket, login);
+    }
+
+    public createLobbyListener(lobby: Lobby) {
+        if (!this._lobbyUiListener) this._lobbyUiListener = new LobbyUiListener();
+        this._lobbyUiListener.listen(this._socket, lobby);
+    }
+
+    public createRoomUIListener(room: Room) {
+        if (!this._roomUiListener) this._roomUiListener = new RoomUiListener();
+        this._roomUiListener.listen(this._socket, room);
     }
 
 }

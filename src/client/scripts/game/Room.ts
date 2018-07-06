@@ -1,28 +1,40 @@
+import {IRoomUI} from "../ui/interfaces/IRoomUI";
 import {Grid} from "./Grid";
+import {LocalPlayer} from "./LocalPlayer";
+import {MissionDistributer} from "./MissionDistributer";
 import {OtherPlayer} from "./OtherPlayer";
 
 export class Room {
 
     private _otherPlayers: OtherPlayer[];
-    private _grid: Grid;
 
     /**
      * Room has a secret key, a name, and a list of otherPlayers
      * (LocalPlayer is not listed as room itself is local)
-     * @param {string} _roomKey
-     * @param {string} _roomName
+     * @param _key
+     * @param _name
+     * @param _localPlayer
      * @param {IPlayer[]} otherPlayers
+     * @param _ui
+     * @param _grid
      */
-    constructor(private _roomKey: string, private _roomName: string, otherPlayers: IPlayer[]) {
+    constructor(private _key: string,
+                private _name: string,
+                private _localPlayer: LocalPlayer,
+                otherPlayers: IPlayer[],
+                private _ui: IRoomUI,
+                private _grid: Grid = null
+    ) {
         this._otherPlayers = this.toOtherPlayers(otherPlayers);
+        this._ui.updatePlayerList(this._otherPlayers);
     }
 
-    /**
-     *
-     * @returns {string}
-     */
     public get key(): string {
-        return this._roomKey;
+        return this._key;
+    }
+
+    public set grid(val: Grid) {
+        this._grid = val;
     }
 
     /**
@@ -30,7 +42,7 @@ export class Room {
      * @returns {string}
      */
     public get name(): string {
-        return this._roomName;
+        return this._name;
     }
 
     /**
@@ -42,27 +54,23 @@ export class Room {
     }
 
     /**
-     * Get Player by name and tell room to remove it
-     * @param player
+     * Tell room to create game with given sizes & update Ui
+     * @param {number} sizeX
+     * @param {number} sizeY
+     * @param missionName
      */
-    public otherLeftRoom(player: IPlayer): void {
-        const otherPlayer = this.getOtherPlayer(player);
-        this.removePlayer(otherPlayer);
-        this._grid.removePlayer(player);
+    public startedGame(sizeX: number, sizeY: number, missionName: string): void {
+        this._grid = Grid.createGrid(sizeX, sizeY, this._localPlayer.color);
+        this._localPlayer.mission = MissionDistributer.getMission(missionName);
+        this.updateMission( this._localPlayer.mission);
+    }
+
+    public updateMission(mission: IMission): void {
+        this._localPlayer.mission = mission;
     }
 
     /**
-     * Create new Otherplayer and tell room to add it
-     * @param {IPlayer} otherPlayer
-     */
-    public otherJoinedRoom(otherPlayer: IPlayer): void {
-        const player: OtherPlayer = new OtherPlayer(otherPlayer);
-        this.addPlayer(player);
-    }
-
-    /**
-     * Tell grid to assign tile on x,y to given IPlayer
-     * (IPlayer can ne LocalPlayer or OtherPlayer
+     * Tell room to place Tile & updateUi
      * @param {number} x
      * @param {number} y
      * @param {IPlayer} player
@@ -72,13 +80,24 @@ export class Room {
     }
 
     /**
-     * A new game has been started so destroy old grid
-     * and assign new one
-     * @param {Grid} grid
+     * Get Player by name and tell room to remove it
+     * @param player
      */
-    public startedGame(grid: Grid) {
-        this.destroyGrid(); // Destroy previous grid;
-        this._grid = grid;
+    public otherLeftRoom(player: IPlayer): void {
+        const otherPlayer = this.getOtherPlayer(player);
+        this.removePlayer(otherPlayer);
+        this._grid.removePlayer(player);
+        this._ui.updatePlayerList(this._otherPlayers);
+    }
+
+    /**
+     * Create new Otherplayer and tell room to add it
+     * @param {IPlayer} otherPlayer
+     */
+    public otherJoinedRoom(otherPlayer: IPlayer): void {
+        const player: OtherPlayer = new OtherPlayer(otherPlayer);
+        this.addPlayer(player);
+        this._ui.updatePlayerList(this._otherPlayers);
     }
 
     /**
@@ -109,6 +128,7 @@ export class Room {
     private addPlayer(player: OtherPlayer): void {
         if (this._otherPlayers.includes(player)) return;
         this._otherPlayers.push(player);
+        this._ui.updatePlayerList(this._otherPlayers);
     }
 
     /**
@@ -118,6 +138,7 @@ export class Room {
     private removePlayer(player: OtherPlayer): void {
         const index: number = this._otherPlayers.indexOf(player);
         if (index > -1) this._otherPlayers.splice(index, 1);
+        this._ui.updatePlayerList(this._otherPlayers);
     }
 
     private getOtherPlayer(player: IPlayer): OtherPlayer {
@@ -148,6 +169,28 @@ export class Room {
         this._otherPlayers = []; // Reset on Join Room
         for (const player of players) {
             this._otherPlayers.push(new OtherPlayer(player));
+            this._ui.updatePlayerList(this._otherPlayers);
         }
     }
+
+    /**
+     * Update Ui to display winner
+     * @param {IPlayer} player
+     */
+    public updateWinner(player: IPlayer): void {
+        this._ui.updateWinner(player);
+    }
+
+    /**
+     * Update Ui for current players turn
+     * @param {IPlayer} player
+     */
+    public updateTurnInfo(player: IPlayer): void {
+        this._ui.updateTurnInfo( player );
+    }
+
+    public roomMessage(player: IPlayer, message: string): void {
+        this._ui.roomMessage(player, message);
+    }
+
 }

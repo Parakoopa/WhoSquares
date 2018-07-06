@@ -2,7 +2,7 @@ import * as React from "react";
 import {Link} from "react-router-dom";
 import {Routes} from "../Routes";
 import {App} from "../App";
-import {GameManager} from "../../game/GameManager";
+import {LoginManager} from "../../game/GameManager";
 import {Connection} from "../../Connection";
 import {RoomList} from "./lobby/RoomList";
 import {NewRoomForm} from "./lobby/NewRoomForm";
