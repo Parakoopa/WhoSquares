@@ -58,6 +58,13 @@ export class InputManager {
     }
 
     /**
+     * Tell RequestEmitter to send a Message
+     */
+    public sendRoomMessage( message: string) {
+        this._requestEmitter.roomMessage( message );
+    }
+
+    /**
      * Tell RequestEmitter to place Tile by ths player
      * @param {number} x
      * @param {number} y

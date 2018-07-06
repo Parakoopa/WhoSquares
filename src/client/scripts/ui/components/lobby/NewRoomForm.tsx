@@ -1,7 +1,4 @@
 import * as React from "react";
-import {Routes} from "../../Routes";
-import {Connection} from "../../../Connection";
-import {ILobbyProps} from "../Lobby";
 
 export interface INewRoomFormProps {
     actionCreate: (roomname: string) => void;
