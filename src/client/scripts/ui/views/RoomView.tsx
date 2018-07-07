@@ -31,6 +31,7 @@ export interface IRoomViewState {
     messages: ChatMessage[];
     room_backend: Room;
     gameStarted: boolean;
+    isOwner: boolean;
 }
 
 export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> implements IRoomUI {
@@ -74,7 +75,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                 resp.gridInfo
             );
 
-            this.setState({room_backend, gameStarted: room_backend.hasGrid()});
+            this.setState({room_backend, gameStarted: room_backend.hasGrid(), isOwner: Utility.getLocalPlayer().isRoomOwner});
         });
         Connection._socket.once("nameNotRegistered", () => {
             Connection.setKey("");
@@ -89,7 +90,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             login: null,
             messages: [],
             room_backend: null,
-            gameStarted: false
+            gameStarted: false,
+            isOwner: false
         };
 
         this.leaveRoom = this.leaveRoom.bind(this);
@@ -123,6 +125,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public otherLeftRoom(player: IPlayer): void {
         App.showTextOnSnackbar("Player '" + player.name + "' left room!");
+        this.setState({isOwner: Utility.getLocalPlayer().isRoomOwner});
     }
 
     public updateTurnInfo(activePlayer: IPlayer): void {
@@ -170,7 +173,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         return (
             <div className={"content"}>
                 <Game/>
-                <GameControl gameAlreadyStarted={this.state.gameStarted} actionStartGame={this.startGame} actionLeaveRoom={this.leaveRoom}/>
+                <GameControl gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted} actionStartGame={this.startGame} actionLeaveRoom={this.leaveRoom}/>
                 <div className={"info"}>
                     <RoomInfo roomid={this.props.match.params.roomid}/>
                     <WinnerInfo winner={this.state.winner}/>
