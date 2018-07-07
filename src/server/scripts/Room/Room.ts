@@ -232,7 +232,7 @@ export class Room extends RoomEvents implements IRoom {
 
         const leftEvent: IEvent = this.leftEvent(client, this._name);
         const otherLeftEvent: IEvent = this.otherLeftEvent(this.getPlayerSocketsExcept(client), this.name, player, this._owner);
-        if (!this._serverGrid) return [leftEvent, otherLeftEvent];
+        if (!this._serverGrid || this.isEmpty()) return [leftEvent, otherLeftEvent];
         const turnInfoEvent: IEvent = this.informTurnEvent(this.getPlayerSocketsExcept(client), this._turnManager.curPlayer());
         return [leftEvent, otherLeftEvent, turnInfoEvent];
     }
