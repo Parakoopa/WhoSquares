@@ -3,7 +3,7 @@ import {FormMission} from "./FormMission";
 export class FormMissionLineHorizontal extends FormMission {
 
     public description(): string {
-        return "Just create a horizontal line!";
+        return "Create a horizontal line!";
     }
 
     public name(): string {
@@ -11,7 +11,7 @@ export class FormMissionLineHorizontal extends FormMission {
     }
 
     public imgpath(): string {
-        return "img/Mission.jpg";
+        return "../../../img/mission_Horizontal.png";
     }
 
     public getForm(): number[][] {

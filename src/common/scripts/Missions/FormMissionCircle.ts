@@ -3,7 +3,7 @@ import {FormMission} from "./FormMission";
 export class FormMissionCircle extends FormMission {
 
     public description(): string {
-        return "Just create a circle with your tile!";
+        return "Create a circle!";
     }
 
     public name(): string {
@@ -11,7 +11,7 @@ export class FormMissionCircle extends FormMission {
     }
 
     public imgpath(): string {
-        return "img/Mission.jpg";
+        return "../../../img/mission_Circle.png";
     }
 
     public getForm(): number[][] {
