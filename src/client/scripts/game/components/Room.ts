@@ -78,6 +78,7 @@ export class Room {
      * @param missionName
      */
     public startedGame(sizeX: number, sizeY: number, missionName: string): void {
+        if (this._grid) this.destroyGrid();
         this._grid = GridFactory.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
         this._localPlayer.mission = MissionDistributer.getMission(missionName);
         this.updateMission( this._localPlayer.mission);
