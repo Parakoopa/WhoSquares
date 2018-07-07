@@ -7,11 +7,11 @@ export class ExpandMission implements IMission {
     }
 
     public name(): string {
-        return "Capture 40%";
+        return "Capture 40% of the grid!";
     }
 
     public imgpath(): string {
-        return "img/Mission.jpg";
+        return "../../../img/mission_40percent.png";
     }
 
     public check(player: IPlayer, grid: IPlayer[][]): boolean {
