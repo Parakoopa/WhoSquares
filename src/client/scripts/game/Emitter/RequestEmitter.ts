@@ -24,6 +24,7 @@ export class RequestEmitter {
      * @param {string} roomName
      */
     public joinRoom(roomName: string): void {
+        console.log("send joinRoom");
         const playerKey = Utility.getLocalPlayer().key;
         this._socket.emit("joinRoom", {playerKey, roomName});
     }

@@ -4,38 +4,45 @@ import {Room} from "../../components/Room";
 // ToDo rename into messageListener or smth like that
 export class RoomUiListener {
 
+    constructor(socket: Socket, private _room: Room) {
+        this.listen(socket);
+    }
+
+    public reListen(val: Room) {
+        this._room = val;
+    }
+
     /**
      * Listen for ErrorResponses on socket to be displayed via UiManager
      * @param {SocketIOClient.Socket} socket
-     * @param room
      */
-    public listen(socket: Socket, room: Room) {
+    public listen(socket: Socket) {
         // Room Management Actions
         socket.on("leftRoom", (resp: ILeftResponse) => {
-            room.leftRoom();
+            this._room.leftRoom();
         });
         socket.on("otherLeftRoom", (resp: IOtherLeftResponse) => {
-            room.otherLeftRoom(resp.player);
+            this._room.otherLeftRoom(resp.player);
         });
         socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
-            room.otherJoinedRoom(resp.otherPlayer);
+            this._room.otherJoinedRoom(resp.otherPlayer);
         });
 
         // Inside Room Actions
         socket.on("startGame", (resp: IStartGameResponse) => {
-            room.startedGame(resp.sizeX, resp.sizeY, resp.missionName);
+            this._room.startedGame(resp.sizeX, resp.sizeY, resp.missionName);
         });
         socket.on("placedTile", (resp: IPlacedTileResponse) => {
-            room.placedTile(resp.y, resp.x, resp.player);
+            this._room.placedTile(resp.y, resp.x, resp.player);
         });
         socket.on("winGame", (resp: IWinGameResponse) => {
-            room.updateWinner(resp.player);
+            this._room.updateWinner(resp.player);
         });
         socket.on("informTurn", (resp: IInformTurnResponse) => {
-            room.updateTurnInfo(resp.player);
+            this._room.updateTurnInfo(resp.player);
         });
         socket.on("roomMessage", (resp: IRoomMessageResponse) => {
-            room.roomMessage(resp.player, resp.message);
+            this._room.roomMessage(resp.player, resp.message);
         });
     }
 

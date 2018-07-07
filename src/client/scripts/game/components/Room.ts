@@ -31,6 +31,7 @@ export class Room {
                 private _ui: IRoomUI,
                 gridInfo: IPlayer[][] = null
     ) {
+        console.log("created room: " + _name);
         _localPlayer.room = this;
         this._otherPlayers = this.toOtherPlayers(otherPlayers);
         this._ui.updatePlayerList(this._otherPlayers);
