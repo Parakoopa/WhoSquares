@@ -42,7 +42,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         Connection.initSocket();
 
         if (!Connection.getKey() || !Connection.getUsername()) {
-            window.location.href = Routes.linkToLoginHREF();
+            window.location.href = Routes.linkToLoginHREF() + "/" + this.props.match.params.roomid;
             return;
         }
 
@@ -82,7 +82,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         Connection._socket.once("nameNotRegistered", () => {
             Connection.setKey("");
             Connection.setUsername("");
-            window.location.href = Routes.linkToLoginHREF();
+            window.location.href = Routes.linkToLoginHREF() + "/" + this.props.match.params.roomid;
         });
 
         this.state = {

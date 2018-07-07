@@ -2,12 +2,12 @@ import * as React from "react";
 import {Connection} from "../../Connection";
 import {ILoginUI} from "../interfaces/ILoginUI";
 import {Routes} from "../Routes";
-import {ResponseManager} from "../../game/ResponseManager/ResponseManager";
 import {Login} from "../../game/components/Login";
 import {App} from "../App";
 import {Utility} from "../../game/Utility";
+import {RouteComponentProps} from "react-router-dom";
 
-export interface ILoginViewProps {
+export interface ILoginViewProps extends RouteComponentProps<{jumpToRoom: string}> {
 }
 
 export interface ILoginViewState {
@@ -44,7 +44,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
                 Connection.getSocket()
             );
 
-            window.location.href = Routes.linkToLobbyHREF();
+            window.location.href = this.redirectAfterLogin();
             return;
         }
 
@@ -88,12 +88,19 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
                 Connection.getSocket()
             );
 
-            window.location.href = Routes.linkToLobbyHREF();
+            window.location.href = this.redirectAfterLogin();
         });
     }
 
     public componentDidMount() {
         this.setState( {username: Connection.getUsername()});
+    }
+
+    private redirectAfterLogin(): string {
+        if (this.props.match.params.jumpToRoom) {
+            return Routes.linkToGameHREF(this.props.match.params.jumpToRoom);
+        }
+        return Routes.linkToLobbyHREF();
     }
 
     public render() {
