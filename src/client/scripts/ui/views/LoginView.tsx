@@ -72,15 +72,14 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
     }
 
     private login(): void {
-        const username = this.state.username;
+        const name = this.state.username;
 
-        Connection._socket.emit("register", {username});
+        Connection._socket.emit("register", {name});
         Connection._socket.once("registered", (resp: IRegisteredResponse) => {
             Connection.setKey(resp.key);
-            Connection.setUsername( username );
+            Connection.setUsername( name );
 
             const color = parseInt("FF33FF", 16);
-            const name = username;
             const isObserver = true;
 
             Utility.addLocalPlayer(
