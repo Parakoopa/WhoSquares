@@ -7,7 +7,7 @@ export class Routes  {
 
     // Definitions
     public static APP_DEF: string = "/";
-    public static LOGIN_DEF: string = "/login";
+    public static LOGIN_DEF: string = "/login/:jumpToRoom?";
     public static LOBBY_DEF: string = "/lobby";
     public static GAME_DEF: string = "/game/:roomid";
 
