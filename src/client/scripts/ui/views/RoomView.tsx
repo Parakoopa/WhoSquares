@@ -99,7 +99,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public getRoomID() {
-        return this.props.roomid;
+        return this.props.match.params.roomid;
     }
 
     public leaveRoom() {

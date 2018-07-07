@@ -1,10 +1,12 @@
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
 import {RequestEmitter} from "../../Emitter/RequestEmitter";
+import {PhaserGame} from "../PhaserGame";
 
 export class Grid {
 
     private _grid: Sprite[][];
+    private _isPhaserLoaded: Promise<Phaser.Game>;
 
     /**
      * Players are talked to via socket and identified via unique id guid
@@ -22,15 +24,13 @@ export class Grid {
         private _sizeX: number,
         private _sizeY: number,
         tileName: string,
-        game: Game,
+        game: PhaserGame,
         tileSize: number
     ) {
-        // ToDo move callback into gridfactory
-        setTimeout(() =>
-            {
-                this.createGrid(game, tileName, tileSize);
-            },
-            500);
+        this._isPhaserLoaded = game.loaded();
+        this._isPhaserLoaded.then((canvas) =>  {
+            this.createGrid(canvas, tileName, tileSize);
+        });
     }
 
     /**
@@ -97,10 +97,12 @@ export class Grid {
      * @param {number} y
      */
     public placedTile(player: IPlayer, y: number, x: number) {
-        if (!player) return; // tile is not owned by any player
-        const sprite: Sprite =  this._grid[y][x];
-        sprite.data.color = player.color; // save color on object as it is overwritten f.e. onOver
-        this._grid[y][x].tint = player.color;
+        this._isPhaserLoaded.then(() => {
+            if (!player) return; // tile is not owned by any player
+            const sprite: Sprite =  this._grid[y][x];
+            sprite.data.color = player.color; // save color on object as it is overwritten f.e. onOver
+            this._grid[y][x].tint = player.color;
+        });
     }
 
     public removePlayer(player: IPlayer): void {

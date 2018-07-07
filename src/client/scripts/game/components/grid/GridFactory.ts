@@ -46,7 +46,7 @@ export class GridFactory {
     public static createGrid(sizeX: number, sizeY: number, overColor: number, requestEmitter: RequestEmitter): Grid {
         // ToDo add Callback
         this._phaserGame = new PhaserGame();
-        return new Grid(requestEmitter, overColor, sizeX, sizeY, "gridTile", this._phaserGame.game, 40);
+        return new Grid(requestEmitter, overColor, sizeX, sizeY, "gridTile", this._phaserGame, 40);
     }
 
 }
