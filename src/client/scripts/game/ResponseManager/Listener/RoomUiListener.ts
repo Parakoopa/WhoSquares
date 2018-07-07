@@ -11,9 +11,6 @@ export class RoomUiListener {
      */
     public listen(socket: Socket, room: Room) {
         // Room Management Actions
-        socket.on("joinedRoom", (resp: IJoinedResponse) => {
-            room.joinedRoom(resp);
-        });
         socket.on("leftRoom", (resp: ILeftResponse) => {
             room.leftRoom();
         });

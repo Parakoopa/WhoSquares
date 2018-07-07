@@ -1,18 +1,21 @@
 import * as React from "react";
 import {Routes} from "./ui/Routes";
 import {ResponseManager} from "./game/ResponseManager/ResponseManager";
+import {LocalPlayer} from "./game/LocalPlayer";
 
 export class Connection {
 
     public static _socket: SocketIOClient.Socket;
     private static _localPlayer: IPlayer;
 
-    public static initSocket(callback: any) {
+    public static initSocket() {
+        if (this._socket)
+            return;
+
         const key = this.getKey();
 
         if (!key) {
             this._socket = io();
-            ResponseManager.setSocket(this._socket);
         } else {
             this._socket = io({
                 transportOptions: {
@@ -23,89 +26,7 @@ export class Connection {
             });
         }
 
-        this._socket.once("connected", (resp: IConnectedResponse) => {
-            this.setKey(resp.key);
-
-            if (callback)
-                callback();
-        });
-    }
-
-    public static login(username: string, callback: any): boolean {
-        if (!username)
-            return false;
-        else {
-            this.initSocket(() => {
-
-                console.log("UserLogin!");
-                ResponseManager.createLoginListener(); // Need to listen for login Response
-                this._socket.emit("userName", {playerKey: this.getKey(), playerName: username});
-
-                this._socket.once("nameUnavailable", () => {
-                    alert("Name unavailable!");
-                    window.location.href = Routes.linkToLoginHREF();
-                });
-                this._socket.once("userName", (resp: IUserNameResponse) => {
-                    this.setLocalPlayer(resp.player);
-                    this.setUsername(resp.player.name);
-
-                    if (callback)
-                        callback();
-                });
-            });
-        }
-
-        return true;
-    }
-
-    public static joinLobby(callback: any): boolean {
-        const username = this.getUsername();
-
-        if (!username)
-            return false;
-
-        const ok = this._socket || this.login(username, null);
-
-        if (!ok)
-            return false;
-
-        this._socket.emit("joinLobby");
-        this._socket.once("joinLobby", callback);
-        return true;
-    }
-
-    public static joinRoom(callback: any): boolean {
-        const username = this.getUsername();
-        if (!username) {
-            window.location.href = Routes.linkToLoginHREF();
-            return false;
-        }
-
-        if (!this._socket && !this.login(username, null)) {
-            alert("Can't establish connection!");
-            return false;
-        }
-
-        const roomname = this.getRoomname();
-        if (!roomname) {
-            alert("No Roomname available!");
-            return false;
-        }
-
-        if (callback)
-            callback();
-
-        return true;
-    }
-
-    public static getSocket(callback: any): boolean {
-        const ok = this.joinRoom(null);
-
-        if (!ok)
-            return false;
-
-        console.log("GetSocket worked! : " + this._socket);
-        callback(this._socket);
+        ResponseManager.setSocket(this._socket);
     }
 
     public static getKey(): string {
@@ -120,17 +41,12 @@ export class Connection {
         return localStorage["who-squares-username"];
     }
 
-    public static setUsername(username: string):
-        void {
+    public static setUsername(username: string): void {
         localStorage["who-squares-username"] = username;
     }
 
-    public static setRoomname(roomid: string): void {
-        localStorage["who-squares-roomname"] = roomid;
-    }
-
-    public static getRoomname(): string {
-        return localStorage["who-squares-roomname"];
+    public static setLocalPlayerParams( name: string, color: number, isObserver: boolean ): void {
+        this.setLocalPlayer( {name, color, isObserver} );
     }
 
     public static setLocalPlayer(player: IPlayer): void {
@@ -139,6 +55,10 @@ export class Connection {
 
     public static getLocalPlayer(): IPlayer {
         return this._localPlayer;
+    }
+
+    public static getSocket(): SocketIOClient.Socket {
+        return this._socket;
     }
 
 }

@@ -16,6 +16,7 @@ export class SessionManager {
 
     constructor() {
         this._lobby = new Lobby();
+        this._registeredNames = new Map();
     }
 
     /**

@@ -226,16 +226,4 @@ export class Room {
         // this._ui.updateGameInfo("left room");
         // destroy itself?
     }
-
-    /**
-     * Tell room that localPlayer joined
-     * If it contains a grid (running game) so create the grid
-     * ToDo display client his role (player/observer)
-     * @param {IJoinedResponse} resp
-     */
-    public joinedRoom(resp: IJoinedResponse): void {
-        this._ui.joinedRoom(resp.color, resp.roomKey, resp.roomName, resp.otherPlayers, resp.gridInfo);
-        // this._ui.updateGameInfo("You joined, color: " + resp.color);
-    }
-
 }

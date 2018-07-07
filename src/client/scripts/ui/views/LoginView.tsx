@@ -2,6 +2,9 @@ import * as React from "react";
 import {Connection} from "../../Connection";
 import {ILoginUI} from "../interfaces/ILoginUI";
 import {Routes} from "../Routes";
+import {ResponseManager} from "../../game/ResponseManager/ResponseManager";
+import {Login} from "../../game/components/Login";
+import {App} from "../App";
 
 export interface ILoginViewProps {
 }
@@ -11,17 +14,44 @@ export interface ILoginViewState {
 }
 
 export class LoginView extends React.Component<ILoginViewProps, ILoginViewState> implements ILoginUI {
-    // ToDo create Login
+
+    private login_backend: Login;
 
     constructor(props: ILoginViewProps) {
         super(props);
+
+        Connection.initSocket();
+
+        this.login_backend = new Login(this);
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
 
         const username = Connection.getUsername();
+        const key = Connection.getKey();
+
+        if (key) {
+            const color = parseInt("FF33FF", 16);
+            const name = username;
+            const isObserver = true;
+
+            Connection.setLocalPlayerParams(name, color, isObserver);
+
+            this.login_backend.addLocalPlayer(
+                Connection.getLocalPlayer(),
+                Connection.getKey(),
+                Connection.getSocket()
+            );
+
+            window.location.href = Routes.linkToLobbyHREF();
+            return;
+        }
 
         this.state = {username};
+    }
+
+    public updateGameInfo(info: string): void {
+        App.showTextOnSnackbar(info);
     }
 
     private validateForm() {
@@ -42,12 +72,26 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
     }
 
     private login(): void {
-        const ok = Connection.login(this.state.username, () => {
+        const username = this.state.username;
+
+        Connection._socket.emit("register", {username});
+        Connection._socket.once("registered", (resp: IRegisteredResponse) => {
+            Connection.setKey(resp.key);
+
+            const color = parseInt("FF33FF", 16);
+            const name = username;
+            const isObserver = true;
+
+            Connection.setLocalPlayerParams(name, color, isObserver);
+
+            this.login_backend.addLocalPlayer(
+                Connection.getLocalPlayer(),
+                Connection.getKey(),
+                Connection.getSocket()
+            );
+
             window.location.href = Routes.linkToLobbyHREF();
         });
-
-        if (!ok)
-            alert("Connection failed, please try again!");
     }
 
     public render() {
