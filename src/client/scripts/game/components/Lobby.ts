@@ -11,13 +11,9 @@ export class Lobby {
     private _room: Room;
     private _requestEmitter: RequestEmitter;
 
-    constructor(private _ui: ILobbyUI, private _roomUi: IRoomUI, private _localPlayer: LocalPlayer) {
+    constructor(private _ui: ILobbyUI) {
         this._requestEmitter = RequestManager.requestEmitter;
         ResponseManager.createLobbyListener(this);
-    }
-
-    public get localPlayer(): LocalPlayer {
-        return this._localPlayer;
     }
 
     public get room(): Room {
