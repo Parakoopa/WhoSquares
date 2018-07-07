@@ -20,7 +20,15 @@ export class RoomEvents {
      */
     public joinedEvent(
         client: Socket, roomName: string, roomKey: string,
-        color: number, otherPlayers: IPlayer[], gridInfo: IPlayer[][]): IEvent {
+        color: number, otherPlayers: IPlayer[], gridInfo: IPlayer[][]): IEvent
+    {
+        if (gridInfo) {
+            // Convert all Players in the Grid into real IPlayers.
+            gridInfo = gridInfo.map((y) => y.map((x) => {
+                if (!x) return null;
+                return RoomEvents.stripPlayer(x);
+            }));
+        }
         const response: IJoinedResponse = {
             roomName,
             roomKey,
