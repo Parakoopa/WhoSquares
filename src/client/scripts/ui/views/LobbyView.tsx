@@ -7,6 +7,7 @@ import {Lobby} from "../../game/components/Lobby";
 import {ILobbyUI} from "../interfaces/ILobbyUI";
 import {App} from "../App";
 import {LocalPlayer} from "../../game/LocalPlayer";
+import {Utility} from "../../game/Utility";
 
 export interface ILobbyViewProps {
     username: string;
@@ -34,16 +35,19 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
             return;
         }
 
-        if (!Connection.getLocalPlayer()) {
+        if (!Utility.getLocalPlayer()) {
             const color = parseInt("FF33FF", 16);
             const name = Connection.getUsername();
             const isObserver = true;
 
-            Connection.setLocalPlayerParams(name, color, isObserver);
+            Utility.addLocalPlayer(
+                {name, color, isObserver},
+                Connection.getKey(),
+                Connection.getSocket()
+            );
         }
 
-        const localPlayer = new LocalPlayer(Connection.getLocalPlayer(), Connection.getKey());
-        this.lobby_backend = new Lobby(this, null, localPlayer );
+        this.lobby_backend = new Lobby(this, null, Utility.getLocalPlayer() );
 
         Connection._socket.emit("roomList");
         Connection._socket.once("roomList", (roomList: string[]) => {

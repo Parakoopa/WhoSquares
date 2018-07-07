@@ -5,6 +5,7 @@ import {Routes} from "../Routes";
 import {ResponseManager} from "../../game/ResponseManager/ResponseManager";
 import {Login} from "../../game/components/Login";
 import {App} from "../App";
+import {Utility} from "../../game/Utility";
 
 export interface ILoginViewProps {
 }
@@ -31,14 +32,13 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         const key = Connection.getKey();
 
         if (key) {
+
             const color = parseInt("FF33FF", 16);
             const name = username;
             const isObserver = true;
 
-            Connection.setLocalPlayerParams(name, color, isObserver);
-
-            this.login_backend.addLocalPlayer(
-                Connection.getLocalPlayer(),
+            Utility.addLocalPlayer(
+                {name, color, isObserver},
                 Connection.getKey(),
                 Connection.getSocket()
             );
@@ -82,10 +82,8 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
             const name = username;
             const isObserver = true;
 
-            Connection.setLocalPlayerParams(name, color, isObserver);
-
-            this.login_backend.addLocalPlayer(
-                Connection.getLocalPlayer(),
+            Utility.addLocalPlayer(
+                {name, color, isObserver},
                 Connection.getKey(),
                 Connection.getSocket()
             );

@@ -48,10 +48,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         const name = Connection.getUsername();
         const isObserver = true;
 
-        Connection.setLocalPlayerParams(name, color, isObserver);
-
         Utility.addLocalPlayer(
-            Connection.getLocalPlayer(),
+            {name, color, isObserver},
             Connection.getKey(),
             Connection.getSocket()
         );
@@ -62,7 +60,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             const room_backend = new Room(
                 resp.roomKey,
                 resp.roomName,
-                Utility._localPlayer,
+                Utility.getLocalPlayer(),
                 resp.otherPlayers,
                 this,
                 resp.gridInfo

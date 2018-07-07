@@ -6,7 +6,6 @@ import {LocalPlayer} from "./game/LocalPlayer";
 export class Connection {
 
     public static _socket: SocketIOClient.Socket;
-    private static _localPlayer: IPlayer;
 
     public static initSocket() {
         if (this._socket)
@@ -43,18 +42,6 @@ export class Connection {
 
     public static setUsername(username: string): void {
         localStorage["who-squares-username"] = username;
-    }
-
-    public static setLocalPlayerParams( name: string, color: number, isObserver: boolean ): void {
-        this.setLocalPlayer( {name, color, isObserver} );
-    }
-
-    public static setLocalPlayer(player: IPlayer): void {
-        this._localPlayer = player;
-    }
-
-    public static getLocalPlayer(): IPlayer {
-        return this._localPlayer;
     }
 
     public static getSocket(): SocketIOClient.Socket {
