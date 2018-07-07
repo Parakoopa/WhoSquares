@@ -88,3 +88,4 @@ interface INotInRoomResponse extends IResponse {
 
 interface IRefreshResponse extends IResponse {
 }
+// ToDo add UpdateRoomList or JoinLobby Response

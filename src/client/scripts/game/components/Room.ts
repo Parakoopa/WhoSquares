@@ -1,16 +1,18 @@
 import {IRoomUI} from "../../ui/interfaces/IRoomUI";
-import {Grid} from "./Grid";
+import {RequestEmitter} from "../Emitter/RequestEmitter";
+import {RequestManager} from "../Emitter/RequestManager";
 import {LocalPlayer} from "../LocalPlayer";
 import {MissionDistributer} from "../MissionDistributer";
 import {OtherPlayer} from "../OtherPlayer";
-import {RequestManager} from "../Emitter/RequestManager";
-import {RequestEmitter} from "../Emitter/RequestEmitter";
 import {ResponseManager} from "../ResponseManager/ResponseManager";
+import {Grid} from "./grid/Grid";
+import {GridFactory} from "./grid/GridFactory";
 
 export class Room {
 
     private _otherPlayers: OtherPlayer[];
     private readonly _requestEmitter: RequestEmitter;
+    private _grid: Grid;
 
     /**
      * Room has a secret key, a name, and a list of otherPlayers
@@ -20,28 +22,25 @@ export class Room {
      * @param _localPlayer
      * @param {IPlayer[]} otherPlayers
      * @param _ui
-     * @param _grid
+     * @param gridInfo
      */
     constructor(private _key: string,
                 private _name: string,
                 private _localPlayer: LocalPlayer,
                 otherPlayers: IPlayer[],
                 private _ui: IRoomUI,
-                private _grid: Grid = null
+                gridInfo: IPlayer[][] = null
     ) {
+        _localPlayer.room = this;
         this._otherPlayers = this.toOtherPlayers(otherPlayers);
         this._ui.updatePlayerList(this._otherPlayers);
-        _localPlayer.room = this;
         this._requestEmitter = RequestManager.requestEmitter;
         ResponseManager.createRoomUIListener(this);
+        if (gridInfo) this._grid = GridFactory.createGridByInfo(gridInfo, _localPlayer.color, this._requestEmitter);
     }
 
     public get key(): string {
         return this._key;
-    }
-
-    public set grid(val: Grid) {
-        this._grid = val;
     }
 
     /**
@@ -60,6 +59,10 @@ export class Room {
         return this._otherPlayers;
     }
 
+    public static actionJoinRoom(roomName: string): void {
+        RequestManager.requestEmitter.joinRoom(roomName);
+    }
+
     public actionStartGame(x: number, y: number): void {
         this._requestEmitter.startGame(x, y);
     }
@@ -75,7 +78,7 @@ export class Room {
      * @param missionName
      */
     public startedGame(sizeX: number, sizeY: number, missionName: string): void {
-        this._grid = Grid.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
+        this._grid = GridFactory.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
         this._localPlayer.mission = MissionDistributer.getMission(missionName);
         this.updateMission( this._localPlayer.mission);
     }
@@ -103,6 +106,7 @@ export class Room {
         this.removePlayer(otherPlayer);
         this._grid.removePlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
+        // this._ui.updateGameInfo(player.name + "left");
     }
 
     /**
@@ -113,6 +117,7 @@ export class Room {
         const player: OtherPlayer = new OtherPlayer(otherPlayer);
         this.addPlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
+        // this._ui.updateGameInfo(otherPlayer.name + "joined");
     }
 
     /**
@@ -206,6 +211,31 @@ export class Room {
 
     public roomMessage(player: IPlayer, message: string): void {
         this._ui.sendRoomMessage(player, message);
+    }
+
+    public actionLeaveRoom(): void {
+        this._requestEmitter.leaveRoom();
+    }
+
+    /**
+     * Tell room that localPlayer left & update Ui
+     */
+    public leftRoom(): void {
+        this._localPlayer.room = null;
+        this.destroyGrid();
+        // this._ui.updateGameInfo("left room");
+        // destroy itself?
+    }
+
+    /**
+     * Tell room that localPlayer joined
+     * If it contains a grid (running game) so create the grid
+     * ToDo display client his role (player/observer)
+     * @param {IJoinedResponse} resp
+     */
+    public joinedRoom(resp: IJoinedResponse): void {
+        this._ui.joinedRoom(resp.color, resp.roomKey, resp.roomName, resp.otherPlayers, resp.gridInfo);
+        // this._ui.updateGameInfo("You joined, color: " + resp.color);
     }
 
 }

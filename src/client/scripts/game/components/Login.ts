@@ -22,7 +22,6 @@ export class Login {
      */
     public addLocalPlayer(player: IPlayer, secretKey: string, socket: Socket): void {
         this._localPlayer = new LocalPlayer(player, secretKey);
-
         this._requestEmitter = RequestManager.createRequestEmitter(socket, this._localPlayer);
         this.updateGameInfo("LocalPlayer: " + this._localPlayer.name);
     }

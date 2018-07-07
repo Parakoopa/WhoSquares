@@ -10,14 +10,27 @@ export class RoomUiListener {
      * @param room
      */
     public listen(socket: Socket, room: Room) {
-        // Actions
+        // Room Management Actions
+        socket.on("joinedRoom", (resp: IJoinedResponse) => {
+            room.joinedRoom(resp);
+        });
+        socket.on("leftRoom", (resp: ILeftResponse) => {
+            room.leftRoom();
+        });
+        socket.on("otherLeftRoom", (resp: IOtherLeftResponse) => {
+            room.otherLeftRoom(resp.player);
+        });
+        socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
+            room.otherJoinedRoom(resp.otherPlayer);
+        });
+
+        // Inside Room Actions
         socket.on("startGame", (resp: IStartGameResponse) => {
             room.startedGame(resp.sizeX, resp.sizeY, resp.missionName);
         });
         socket.on("placedTile", (resp: IPlacedTileResponse) => {
             room.placedTile(resp.y, resp.x, resp.player);
         });
-        // Actions
         socket.on("winGame", (resp: IWinGameResponse) => {
             room.updateWinner(resp.player);
         });

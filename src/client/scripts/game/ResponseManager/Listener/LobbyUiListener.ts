@@ -10,19 +10,7 @@ export class LobbyUiListener {
      * @param lobby
      */
     public listen(socket: Socket, lobby: Lobby) {
-        socket.on("joinedRoom", (resp: IJoinedResponse) => {
-            lobby.joinedRoom(resp);
-        });
-        socket.on("leftRoom", (resp: ILeftResponse) => {
-            lobby.leftRoom();
-        });
-        socket.on("otherLeftRoom", (resp: IOtherLeftResponse) => {
-            lobby.otherLeftRoom(resp.player);
-        });
-        socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
-            lobby.otherJoinedRoom(resp.otherPlayer);
-        });
-
+        // ToDo add listener to update roomlist
     }
 
 }
