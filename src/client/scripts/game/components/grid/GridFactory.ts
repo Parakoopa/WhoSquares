@@ -11,7 +11,6 @@ export class GridFactory {
      * Is owned by room but called here as it consists of ui elements
      * @param {IPlayer[][]} gridInfo
      * @param overColor
-     * @param phaserGame
      * @param requestEmitter
      * @returns {Grid}
      */
@@ -45,8 +44,9 @@ export class GridFactory {
      * @returns {Grid}
      */
     public static createGrid(sizeX: number, sizeY: number, overColor: number, requestEmitter: RequestEmitter): Grid {
-        if (!this._phaserGame) this._phaserGame = new PhaserGame();
-        return  new Grid(requestEmitter, overColor, sizeX, sizeY, "gridTile", this._phaserGame.game, 40);
+        // ToDo add Callback
+        this._phaserGame = new PhaserGame();
+        return new Grid(requestEmitter, overColor, sizeX, sizeY, "gridTile", this._phaserGame.game, 40);
     }
 
 }

@@ -25,7 +25,12 @@ export class Grid {
         game: Game,
         tileSize: number
     ) {
-        this.createGrid(game, tileName, tileSize);
+        // ToDo move callback into gridfactory
+        setTimeout(() =>
+            {
+                this.createGrid(game, tileName, tileSize);
+            },
+            500);
     }
 
     /**
@@ -53,6 +58,8 @@ export class Grid {
      * @constructor
      */
     private createGrid(game: Game, imageName: string, cellSize: number): void {
+        console.log(game);
+        console.log(game.world);
         const offset = this._sizeX * cellSize / 2.0;
         const xOffset: number = game.world.centerX - offset;
         const yOffset: number = game.world.centerY - offset;

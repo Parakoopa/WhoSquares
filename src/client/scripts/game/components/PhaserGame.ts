@@ -1,6 +1,5 @@
 import Game = Phaser.Game;
-import {InputManager} from "../InputManager";
-import {RequestEmitter} from "../Emitter/RequestEmitter";
+import World = Phaser.World;
 
 export class PhaserGame {
 
@@ -18,9 +17,9 @@ export class PhaserGame {
 
         const game = new Phaser.Game(width, height, Phaser.AUTO, "game", {
             preload() {
-                this.game.scale.pageAlignHorizontally = true;
-                this.game.scale.pageAlignVertically = true;
-                game.load.image("gridTile", "./img/square32_grey.png");
+                this.scale.pageAlignHorizontally = true;
+                this.scale.pageAlignVertically = true;
+                this.load.image("gridTile", "./img/square32_grey.png");
             },
             create() {
 
@@ -32,5 +31,4 @@ export class PhaserGame {
     public get game(): Game {
         return this._game;
     }
-
 }
