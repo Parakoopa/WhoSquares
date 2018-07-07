@@ -1,22 +1,18 @@
 import {Socket} from "socket.io";
 import SocketIO = require("socket.io");
-import {Client} from "../Client/Client";
-import {Player} from "../Client/Player/Player";
 import {IEvent} from "../Event";
-import {Lobby} from "../Lobby/Lobby";
-import {Utility} from "../Utility";
-import {ClientManager} from "./ClientManager";
+import {SessionManager} from "./SessionManager";
 import {ResponseEmitter} from "./ResponseEmitter";
 
 export class RequestManager extends ResponseEmitter {
 
     private _io: SocketIO.Server;
-    private _clientManager: ClientManager;
+    private _sessionManager: SessionManager;
 
     constructor( io: SocketIO.Server ) {
         super();
         this._io = io;
-        this._clientManager = new ClientManager();
+        this._sessionManager = new SessionManager();
     }
 
     /**
@@ -27,28 +23,26 @@ export class RequestManager extends ResponseEmitter {
      */
     public RequestListener() {
         this._io.on("connection", (socket: Socket) => {
-            this.emitEvents(this._clientManager.connect(socket));
-
-            socket.on("disconnect", () => {
-                this.emitEvents(this._clientManager.disconnect(socket));
+            socket.on("register", (req: IRegisterRequest) => {
+                this.emitEvents(this._sessionManager.registerClient(socket, req));
             });
-            socket.on("userName", (req: IUserNameRequest) => {
-                this.emitEvents(this._clientManager.setUserName(socket, req));
+            socket.on("roomList", () => {
+                this.emitEvents(this._sessionManager.sendLobby(socket));
             });
             socket.on("joinRoom", (req: IJoinRoomRequest) => {
-                this.emitEvents(this._clientManager.joinRoom(socket, req));
+                this.emitEvents(this._sessionManager.joinRoom(socket, req));
             });
             socket.on("leaveRoom", (req: ILeaveRoomRequest) => {
-                this.emitEvents(this._clientManager.leaveRoom(socket, req));
+                this.emitEvents(this._sessionManager.leaveRoom(socket, req));
             });
             socket.on("startGame", (req: IStartGameRequest) => {
-                this.emitEvents(this._clientManager.startGame(socket, req));
+                this.emitEvents(this._sessionManager.startGame(socket, req));
             });
             socket.on("placeTile", (req: IPlaceTileRequest) => {
-                this.emitEvents(this._clientManager.placeTile(socket, req));
+                this.emitEvents(this._sessionManager.placeTile(socket, req));
             });
             socket.on("roomMessage", (req: IRoomMessageRequest) => {
-                this.emitEvents(this._clientManager.roomMessage(socket, req));
+                this.emitEvents(this._sessionManager.roomMessage(socket, req));
             });
         });
 

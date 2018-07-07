@@ -1,11 +1,11 @@
-import {Client} from "../Client/Client";
-import {Player} from "../Client/Player/Player";
 import {IEvent} from "../Event";
 import {ColorDistributer} from "./Game/ColorDistributer";
 import {MissionDistributer} from "./Game/MissionDistributer";
 import {ServerGrid} from "./Game/ServerGrid";
 import {TurnManager} from "./Game/TurnManager";
 import {RoomEvents} from "./RoomEvents";
+import {Player} from "./Player";
+import {Socket} from "socket.io";
 
 /**
  * A Room hosts a game for clients
@@ -17,18 +17,20 @@ import {RoomEvents} from "./RoomEvents";
  */
 export class Room extends RoomEvents implements IRoom {
 
-    private _owner: Client;
-    private _clients: Client[];
-  //  private _clientMap: Map<Client, LocalPlayer>; // Todo Readd LocalPlayer property to client class on server
+    private _owner: Player;
+    private _players: Player[];
+    // A room is running if a server grid exists
     private _serverGrid: ServerGrid;
-    private _colorDistr: ColorDistributer;  // Todo Readd color property to client class on server
-    private _missionDistr: MissionDistributer;  // Todo mission LocalPlayer property to client class on server
+    private _colorDistr: ColorDistributer;
+    private _missionDistr: MissionDistributer;
     private _turnManager: TurnManager;
     private _gameEnded: boolean;
+    private static _minGridSize: number = 3;
+    private static _maxGridSize: number = 10;
 
     constructor(private _name: string, private _key: string, private _maxSize: number) {
         super();
-        this._clients = [];
+        this._players = [];
        // this._clientMap = new Map<Client, LocalPlayer>();
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
@@ -58,22 +60,22 @@ export class Room extends RoomEvents implements IRoom {
      */
     public get players(): IPlayer[] {
         const players: IPlayer[] = [];
-        for (const client of this._clients) {
-            players.push(client.player);
+        for (const player of this._players) {
+            players.push(player);
         }
         return players;
     }
 
     /**
      * Return all players of a room except the given one
-     * @param {LocalPlayer} player
-     * @returns {IPlayer[]}
+     * @param {Player} player
+     * @returns {Player[]}
      */
-    public getPlayersExcept(player: IPlayer): IPlayer[] {
-        const players: IPlayer[] = [];
-        for (const client of  this._clients) {
-            if (client.player !== player) {
-                players.push(client.player);
+    public getPlayersExcept(player: IPlayer): Player[] {
+        const players: Player[] = [];
+        for (const needle of  this._players) {
+            if (needle !== player) {
+                players.push(needle);
             }
         }
         return players;
@@ -89,10 +91,10 @@ export class Room extends RoomEvents implements IRoom {
 
     /**
      * Client owning this room
-     * @returns {Client}
+     * @returns {Player}
      * @constructor
      */
-    public Owner(): Client {
+    public Owner(): Player {
         return this._owner;
     }
 
@@ -106,28 +108,61 @@ export class Room extends RoomEvents implements IRoom {
     }
 
     /**
+     * Return NotInRoomEvent if client is not in room
+     * Return NotOwnerEvent if requesting client is not room owner
+     * Return NotEnoughClientsEvent if room lacks players
+     * Tells room to create a game
+     */
+    public startGame(client: Socket, sizeX: number, sizeY: number): IEvent[] {
+        const player = this.getPlayerForSocket(client);
+        if (this._owner !== player) return [this.notOwnerEvent(client, this.name)];
+
+        const sizes = Room.adjustGameSize(sizeX, sizeY);
+        sizeX = sizes[0];
+        sizeY = sizes[1];
+
+        return this.createGame(sizeX, sizeY);
+    }
+
+    /**
+     * Readjusts grid sizes to be inside minimum-maximum range
+     * @param {number} sizeX
+     * @param {number} sizeY
+     * @returns {number[]}
+     */
+    private static adjustGameSize(sizeX: number, sizeY: number): number[] {
+        if (sizeX > this._maxGridSize) sizeX = this._maxGridSize;
+        if (sizeY > this._maxGridSize) sizeY = this._maxGridSize;
+        if (sizeX < this._minGridSize) sizeX = this._minGridSize;
+        if (sizeY < this._minGridSize) sizeY =  this._minGridSize;
+        return [sizeX, sizeY];
+    }
+
+    /**
      * Add Client to room
      * Adds Client as Observer if game has started
      * Inform player that he has joined
      * Inform other clients that player has joined
-     * @param {Client} client
      * @returns {string}
-     * @constructor
+     * @param socket
+     * @param playerKey
+     * @param playerName
      */
-    public AddClient(client: Client): IEvent[] { // ToDo make string into color enum
-        client.room = this;
-        this._clients.push(client);
-        if (!this._owner) this._owner = client;
+    public AddClient(socket: Socket, playerKey: string, playerName: string): IEvent[] {
+        let player: Player;
         if (this._serverGrid) {
-            this.createObserver(client);
+            player = this.createObserver(socket, playerKey, playerName);
         } else {
-            this.createPlayer(client);
+            player = this.createPlayer(socket, playerKey, playerName);
         }
-        const otherPlayers = this.getPlayersExcept(client.player);
+        this._players.push(player);
+        if (!this._owner) this._owner = player;
+
+        const otherPlayers = this.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            client, this._name, this._key, client.player.color, otherPlayers, this.gridInfo);
-        const otherClients = this.getClientsExcept(client);
-        const otherJoinedEvent: IEvent = this.otherJoinedEvent(otherClients, this.name, client.player);
+            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo);
+        const otherSockets =  otherPlayers.map((otherPlayer) => otherPlayer.socket);
+        const otherJoinedEvent: IEvent = this.otherJoinedEvent(otherSockets, this.name, player);
         return [joinedEvent, otherJoinedEvent];
     }
 
@@ -135,39 +170,45 @@ export class Room extends RoomEvents implements IRoom {
      * Inform client & other clients in room that he reconnected
      * Sends room & grid information so that client may continue game
      * without reentering room etc.
-     * @param {Client} client
      * @returns {IEvent[]}
+     * @param socket
+     * @param player
      */
-    public reconnectClient(client: Client): IEvent[] {
-        const player = client.player;
+    public reconnectClient(socket: Socket, player: Player): IEvent[] {
+        player.socket = socket;
         const otherPlayers = this.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            client, this._name, this._key, player.color, otherPlayers, this.gridInfo);
-        const otherClients = this.getClientsExcept(client);
+            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo);
+        const otherClients = this.getPlayerSocketsExcept(player.socket);
         const otherJoinedEvent = this.otherJoinedEvent(otherClients, this.name, player);
         if (this._serverGrid == null) return [joinedEvent, otherJoinedEvent]; // No Grid (running game) => no TurnEvents
-        const informTurnEvent = this.informTurnEvent(this._clients, this._turnManager.curClient().player);
+        const informTurnEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
         return [joinedEvent, otherJoinedEvent, informTurnEvent];
     }
 
     /**
      * Create a player that may not interact with the active game
-     * @param {Client} client
+     * @param socket
+     * @param key
+     * @param name
      */
-    private createObserver(client: Client): void {
-        client.player.color = this._colorDistr.getFreeColor();
-        client.player.isObserver = true;
+    private createObserver(socket: Socket, key: string, name: string): Player {
+        const color = this._colorDistr.getFreeColor(this._players);
+        return new Player(name, key, socket, color, true);
     }
 
     /**
      * Create a player that may interact with an active game
      * Assining color, turn order and mission
-     * @param {Client} client
+     * @param socket
+     * @param key
+     * @param name
      */
-    private createPlayer(client: Client): void {
-        client.player.color = this._colorDistr.getFreeColor();
-        client.player.isObserver = true;
-        client.mission = this._missionDistr.getMission();
+    private createPlayer(socket: Socket, key: string, name: string): Player {
+        const color = this._colorDistr.getFreeColor(this._players);
+        const player: Player = new Player(name, key, socket, color, true);
+        player.mission = this._missionDistr.getMission();
+        return player;
     }
 
     /**
@@ -175,16 +216,16 @@ export class Room extends RoomEvents implements IRoom {
      * @param {Client} client
      * @constructor
      */
-    public removeClient(client: Client): IPlayer {
-        if (client.player === undefined) return null; // todo think of spectators
+    public removeClient(client: Socket): IPlayer {
+        const player = this.getPlayerForSocket(client);
+        if (!player) return null; // todo think of spectators
         // ToDo somehow flag disconnected players for client to be displayed that way
-        this._colorDistr.resetColor(client.player.color);
-        if (this._serverGrid) this._serverGrid.removePlayer(client.player);
+        if (this._serverGrid) this._serverGrid.removePlayer(player);
         // remove client from room
-        const index = this._clients.indexOf(client);
-        if (index > -1)this._clients.splice(index);
-        if (this._owner === client) this.assignNewOwner();
-        return client.player;
+        const index = this._players.indexOf(player);
+        if (index > -1)this._players.splice(index);
+        if (this._owner === player) this.assignNewOwner();
+        return player;
     }
 
     /**
@@ -201,23 +242,36 @@ export class Room extends RoomEvents implements IRoom {
      */
     private assignNewOwner() {
         if (this.size() > 0) {
-            this._owner = this._clients[0]; // Todo find better way to select new owner
+            this._owner = this._players[0]; // Todo find better way to select new owner
         } else {
             // Todo Destroy room
         }
     }
 
     /**
-     * Returns all clients except the given one
-     * @param {Client} client
-     * @returns {Client[]}
+     * Returns all sockets for players except the given one
+     * @param {Socket} socket
+     * @returns {Socket[]}
      */
-    public getClientsExcept(client: Client): Client[] {
-        const clients: Client[] = [];
-        for (const curClient of this._clients) {
-            if (client !== curClient) clients.push(curClient);
+    public getPlayerSocketsExcept(socket: Socket): Socket[] {
+        const sockets: Socket[] = [];
+        for (const curPlayer of this._players) {
+            if (socket !== curPlayer.socket) sockets.push(curPlayer.socket);
         }
-        return clients;
+        return sockets;
+    }
+
+    public getPlayerByKey(playerKey: string): Player | null {
+        for (const player of this._players) {
+            if (playerKey === player.key) return player;
+        }
+        return null;
+    }
+
+    public getPlayerForSocket(socket: Socket): Player {
+        for (const player of this._players) {
+            if (socket === player.socket) return player;
+        }
     }
 
     /**
@@ -234,15 +288,15 @@ export class Room extends RoomEvents implements IRoom {
         this._gameEnded = false;
         this._serverGrid = new ServerGrid(sizeX, sizeY);
         this.assignMissions();
-        const startEvents: IEvent[] = this.startEvent(this._clients, this.name, sizeX, sizeY);
-        const informTurnEvent: IEvent = this.informTurnEvent(this._clients, this._turnManager.curClient().player);
+        const startEvents: IEvent[] = this.startEvent(this._players, this.name, sizeX, sizeY);
+        const informTurnEvent: IEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
         startEvents.push(informTurnEvent);
         return startEvents;
     }
 
     private assignMissions(): void {
-        for (const client of this._clients) {
-            client.mission = this._missionDistr.getMission();
+        for (const player of this._players) {
+            player.mission = this._missionDistr.getMission();
         }
     }
 
@@ -251,9 +305,9 @@ export class Room extends RoomEvents implements IRoom {
      * and adds all to turnmanager order
      */
     private observerToPlayer(): void {
-        for (const client of this._clients) {
-            client.player.isObserver = false;
-            this._turnManager.addClient(client);
+        for (const player of this._players) {
+            player.isObserver = false;
+            this._turnManager.addPlayer(player);
         }
     }
 
@@ -267,34 +321,37 @@ export class Room extends RoomEvents implements IRoom {
      * @param x
      * @param y
      */
-    public placeTile(client: Client, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
+    public placeTile(client: Socket, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
         if (this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
-        const player: IPlayer = client.player;
+        const player: Player = this.getPlayerForSocket(client);
+        if (!player) return [this.invalidPlayerEvent(client, this.name)];
         if (player.isObserver) {
             return [this.observerEvent(client)];
         }
-        if (client !== this._turnManager.curClient()) {
+        if (player !== this._turnManager.curPlayer()) {
             return [this.notYourTurnEvent(client, this.name)];
         }
+        const sockets = this.getAllSockets();
         if (this._serverGrid.placeTile(player, y, x)) {
-            const placedEvent: IEvent = this.placedEvent(this._clients, this.name, player, y, x); // Also sets next client
-            if (client.mission.check(player, this._serverGrid.gridInfo)) {
+            const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
+            if (player.mission.check(player, this._serverGrid.gridInfo)) {
                 console.log("Client won his mission: " + player.color);
                 this._gameEnded = true;
-                return [placedEvent, this.winGameEvent(this._clients, this.name, player)];
+                return [placedEvent, this.winGameEvent(sockets, this.name, player)];
             }
-            this._turnManager.setNextClient();
-            const curPlayer = this._turnManager.curClient().player;
-            const informTurnEvent = this.informTurnEvent(this._clients, curPlayer); // inform for next player color
+            this._turnManager.setNextPlayer();
+            const curPlayer = this._turnManager.curPlayer();
+            const informTurnEvent = this.informTurnEvent(sockets, curPlayer); // inform for next player color
             return [placedEvent, informTurnEvent];
         } else {
              return [this.invalidPlacement(client, this.name)]; // ToDo change to cheat Response
         }
     }
 
-    public chatMessage(client: Client, message: string): IEvent[] {
-        const player: IPlayer = client.player;
-        return [this.roomMessageEvent(this._clients, this._name, player, message)];
+    public chatMessage(client: Socket, message: string): IEvent[] {
+        const player: IPlayer = this.getPlayerForSocket(client);
+        if (!player) return [this.invalidPlayerEvent(client, this.name)];
+        return [this.roomMessageEvent(this.getAllSockets(), this._name, player, message)];
     }
 
     /**
@@ -302,7 +359,10 @@ export class Room extends RoomEvents implements IRoom {
      * @returns {number}
      */
     public size(): number {
-        return this._clients.length;
+        return this._players.length;
     }
 
+    private getAllSockets() {
+        return this._players.map((pl) => pl.socket);
+    }
 }

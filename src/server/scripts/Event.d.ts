@@ -1,10 +1,10 @@
 /**
  * Data format that gets send to client
  */
-import {Client} from "./Client/Client";
+import {Socket} from "socket.io";
 
 interface IEvent {
-    clients: Client[];
+    clients: Socket[];
     name: string;
     response: IResponse;
 }

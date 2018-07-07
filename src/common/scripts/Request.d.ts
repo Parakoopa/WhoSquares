@@ -42,3 +42,7 @@ interface IRoomMessageRequest extends IRequest {
     roomKey: string;
     message: string;
 }
+
+interface IRegisterRequest extends IRequest {
+    name: string;
+}

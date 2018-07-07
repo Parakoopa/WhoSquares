@@ -1,8 +1,6 @@
+import {Player} from "../Player";
 
 export class ColorDistributer {
-
-    private _clientColorMap: Map<number, boolean>;
-
     private readonly _colors: number[] = [
            parseInt("FF3333", 16), // red
            parseInt("FF9933", 16), // orange
@@ -16,43 +14,18 @@ export class ColorDistributer {
             // Todo grey, black, white
         ];
 
-    constructor() {
-        this._clientColorMap = new Map();
-        this.setColors();
-    }
-
-    /**
-     * Initialize all available colors
-     * @constructor
-     */
-    private setColors(): void {
-        for (const color of this._colors) {
-            this._clientColorMap.set(color, false);
-        }
-    }
-
     /**
      * Return a color not used by any client in this room
      * @returns {string}
      * @constructor
      */
-    public getFreeColor(): number {
-        for (const color of Array.from(this._clientColorMap.keys())) {
-            if (!this._clientColorMap.get(color)) {
-                this._clientColorMap.set(color, true);
+    public getFreeColor(clients: Player[]): number {
+        const colorsUsed: number[] = clients.map((client) => client.color);
+        for (const color of this._colors) {
+            if (!colorsUsed.includes(color)) {
                 return color;
             }
         }
         return null;
     }
-
-    /**
-     * Makes a color available again
-     * @constructor
-     * @param color
-     */
-    public resetColor(color: number): void {
-        this._clientColorMap.set(color, null);
-    }
-
 }
