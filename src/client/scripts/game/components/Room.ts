@@ -205,7 +205,7 @@ export class Room {
     }
 
     public roomMessage(player: IPlayer, message: string): void {
-        this._ui.actionSendRoomMessage(player, message);
+        this._ui.sendRoomMessage(player, message);
     }
 
 }

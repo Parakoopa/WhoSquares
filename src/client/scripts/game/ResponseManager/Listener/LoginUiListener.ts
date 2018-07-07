@@ -1,18 +1,17 @@
 import Socket = SocketIOClient.Socket;
 import {Login} from "../../components/Login";
 
-// ToDo rename into messageListener or smth like that
 export class LoginUiListener {
 
     /**
      * Listen for ErrorResponses on socket to be displayed via UiManager
      * @param {SocketIOClient.Socket} socket
+     * @param login
      */
     public listen(socket: Socket, login: Login) {
         // Initial Connection
-        socket.on("connected", (resp: IConnectedResponse) => {
-            console.log("connected and got key:" + resp.key);
-            localStorage["who-squares-private-key"] = resp.key; // only strings
+        socket.on("connected", (resp: IRegisteredResponse) => {
+            localStorage["who-squares-private-key"] = resp.key;
         });
 
         // Error Feedback

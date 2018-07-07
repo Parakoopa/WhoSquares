@@ -21,10 +21,9 @@ export class InputManager {
 
     /**
      * Tell RequestEmitter to start given Room with given sizes
-     * ToDo: Connect Sizes to InputFields
      */
-    public startGame() {
-        this._requestEmitter.startGame(5, 5);
+    public startGame(x: number = 5, y: number = 5) {
+        this._requestEmitter.startGame(x, y);
     }
 
 }

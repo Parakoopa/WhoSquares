@@ -2,7 +2,6 @@ import Socket = SocketIOClient.Socket;
 import {ILoginUI} from "../../ui/interfaces/ILoginUI";
 import {RequestEmitter} from "../Emitter/RequestEmitter";
 import {RequestManager} from "../Emitter/RequestManager";
-import {InputManager} from "../InputManager";
 import {LocalPlayer} from "../LocalPlayer";
 import {ResponseManager} from "../ResponseManager/ResponseManager";
 

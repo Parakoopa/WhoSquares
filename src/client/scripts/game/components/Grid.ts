@@ -1,7 +1,6 @@
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
 import {RequestEmitter} from "../Emitter/RequestEmitter";
-import {InputManager} from "../InputManager";
 import {PhaserGame} from "./PhaserGame";
 
 export class Grid {
