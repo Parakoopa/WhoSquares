@@ -1,5 +1,5 @@
 export class OtherPlayer {
-
+        // ToDo delete
     /**
      * Represents every other player
      * Values are used to interact with Otherplayers via Requests
@@ -26,11 +26,6 @@ export class OtherPlayer {
 
     public set color(val: number) {
         this._player.color = val;
-    }
-
-    public equals(other: IPlayer) {
-        if (this.player === other ) return true;
-        return this.player.name === other.name && this.player.color === other.color;
     }
 
 }

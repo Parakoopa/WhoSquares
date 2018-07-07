@@ -7,6 +7,7 @@ import {OtherPlayer} from "../OtherPlayer";
 import {ResponseManager} from "../ResponseManager/ResponseManager";
 import {Grid} from "./grid/Grid";
 import {GridFactory} from "./grid/GridFactory";
+import {Utility} from "../Utility";
 
 export class Room {
 
@@ -107,6 +108,7 @@ export class Room {
      */
     public otherLeftRoom(player: IPlayer, roomOwner: IPlayer): void {
         // set whether localPlayer is new room owner
+        this._localPlayer.isRoomOwner = Utility.equalsIPlayer(this._localPlayer.player, roomOwner);
         this._localPlayer.isRoomOwner = roomOwner === this._localPlayer.player;
         const otherPlayer = this.getOtherPlayer(player);
         this.removePlayer(otherPlayer);
@@ -170,7 +172,7 @@ export class Room {
     private getOtherPlayer(player: IPlayer): OtherPlayer {
         for (const otherPlayer of this._otherPlayers) {
             // ToDo implement equals in real IPlayer on Client somehow
-            if (otherPlayer.equals(player)) return otherPlayer;
+            if (Utility.equalsIPlayer(otherPlayer.player, player)) return otherPlayer;
         }
     }
 

@@ -62,20 +62,22 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
         Connection._socket.once("joinedRoom", (resp: IJoinedResponse) => {
 
-            // set whether localPlayer is new room owner
+            // Update color from observer color to player color
             const localPlayer = Utility.getLocalPlayer();
-            localPlayer.isRoomOwner = resp.roomOwner === localPlayer.player;
+            localPlayer.color = resp.color;
+            // set whether localPlayer is new room owner
+            localPlayer.isRoomOwner = Utility.equalsIPlayer(resp.roomOwner, localPlayer.player);
 
             const room_backend = new Room(
                 resp.roomKey,
                 resp.roomName,
-                Utility.getLocalPlayer(),
+                localPlayer,
                 resp.otherPlayers,
                 this,
                 resp.gridInfo
             );
 
-            this.setState({room_backend, gameStarted: room_backend.hasGrid(), isOwner: Utility.getLocalPlayer().isRoomOwner});
+            this.setState({room_backend, gameStarted: room_backend.hasGrid(), isOwner: localPlayer.isRoomOwner});
         });
         Connection._socket.once("nameNotRegistered", () => {
             Connection.setKey("");
