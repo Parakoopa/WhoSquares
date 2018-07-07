@@ -217,6 +217,7 @@ export class Room {
 
     public actionLeaveRoom(): void {
         this._requestEmitter.leaveRoom();
+        this._ui.leftRoom();
     }
 
     /**

@@ -50,7 +50,7 @@ export class Lobby extends LobbyEvents {
         const existingPlayer = room.getPlayerByKey(req.playerKey);
         if (existingPlayer) {
             // Reconnect
-            room.reconnectClient(socket, existingPlayer);
+            return room.reconnectClient(socket, existingPlayer);
         } else {
             // Join!
             if (room.size() > room.maxSize) {
