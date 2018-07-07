@@ -56,7 +56,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             );
         }
 
-        Room.actionJoinRoom(this.props.roomid);
+        Room.actionJoinRoom(this.props.match.params.roomid);
 
         Connection._socket.once("joinedRoom", (resp: IJoinedResponse) => {
             const room_backend = new Room(
