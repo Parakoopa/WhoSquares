@@ -81,6 +81,9 @@ export class SessionManager {
         console.log("new client");
         const key = Utility.getGUID();
         this._registeredNames.set(key, req.name);
+        console.log(key);
+        console.log(req.name);
+        console.log(this._registeredNames.get(key));
         const response =  {response: "registered", key} as IRegisteredResponse;
         const connectedEvent = {clients: [socket], name: "registered", response};
         return [connectedEvent];

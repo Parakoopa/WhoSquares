@@ -8,7 +8,7 @@ export class Utility {
 
     public static addLocalPlayer(player: IPlayer, secretKey: string, socket: Socket) {
         this._localPlayer = new LocalPlayer(player, secretKey);
-        RequestManager.createRequestEmitter(socket, this._localPlayer);
+        RequestManager.createRequestEmitter(socket);
     }
 
     public static getLocalPlayer() {

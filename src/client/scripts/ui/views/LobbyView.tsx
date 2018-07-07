@@ -47,7 +47,7 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
             );
         }
 
-        this.lobby_backend = new Lobby(this, null, Utility.getLocalPlayer() );
+        this.lobby_backend = new Lobby(this);
 
         Connection._socket.emit("roomList");
         Connection._socket.once("roomList", (roomList: {rooms: string[]}) => {

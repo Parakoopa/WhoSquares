@@ -1,13 +1,12 @@
 import Socket = SocketIOClient.Socket;
-import {LocalPlayer} from "../LocalPlayer";
 import {RequestEmitter} from "./RequestEmitter";
 
 export class RequestManager {
 
     private static _requestEmitter: RequestEmitter;
 
-    public static createRequestEmitter( socket: Socket, localPlayer: LocalPlayer): RequestEmitter {
-        if (!this._requestEmitter) this._requestEmitter = new RequestEmitter(socket, localPlayer);
+    public static createRequestEmitter( socket: Socket): RequestEmitter {
+        if (!this._requestEmitter) this._requestEmitter = new RequestEmitter(socket);
         return this._requestEmitter;
     }
 
