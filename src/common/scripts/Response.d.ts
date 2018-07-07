@@ -20,7 +20,6 @@ interface IJoinedResponse extends IResponse {
 interface IOtherJoinedResponse extends IResponse {
     roomName: string;
     otherPlayer: IPlayer;
-    roomOwner: IPlayer;
 }
 
 interface ILeftResponse extends IResponse {
@@ -30,6 +29,7 @@ interface ILeftResponse extends IResponse {
 interface IOtherLeftResponse extends IResponse {
     roomName: string;
     player: IPlayer;
+    roomOwner: IPlayer;
 }
 
 interface IStartGameResponse extends IResponse {

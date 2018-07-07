@@ -160,7 +160,7 @@ export class Room extends RoomEvents implements IRoom {
 
         const otherPlayers = this.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo);
+            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner);
         const otherSockets =  otherPlayers.map((otherPlayer) => otherPlayer.socket);
         const otherJoinedEvent: IEvent = this.otherJoinedEvent(otherSockets, this.name, player);
         return [joinedEvent, otherJoinedEvent];
@@ -178,7 +178,7 @@ export class Room extends RoomEvents implements IRoom {
         player.socket = socket;
         const otherPlayers = this.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo);
+            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner);
         if (this._serverGrid == null) return [joinedEvent]; // No Grid (running game) => no TurnEvents
         const informTurnEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
         return [joinedEvent, informTurnEvent];
@@ -231,7 +231,7 @@ export class Room extends RoomEvents implements IRoom {
         if (!player) return []; // Player was not in room?
 
         const leftEvent: IEvent = this.leftEvent(client, this._name);
-        const otherLeftEvent: IEvent = this.otherLeftEvent(this.getPlayerSocketsExcept(client), this.name, player);
+        const otherLeftEvent: IEvent = this.otherLeftEvent(this.getPlayerSocketsExcept(client), this.name, player, this._owner);
         if (!this._serverGrid) return [leftEvent, otherLeftEvent];
         const turnInfoEvent: IEvent = this.informTurnEvent(this.getPlayerSocketsExcept(client), this._turnManager.curPlayer());
         return [leftEvent, otherLeftEvent, turnInfoEvent];

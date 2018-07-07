@@ -20,8 +20,8 @@ export class RoomEvents {
      */
     public joinedEvent(
         client: Socket, roomName: string, roomKey: string,
-        color: number, otherPlayers: IPlayer[], gridInfo: IPlayer[][]): IEvent
-    {
+        color: number, otherPlayers: IPlayer[], gridInfo: IPlayer[][], roomOwner: IPlayer
+    ): IEvent {
         if (gridInfo) {
             // Convert all Players in the Grid into real IPlayers.
             gridInfo = gridInfo.map((y) => y.map((x) => {
@@ -34,7 +34,8 @@ export class RoomEvents {
             roomKey,
             color,
             otherPlayers: otherPlayers.map((op) => RoomEvents.stripPlayer(op)),
-            gridInfo
+            gridInfo,
+            roomOwner: RoomEvents.stripPlayer(roomOwner)
         };
         return{clients: [client], name: "joinedRoom", response};
     }
@@ -63,10 +64,14 @@ export class RoomEvents {
      * @param {Client[]} clients
      * @param {string} roomName
      * @param otherPlayer
+     * @param roomOwner
      * @returns {IEvent}
      */
     public otherJoinedEvent(clients: Socket[], roomName: string, otherPlayer: IPlayer): IEvent {
-        const response: IOtherJoinedResponse = {roomName, otherPlayer: RoomEvents.stripPlayer(otherPlayer)};
+        const response: IOtherJoinedResponse = {
+            roomName,
+            otherPlayer: RoomEvents.stripPlayer(otherPlayer)
+        };
         return {clients, name: "otherJoinedRoom", response};
     }
 
@@ -173,10 +178,15 @@ export class RoomEvents {
      * @param {Socket[]} clients
      * @param {string} roomName
      * @param {IPlayer} player
+     * @param roomOwner
      * @returns {IEvent}
      */
-    public otherLeftEvent(clients: Socket[], roomName: string, player: IPlayer): IEvent {
-        const otherLeftResponse: IOtherLeftResponse = {roomName, player: RoomEvents.stripPlayer(player)};
+    public otherLeftEvent(clients: Socket[], roomName: string, player: IPlayer, roomOwner: IPlayer): IEvent {
+        const otherLeftResponse: IOtherLeftResponse = {
+            roomName,
+            player: RoomEvents.stripPlayer(player),
+            roomOwner: RoomEvents.stripPlayer(player)
+        };
         return {clients, name: "otherLeftRoom", response: otherLeftResponse};
     }
 
