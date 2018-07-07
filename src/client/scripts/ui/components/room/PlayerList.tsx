@@ -2,7 +2,7 @@ import * as React from "react";
 import {OtherPlayer} from "../../../game/OtherPlayer";
 
 export interface IPlayerListProps {
-    players: OtherPlayer[];
+    players: IPlayer[];
 }
 
 export interface IPlayerListState {

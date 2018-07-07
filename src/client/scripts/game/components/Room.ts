@@ -234,4 +234,8 @@ export class Room {
         // this._ui.updateGameInfo("left room");
         // destroy itself?
     }
+
+    public hasGrid() {
+        return !!this._grid;
+    }
 }

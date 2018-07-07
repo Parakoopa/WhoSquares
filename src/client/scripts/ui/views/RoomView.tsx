@@ -24,12 +24,13 @@ export interface IRoomViewProps extends RouteComponentProps<IRoomViewProps> {
 }
 
 export interface IRoomViewState {
-    players: OtherPlayer[];
+    players: IPlayer[];
     activePlayer: IPlayer;
     winner: IPlayer;
     login: Login;
     messages: ChatMessage[];
     room_backend: Room;
+    gameStarted: boolean;
 }
 
 export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> implements IRoomUI {
@@ -73,7 +74,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                 resp.gridInfo
             );
 
-            this.setState({room_backend});
+            this.setState({room_backend, gameStarted: room_backend.hasGrid()});
         });
         Connection._socket.once("nameNotRegistered", () => {
             Connection.setKey("");
@@ -87,7 +88,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             winner: null,
             login: null,
             messages: [],
-            room_backend: null
+            room_backend: null,
+            gameStarted: false
         };
 
         this.leaveRoom = this.leaveRoom.bind(this);
@@ -112,7 +114,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public updatePlayerList(players: OtherPlayer[]) {
-        this.setState({players});
+        this.setState({players: [Utility.getLocalPlayer(), ...players].map((p) => p.player)});
     }
 
     public otherJoinedRoom(player: IPlayer): void {
@@ -125,6 +127,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public updateTurnInfo(activePlayer: IPlayer): void {
         this.setState({activePlayer});
+        if (!this.state.gameStarted) {
+            this.setState({gameStarted: true});
+        }
     }
 
     public updateGameInfo(gameInfo: string): void {
@@ -141,6 +146,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     public startGame() {
         if (this.state.room_backend)
             this.state.room_backend.actionStartGame(10, 10);
+        this.setState({gameStarted: true});
     }
 
     public leftRoom() {
@@ -164,9 +170,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         return (
             <div className={"content"}>
                 <Game/>
-                <GameControl actionStartGame={this.startGame} actionLeaveRoom={this.leaveRoom}/>
+                <GameControl gameAlreadyStarted={this.state.gameStarted} actionStartGame={this.startGame} actionLeaveRoom={this.leaveRoom}/>
                 <div className={"info"}>
-                    <RoomInfo roomid={this.props.roomid}/>
+                    <RoomInfo roomid={this.props.match.params.roomid}/>
                     <WinnerInfo winner={this.state.winner}/>
                     <PlayerList players={this.state.players}/>
                     <TurnInfo player={this.state.activePlayer}/>

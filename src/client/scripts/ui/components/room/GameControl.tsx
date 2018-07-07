@@ -3,6 +3,7 @@ import * as React from "react";
 export interface IGameControlProps {
     actionStartGame: () => void;
     actionLeaveRoom: () => void;
+    gameAlreadyStarted: boolean;
 }
 
 export interface IGameControlState {
@@ -29,7 +30,8 @@ export class GameControl extends React.Component<IGameControlProps, IGameControl
 
     public render(): any {
         return <div id={"buttons"}>
-            <button className={"button"} onClick={this.startGame}>Start Game</button>
+            {!this.props.gameAlreadyStarted
+                && <button className={"button"} onClick={this.startGame}>Start Game</button> }
             <button className={"button"} onClick={this.leaveRoom}>Leave Room</button>
         </div>;
     }

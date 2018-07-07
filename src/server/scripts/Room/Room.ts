@@ -179,11 +179,9 @@ export class Room extends RoomEvents implements IRoom {
         const otherPlayers = this.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
             socket, this._name, this._key, player.color, otherPlayers, this.gridInfo);
-        const otherClients = this.getPlayerSocketsExcept(player.socket);
-        const otherJoinedEvent = this.otherJoinedEvent(otherClients, this.name, player);
-        if (this._serverGrid == null) return [joinedEvent, otherJoinedEvent]; // No Grid (running game) => no TurnEvents
+        if (this._serverGrid == null) return [joinedEvent]; // No Grid (running game) => no TurnEvents
         const informTurnEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
-        return [joinedEvent, otherJoinedEvent, informTurnEvent];
+        return [joinedEvent, informTurnEvent];
     }
 
     /**
@@ -216,16 +214,27 @@ export class Room extends RoomEvents implements IRoom {
      * @param {Client} client
      * @constructor
      */
-    public removeClient(client: Socket): IPlayer {
+    public removeClient(client: Socket): IEvent[]  {
         const player = this.getPlayerForSocket(client);
-        if (!player) return null; // todo think of spectators
-        // ToDo somehow flag disconnected players for client to be displayed that way
+        if (!player) return null;
         if (this._serverGrid) this._serverGrid.removePlayer(player);
+        // if this players turn, remove it
+        if (this._turnManager.curPlayer() === player) {
+            this._turnManager.setNextPlayer();
+            this._turnManager.removePlayer(player);
+        }
         // remove client from room
         const index = this._players.indexOf(player);
-        if (index > -1)this._players.splice(index);
+        if (index > -1)this._players.splice(index, 1);
         if (this._owner === player) this.assignNewOwner();
-        return player;
+
+        if (!player) return []; // Player was not in room?
+
+        const leftEvent: IEvent = this.leftEvent(client, this._name);
+        const otherLeftEvent: IEvent = this.otherLeftEvent(this.getPlayerSocketsExcept(client), this.name, player);
+        if (!this._serverGrid) return [leftEvent, otherLeftEvent];
+        const turnInfoEvent: IEvent = this.informTurnEvent(this.getPlayerSocketsExcept(client), this._turnManager.curPlayer());
+        return [leftEvent, otherLeftEvent, turnInfoEvent];
     }
 
     /**

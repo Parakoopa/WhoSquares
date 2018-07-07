@@ -169,6 +169,28 @@ export class RoomEvents {
     }
 
     /**
+     * Return OtherLeftRoomEvent
+     * @param {Socket[]} clients
+     * @param {string} roomName
+     * @param {IPlayer} player
+     * @returns {IEvent}
+     */
+    public otherLeftEvent(clients: Socket[], roomName: string, player: IPlayer): IEvent {
+        const otherLeftResponse: IOtherLeftResponse = {roomName, player: RoomEvents.stripPlayer(player)};
+        return {clients, name: "otherLeftRoom", response: otherLeftResponse};
+    }
+
+    /**
+     * Return LeftEvent
+     * @param {Socket} client
+     * @param {string} roomName
+     * @returns {IEvent}
+     */
+    public leftEvent(client: Socket, roomName: string): IEvent {
+        return {clients: [client], name: "leftRoom", response:  {roomName}}; // no one else in room to notify
+    }
+
+    /**
      * Remove everything from the IPlayer object that is NOT part of the interface
      * returns a new object
      * @param {IPlayer} player

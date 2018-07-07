@@ -36,28 +36,6 @@ export class LobbyEvents {
     }
 
     /**
-     * Return LeftEvent
-     * @param {Socket} client
-     * @param {string} roomName
-     * @returns {IEvent}
-     */
-    public leftEvent(client: Socket, roomName: string): IEvent {
-        return {clients: [client], name: "leftRoom", response:  {roomName}}; // no one else in room to notify
-    }
-
-    /**
-     * Return OtherLeftRoomEvent
-     * @param {Socket[]} clients
-     * @param {string} roomName
-     * @param {IPlayer} player
-     * @returns {IEvent}
-     */
-    public otherLeftEvent(clients: Socket[], roomName: string, player: IPlayer): IEvent {
-        const otherLeftResponse: IOtherLeftResponse = {roomName, player};
-        return {clients, name: "otherLeftRoom", response: otherLeftResponse};
-    }
-
-    /**
      * Return NameNotRegistered
      * @param {Socket} client
      * @returns {IEvent}

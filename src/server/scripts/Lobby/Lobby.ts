@@ -71,15 +71,9 @@ export class Lobby extends LobbyEvents {
     public leaveRoom(client: Socket, roomKey: string): IEvent[] {
         const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
-        const player = room.removeClient(client);
-        if (!player) return []; // ToDo Notify client that client is not in this room
-
-        // ToDo move into RoomEvents and call from Room?
-        const leftEvent: IEvent = this.leftEvent(client, room.name);
-        const otherLeftEvent: IEvent = this.otherLeftEvent(room.getPlayerSocketsExcept(client), room.name, player);
-
+        const events = room.removeClient(client);
         if (room.isEmpty()) this.removeRoom(room);
-        return [leftEvent, otherLeftEvent];
+        return events;
     }
 
     /**
