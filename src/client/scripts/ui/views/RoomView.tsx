@@ -59,7 +59,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         Room.actionJoinRoom(this.props.match.params.roomid);
 
         Connection._socket.once("joinedRoom", (resp: IJoinedResponse) => {
-            console.log("received joinedRoom");
+
+            // set whether localPlayer is new room owner
+            const localPlayer = Utility.getLocalPlayer();
+            localPlayer.isRoomOwner = resp.roomOwner === localPlayer.player;
+
             const room_backend = new Room(
                 resp.roomKey,
                 resp.roomName,

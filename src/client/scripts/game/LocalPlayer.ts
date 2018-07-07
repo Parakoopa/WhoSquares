@@ -3,6 +3,7 @@ import {Room} from "./components/Room";
 export class LocalPlayer {
     private _mission: IMission;
     private _room: Room;
+    private _isRoomOwner: boolean;
 
     /**
      * Represents the Client in rooms & games
@@ -56,4 +57,11 @@ export class LocalPlayer {
         this._room = val;
     }
 
+    public get isRoomOwner(): boolean {
+        return this._isRoomOwner;
+    }
+
+    public set isRoomOwner(val: boolean) {
+        this._isRoomOwner = val;
+    }
 }

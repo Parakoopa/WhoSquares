@@ -25,7 +25,7 @@ export class RoomUiListener {
             this._room.otherLeftRoom(resp.player);
         });
         socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
-            this._room.otherJoinedRoom(resp.otherPlayer);
+            this._room.otherJoinedRoom(resp.otherPlayer, resp.roomOwner);
         });
 
         // Inside Room Actions

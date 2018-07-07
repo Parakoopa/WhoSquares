@@ -12,6 +12,7 @@ interface IJoinedResponse extends IResponse {
     roomKey: string;
     roomName: string;
     color: number;
+    roomOwner: IPlayer;
     otherPlayers: IPlayer[];
     gridInfo: IPlayer[][];
 }
@@ -19,6 +20,7 @@ interface IJoinedResponse extends IResponse {
 interface IOtherJoinedResponse extends IResponse {
     roomName: string;
     otherPlayer: IPlayer;
+    roomOwner: IPlayer;
 }
 
 interface ILeftResponse extends IResponse {

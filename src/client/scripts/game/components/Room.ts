@@ -78,6 +78,7 @@ export class Room {
      * @param {number} sizeY
      * @param missionName
      */
+    // ToDo maybe inform roomview instead of using turninfo
     public startedGame(sizeX: number, sizeY: number, missionName: string): void {
         if (this._grid) this.destroyGrid();
         this._grid = GridFactory.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
@@ -114,8 +115,11 @@ export class Room {
     /**
      * Create new Otherplayer and tell room to add it
      * @param {IPlayer} otherPlayer
+     * @param roomOwner
      */
-    public otherJoinedRoom(otherPlayer: IPlayer): void {
+    public otherJoinedRoom(otherPlayer: IPlayer, roomOwner: IPlayer): void {
+        // set whether localPlayer is new room owner
+        this._localPlayer.isRoomOwner = roomOwner === this._localPlayer.player;
         const player: OtherPlayer = new OtherPlayer(otherPlayer);
         this.addPlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
@@ -225,6 +229,7 @@ export class Room {
      */
     public leftRoom(): void {
         this._localPlayer.room = null;
+        this._localPlayer.isRoomOwner = false;
         this.destroyGrid();
         // this._ui.updateGameInfo("left room");
         // destroy itself?
