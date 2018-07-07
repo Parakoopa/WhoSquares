@@ -1,5 +1,4 @@
 import Socket = SocketIOClient.Socket;
-import {LocalPlayer} from "../LocalPlayer";
 import {Utility} from "../Utility";
 
 export class RequestEmitter {
@@ -41,13 +40,11 @@ export class RequestEmitter {
 
     /**
      * Send StartGameRequest with given grid sizes for a specific room by key
-     * //ToDo check in some other class beforehand if room is empty to avoid sending empty roomkey
      * Requests are listed in /common directory
      * @param {number} sizeX
      * @param {number} sizeY
      */
     public startGame(sizeX: number, sizeY: number): void {
-        this.roomMessage("A simple chat message.");
         const playerKey = Utility.getLocalPlayer().key;
         if (!Utility.getLocalPlayer().room) { // ToDo replace with uiManager message instead of redundantly asking server?
              this._socket.emit("startGame", {playerKey, roomKey: null, sizeX, sizeY});

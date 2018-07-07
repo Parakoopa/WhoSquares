@@ -122,11 +122,12 @@ export class Grid {
      * in game
      */
     public destroy(): void {
-        for (let y = 0; y < this._grid.length; y++) {
-            for (let x = 0; x < this._grid[y].length; x++) {
-               this._grid[y][x].destroy(true);
-            }
+        const game = document.getElementById("game");
+        if (!game) return;
+        while (game.firstChild) {
+            game.removeChild(game.firstChild);
         }
+
     }
 
     /**
