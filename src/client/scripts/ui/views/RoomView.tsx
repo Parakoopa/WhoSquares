@@ -44,19 +44,21 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             return;
         }
 
-        const color = parseInt("FF33FF", 16);
-        const name = Connection.getUsername();
-        const isObserver = true;
+        if (!Utility.getLocalPlayer()) {
+            const color = parseInt("FF33FF", 16);
+            const name = Connection.getUsername();
+            const isObserver = true;
 
-        Utility.addLocalPlayer(
-            {name, color, isObserver},
-            Connection.getKey(),
-            Connection.getSocket()
-        );
+            Utility.addLocalPlayer(
+                {name, color, isObserver},
+                Connection.getKey(),
+                Connection.getSocket()
+            );
+        }
 
-        Room.actionJoinRoom( this.props.roomid );
+        Room.actionJoinRoom(this.props.roomid);
 
-        Connection._socket.once( "joinedRoom", (resp: IJoinedResponse) => {
+        Connection._socket.once("joinedRoom", (resp: IJoinedResponse) => {
             const room_backend = new Room(
                 resp.roomKey,
                 resp.roomName,
@@ -66,9 +68,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                 resp.gridInfo
             );
 
-            this.setState( {room_backend} );
+            this.setState({room_backend});
         });
-        Connection._socket.once( "nameNotRegistered", () => {
+        Connection._socket.once("nameNotRegistered", () => {
             Connection.setKey("");
             Connection.setUsername("");
             window.location.href = Routes.linkToLoginHREF();
@@ -109,11 +111,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public otherJoinedRoom(player: IPlayer): void {
-        App.showTextOnSnackbar( "Player '" + player.name + "' joined room!" );
+        App.showTextOnSnackbar("Player '" + player.name + "' joined room!");
     }
 
     public otherLeftRoom(player: IPlayer): void {
-        App.showTextOnSnackbar( "Player '" + player.name + "' left room!" );
+        App.showTextOnSnackbar("Player '" + player.name + "' left room!");
     }
 
     public updateTurnInfo(activePlayer: IPlayer): void {
@@ -121,7 +123,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public updateGameInfo(gameInfo: string): void {
-        App.showTextOnSnackbar( gameInfo );
+        App.showTextOnSnackbar(gameInfo);
     }
 
     public updateWinner(winner: IPlayer): void {
@@ -133,7 +135,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public startGame() {
         if (this.state.room_backend)
-            this.state.room_backend.actionStartGame( 10, 10);
+            this.state.room_backend.actionStartGame(10, 10);
     }
 
     public leftRoom() {
