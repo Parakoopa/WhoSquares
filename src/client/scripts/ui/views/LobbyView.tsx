@@ -50,8 +50,8 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
         this.lobby_backend = new Lobby(this, null, Utility.getLocalPlayer() );
 
         Connection._socket.emit("roomList");
-        Connection._socket.once("roomList", (roomList: string[]) => {
-            this.setState({roomList});
+        Connection._socket.once("roomList", (roomList: {rooms: string[]}) => {
+            this.setState({roomList: roomList.rooms});
         });
     }
 
@@ -64,7 +64,7 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
     }
 
     public updateRoomList(rooms: string[]): void {
-        this.state = {roomList: rooms};
+        this.setState({roomList: rooms});
     }
 
     public render() {

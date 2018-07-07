@@ -68,6 +68,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
             this.setState( {room_backend} );
         });
+        Connection._socket.once( "nameNotRegistered", () => {
+            Connection.setKey("");
+            Connection.setUsername("");
+            window.location.href = Routes.linkToLoginHREF();
+        });
 
         this.state = {
             players: [],

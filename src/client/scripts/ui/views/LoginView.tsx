@@ -21,6 +21,8 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
     constructor(props: ILoginViewProps) {
         super(props);
 
+        this.state = {username: ""};
+
         Connection.initSocket();
 
         this.login_backend = new Login(this);
@@ -31,8 +33,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         const username = Connection.getUsername();
         const key = Connection.getKey();
 
-        if (key) {
-
+        if (key && username) {
             const color = parseInt("FF33FF", 16);
             const name = username;
             const isObserver = true;
@@ -47,7 +48,6 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
             return;
         }
 
-        this.state = {username};
     }
 
     public updateGameInfo(info: string): void {
@@ -77,6 +77,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         Connection._socket.emit("register", {username});
         Connection._socket.once("registered", (resp: IRegisteredResponse) => {
             Connection.setKey(resp.key);
+            Connection.setUsername( username );
 
             const color = parseInt("FF33FF", 16);
             const name = username;
@@ -90,6 +91,10 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
 
             window.location.href = Routes.linkToLobbyHREF();
         });
+    }
+
+    public componentDidMount() {
+        this.setState( {username: Connection.getUsername()});
     }
 
     public render() {

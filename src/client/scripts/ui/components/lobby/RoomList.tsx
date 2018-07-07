@@ -1,4 +1,5 @@
 import * as React from "react";
+import {ILoginViewProps} from "../../views/LoginView";
 
 export interface IRoomListProps {
     roomlist: string[];
