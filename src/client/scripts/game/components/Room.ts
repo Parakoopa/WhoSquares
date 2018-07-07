@@ -103,8 +103,11 @@ export class Room {
     /**
      * Get Player by name and tell room to remove it
      * @param player
+     * @param roomOwner
      */
-    public otherLeftRoom(player: IPlayer): void {
+    public otherLeftRoom(player: IPlayer, roomOwner: IPlayer): void {
+        // set whether localPlayer is new room owner
+        this._localPlayer.isRoomOwner = roomOwner === this._localPlayer.player;
         const otherPlayer = this.getOtherPlayer(player);
         this.removePlayer(otherPlayer);
         this._grid.removePlayer(player);
@@ -115,11 +118,8 @@ export class Room {
     /**
      * Create new Otherplayer and tell room to add it
      * @param {IPlayer} otherPlayer
-     * @param roomOwner
      */
-    public otherJoinedRoom(otherPlayer: IPlayer, roomOwner: IPlayer): void {
-        // set whether localPlayer is new room owner
-        this._localPlayer.isRoomOwner = roomOwner === this._localPlayer.player;
+    public otherJoinedRoom(otherPlayer: IPlayer): void {
         const player: OtherPlayer = new OtherPlayer(otherPlayer);
         this.addPlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);

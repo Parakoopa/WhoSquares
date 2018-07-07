@@ -22,10 +22,10 @@ export class RoomUiListener {
             this._room.leftRoom();
         });
         socket.on("otherLeftRoom", (resp: IOtherLeftResponse) => {
-            this._room.otherLeftRoom(resp.player);
+            this._room.otherLeftRoom(resp.player,  resp.roomOwner);
         });
         socket.on("otherJoinedRoom", (resp: IOtherJoinedResponse) => {
-            this._room.otherJoinedRoom(resp.otherPlayer, resp.roomOwner);
+            this._room.otherJoinedRoom(resp.otherPlayer);
         });
 
         // Inside Room Actions
