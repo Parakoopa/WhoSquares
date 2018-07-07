@@ -1,7 +1,6 @@
 import Socket = SocketIOClient.Socket;
 import {ILoginUI} from "../../ui/interfaces/ILoginUI";
 import {RequestEmitter} from "../Emitter/RequestEmitter";
-import {RequestManager} from "../Emitter/RequestManager";
 import {LocalPlayer} from "../LocalPlayer";
 import {ResponseManager} from "../ResponseManager/ResponseManager";
 
@@ -21,8 +20,6 @@ export class Login {
      * @param socket
      */
     public addLocalPlayer(player: IPlayer, secretKey: string, socket: Socket): void {
-        this._localPlayer = new LocalPlayer(player, secretKey);
-        this._requestEmitter = RequestManager.createRequestEmitter(socket, this._localPlayer);
         this.updateGameInfo("LocalPlayer: " + this._localPlayer.name);
     }
 
