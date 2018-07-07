@@ -1,8 +1,8 @@
-import {Client} from "../Client/Client";
 import {IEvent} from "../Event";
 import {Room} from "../Room/Room";
 import {Utility} from "../Utility";
 import {LobbyEvents} from "./LobbyEvents";
+import {Socket} from "socket.io";
 
 /**
  * Initializes Lobby and sets base values for rooms/
@@ -11,10 +11,8 @@ import {LobbyEvents} from "./LobbyEvents";
 export class Lobby extends LobbyEvents {
 
     private readonly _rooms: Room[];
-    private _minimumClientsPerGame: number = 1;
+    private _minimumClientsPerGame: number = 1; // TODO: Use!
     private _maxRoomSize: number = 10;
-    private _minGridSize: number = 3;
-    private _maxGridSize: number = 10;
 
     constructor() {
         super();
@@ -29,64 +27,37 @@ export class Lobby extends LobbyEvents {
         return names;
     }
 
-    public joinLobby(client: Client): IEvent {
-        return this.joinLobbyEvent(client, this.roomNames());
-    }
-
-    /**
-     * Return NotInRoomEvent if client is not in room
-     * Return NotOwnerEvent if requesting client is not room owner
-     * Return NotEnoughClientsEvent if room lacks players
-     * Tells room to create a game
-     * @constructor
-     */
-    public startGame(client: Client, room: Room, sizeX: number, sizeY: number): IEvent[] {
-        if (!room) return [this.notInRoomEvent(client)];
-        if (room.Owner() !== client ) return [this.notOwnerEvent(client, room.name)];
-
-        if (room.size() < this._minimumClientsPerGame) {
-            // ToDo Add NotEnoughClients  Response
-        }
-        const sizes = this.adjustGameSize(sizeX, sizeY);
-        sizeX = sizes[0];
-        sizeY = sizes[1];
-
-        return room.createGame(sizeX, sizeY);
-    }
-
-    /**
-     * Readjusts grid sizes to be inside minimum-maximum range
-     * @param {number} sizeX
-     * @param {number} sizeY
-     * @returns {number[]}
-     */
-    private adjustGameSize(sizeX: number, sizeY: number): number[] {
-        if (sizeX > this._maxGridSize) sizeX = this._maxGridSize;
-        if (sizeY > this._maxGridSize) sizeY = this._maxGridSize;
-        if (sizeX < this._minGridSize) sizeX = this._minGridSize;
-        if (sizeY < this._minGridSize) sizeY =  this._minGridSize;
-        return [sizeX, sizeY];
+    public sendLobby(client: Socket): IEvent {
+        return this.roomListEvent(client, this.roomNames());
     }
 
     /**
      * Create Room if it does not yet exist
      * Return RoomIsFullEvent if room is full
      * Otherwise tell room to add client
-     * @param {Client} client
+     * @param socket
      * @param req
+     * @param playerName
      * @returns {string}
      * @constructor
      */
-    public joinRoom(client: Client, req: IJoinRoomRequest): IEvent[] {
-        if (client.room) { // leave existing room
-            return [this.alreadyInRoomEvent(client)]; // ToDo maybe make SwitchRoomResponse to be safe
-        }
+    public joinRoom(socket: Socket, req: IJoinRoomRequest, playerName: string): IEvent[] {
         let room: Room = this.roomByName(req.roomName);
-        if (room === null) room = this.createRoom(req.roomName);
-        else if (room.size() > room.maxSize) {
-            return [this.roomIsFullEvent(client, room.name)];
+        if (room === null) {
+            room = this.createRoom(req.roomName);
         }
-        return room.AddClient(client);
+        // Check if player already exists
+        const existingPlayer = room.getPlayerByKey(req.playerKey);
+        if (existingPlayer) {
+            // Reconnect
+            return room.reconnectClient(socket, existingPlayer);
+        } else {
+            // Join!
+            if (room.size() > room.maxSize) {
+                return [this.roomIsFullEvent(socket, room.name)];
+            }
+            return room.AddClient(socket, req.playerKey, playerName);
+        }
     }
 
     /**
@@ -97,19 +68,12 @@ export class Lobby extends LobbyEvents {
      * @param {string} roomKey
      * @returns {IEvent[]}
      */
-    public leaveRoom(client: Client, roomKey: string): IEvent[] {
+    public leaveRoom(client: Socket, roomKey: string): IEvent[] {
         const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
-        const player = room.removeClient(client);
-        if (!player) return []; // ToDo Notify client that client is not in this room
-        client.room = null;
-
-        // ToDo move into RoomEvents and call from Room?
-        const leftEvent: IEvent = this.leftEvent(client, room.name);
-        const otherLeftEvent: IEvent = this.otherLeftEvent(room.getClientsExcept(client), room.name, player);
-
+        const events = room.removeClient(client);
         if (room.isEmpty()) this.removeRoom(room);
-        return [leftEvent, otherLeftEvent];
+        return events;
     }
 
     /**

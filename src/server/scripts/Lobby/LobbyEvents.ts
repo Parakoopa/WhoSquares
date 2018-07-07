@@ -1,5 +1,5 @@
-import {Client} from "../Client/Client";
 import {IEvent} from "../Event";
+import {Socket} from "socket.io";
 
 /**
  * Eventbuilder for lobby specific events
@@ -7,73 +7,41 @@ import {IEvent} from "../Event";
 export class LobbyEvents {
 
     /**
-     * Return AlreadyInRoomEvent
-     * @param {Client} client
+     * Return RoomList
+     * @param {Socket} client
      * @param rooms
      * @returns {}
      */
-    public joinLobbyEvent(client: Client, rooms: string[]): IEvent {
-        return {clients: [client], name: "joinLobby", response: {rooms}};
-    }
-
-    /**
-     * Return AlreadyInRoomEvent
-     * @param {Client} client
-     * @returns {}
-     */
-    public alreadyInRoomEvent(client: Client): IEvent {
-       return {clients: [client], name: "alreadyInRoom", response: {}};
+    public roomListEvent(client: Socket, rooms: string[]): IEvent {
+        return {clients: [client], name: "roomList", response: {rooms}};
     }
 
     /**
      * Return RoomIsFullEvent
-     * @param {Client} client
+     * @param {Socket} client
      * @param {string} roomName
      * @returns {IEvent}
      */
-    public roomIsFullEvent(client: Client, roomName: string): IEvent {
+    public roomIsFullEvent(client: Socket, roomName: string): IEvent {
         return {clients: [client], name: "roomIsFull", response: {roomName}};
     }
 
     /**
-     * Return NotOwnerEvent
-     * @param {Client} client
-     * @param {string} roomName
-     * @returns {IEvent}
-     */
-    public notOwnerEvent(client: Client, roomName: string): IEvent {
-        return {clients: [client], name: "notOwner", response: {roomName}};
-    }
-
-    /**
      * Return NotInRoomEvent
-     * @param {Client} client
+     * @param {Socket} client
      * @returns {IEvent}
      */
-    public notInRoomEvent(client: Client): IEvent {
+    public notInRoomEvent(client: Socket): IEvent {
         return {clients: [client], name: "notInRoom", response: {}};
     }
 
     /**
-     * Return LeftEvent
-     * @param {Client} client
-     * @param {string} roomName
+     * Return NameNotRegistered
+     * @param {Socket} client
      * @returns {IEvent}
      */
-    public leftEvent(client: Client, roomName: string): IEvent {
-        return {clients: [client], name: "leftRoom", response:  {roomName}}; // no one else in room to notify
-    }
-
-    /**
-     * Return OtherLeftRoomEvent
-     * @param {Client[]} clients
-     * @param {string} roomName
-     * @param {IPlayer} player
-     * @returns {IEvent}
-     */
-    public otherLeftEvent(clients: Client[], roomName: string, player: IPlayer): IEvent {
-        const otherLeftResponse: IOtherLeftResponse = {roomName, player};
-        return {clients, name: "otherLeftRoom", response: otherLeftResponse};
+    public nameNotRegisteredEvent(client: Socket): IEvent {
+        return {clients: [client], name: "nameNotRegistered", response: {}};
     }
 
 }

@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: mongodb
+    name: mongodb
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      service: mongodb
+  template:
+    metadata:
+      labels:
+        service: mongodb
+    spec:
+      containers:
+        - image: nexus.informatik.haw-hamburg.de/library/mongo:3.4
+          name: mongodb
+          volumeMounts:
+            - mountPath: "/data/db"
+              name: db-volume
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          resources:
+            requests:
+              memory: "10000Mi"
+              cpu: "200m"
+            limits:
+              memory: "20000Mi"
+              cpu: "1500m"
+      volumes:
+          - name: db-volume
+            persistentVolumeClaim:
+              claimName: db-volume-claim
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: mongodb
+    name: mongodb
+  name: mongodb
+spec:
+  ports:
+    - name: mongo-port
+      port: 27017
+      targetPort: 27017
+  selector:
+    service: mongodb
+  type: ClusterIP

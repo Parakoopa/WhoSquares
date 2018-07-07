@@ -6,8 +6,6 @@ import {Routes} from "./Routes";
 import {LobbyView} from "./views/LobbyView";
 import {LoginView} from "./views/LoginView";
 import {RoomView} from "./views/RoomView";
-import {GameManager} from "../game/GameManager";
-import {IRoomProps} from "./components/Room";
 
 export interface IAppProps {
     name: string;
@@ -19,9 +17,15 @@ export interface IAppState {
 
 export class App extends React.Component<IAppProps, IAppState> {
 
-    public static _socket: SocketIOClient.Socket;
-    public static _localPlayer: IPlayer;
-    public static _key: string;
+    public static showTextOnSnackbar( text: string ) {
+        const snackbar = document.getElementById("snackbar");
+        snackbar.className = "show";
+        snackbar.innerHTML = text;
+
+        setTimeout(() => {
+            snackbar.className = snackbar.className.replace("show", "");
+        }, 2000);
+    }
 
     public render(): any {
         const routes = [
@@ -57,7 +61,9 @@ export class App extends React.Component<IAppProps, IAppState> {
                         component={route.component}
                     />
                 ))}
+
             </div>
+            <div id="snackbar"/>
             <div id={"footer"}>
                 <Footer/>
             </div>

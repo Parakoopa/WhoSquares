@@ -2,11 +2,14 @@ import * as React from "react";
 
 export class Routes  {
 
+    // Util
+    private static HREF_PREFIX: string = "/#";
+
     // Definitions
     public static APP_DEF: string = "/";
-    public static LOGIN_DEF: string = "/login";
-    public static LOBBY_DEF: string = "/lobby/:username";
-    public static GAME_DEF: string = "/game/:username/:roomid";
+    public static LOGIN_DEF: string = "/login/:jumpToRoom?";
+    public static LOBBY_DEF: string = "/lobby";
+    public static GAME_DEF: string = "/game/:roomid";
 
     // Usable Routes
     private static APP: string = "/";
@@ -19,7 +22,7 @@ export class Routes  {
     }
 
     public static linkToAppHREF() {
-        return "/#" + Routes.APP;
+        return this.HREF_PREFIX + Routes.APP;
     }
 
     public static linkToLogin() {
@@ -27,22 +30,22 @@ export class Routes  {
     }
 
     public static linkToLoginHREF() {
-        return "/#" + Routes.LOGIN;
+        return this.HREF_PREFIX + Routes.LOGIN;
     }
 
-    public static linkToLobby( username: string ) {
-        return Routes.LOBBY + "/" + username;
+    public static linkToLobby() {
+        return Routes.LOBBY;
     }
 
-    public static linkToLobbyHREF( username: string ) {
-        return "/#" + this.linkToLobby(username);
+    public static linkToLobbyHREF() {
+        return this.HREF_PREFIX + this.linkToLobby();
     }
 
-    public static linkToGame( username: string, roomid: string ) {
-        return Routes.GAME + "/" + username + "/" + roomid;
+    public static linkToGame( roomid: string ) {
+        return Routes.GAME + "/" + roomid;
     }
 
-    public static linkToGameHREF( username: string, roomid: string ) {
-        return "/#" + this.linkToGame(username, roomid);
+    public static linkToGameHREF( roomid: string ) {
+        return this.HREF_PREFIX + this.linkToGame(roomid);
     }
 }

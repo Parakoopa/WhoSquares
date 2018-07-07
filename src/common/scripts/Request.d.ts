@@ -8,6 +8,11 @@ interface IRequest {
     response: string;
 }
 
+interface IUserNameRequest extends IRequest {
+    playerKey: string;
+    playerName: string;
+}
+
 interface IJoinRoomRequest extends IRequest {
     playerKey: string;
     roomName: string;
@@ -36,4 +41,8 @@ interface IRoomMessageRequest extends IRequest {
     playerKey: string;
     roomKey: string;
     message: string;
+}
+
+interface IRegisterRequest extends IRequest {
+    name: string;
 }

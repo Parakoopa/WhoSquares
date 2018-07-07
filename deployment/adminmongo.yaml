@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: adminmongo
+    name: adminmongo
+  name: adminmongo
+spec:
+  selector:
+    matchLabels:
+      service: adminmongo
+  template:
+    metadata:
+      labels:
+        service: adminmongo
+    spec:
+      containers:
+        - image: nexus.informatik.haw-hamburg.de/mrvautin/adminmongo
+          name: adminmongo
+          ports:
+            - containerPort: 1234
+              protocol: TCP
+          env:
+          - name: CONN_NAME
+            value: who-squares-mongodb
+          - name: DB_HOST
+            value: mongodb
+          - name: DB_NAME
+            value: whosquares
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: adminmongo
+    name: adminmongo
+  name: adminmongo
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 1234
+  selector:
+    service: adminmongo
+  type: ClusterIP

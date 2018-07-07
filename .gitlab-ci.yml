@@ -43,11 +43,13 @@ deploy:
   image: nexus.informatik.haw-hamburg.de/kubectl:latest
   script:
     #
-    - cp kubernetes_deployment.yaml kubernetes_deployment_new.yaml
-    - sed -i "s/wp-mbc-ss2018\/who-squares:latest/wp-mbc-ss2018\/who-squares:${CI_PIPELINE_ID}/g" kubernetes_deployment_new.yaml
+    - cp deployment/kubernetes_deployment.yaml deployment/kubernetes_deployment_new.yaml
+    - sed -i "s/wp-mbc-ss2018\/who-squares:latest/wp-mbc-ss2018\/who-squares:${CI_PIPELINE_ID}/g" deployment/kubernetes_deployment_new.yaml
     # Deploy files
-    - kubectl apply -f http-auth.yaml
-    - kubectl apply -f kubernetes_deployment_new.yaml
+    - kubectl apply -f deployment/adminmongo.yaml
+    - kubectl apply -f deployment/mongodb.yaml
+    - kubectl apply -f deployment/http-auth.yaml
+    - kubectl apply -f deployment/kubernetes_deployment_new.yaml
   only:
   - master
   - icc-tests

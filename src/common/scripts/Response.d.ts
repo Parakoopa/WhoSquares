@@ -4,19 +4,15 @@
 
 interface IResponse {}
 
-interface IConnectedResponse extends IResponse {
-    player: IPlayer;
+interface IRegisteredResponse extends IResponse {
     key: string;
-}
-
-interface IJoinLobbyEvent extends IResponse {
-    rooms: string[];
 }
 
 interface IJoinedResponse extends IResponse {
     roomKey: string;
     roomName: string;
     color: number;
+    roomOwner: IPlayer;
     otherPlayers: IPlayer[];
     gridInfo: IPlayer[][];
 }
@@ -33,6 +29,7 @@ interface ILeftResponse extends IResponse {
 interface IOtherLeftResponse extends IResponse {
     roomName: string;
     player: IPlayer;
+    roomOwner: IPlayer;
 }
 
 interface IStartGameResponse extends IResponse {
@@ -93,6 +90,4 @@ interface INotInRoomResponse extends IResponse {
 
 interface IRefreshResponse extends IResponse {
 }
-
-interface IAlreadyInRoomResponse extends IResponse {
-}
+// ToDo add UpdateRoomList or JoinLobby Response
