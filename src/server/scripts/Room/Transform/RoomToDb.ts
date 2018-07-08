@@ -33,6 +33,7 @@ export class RoomToDb {
         const list: IRoomMongoSchemaPlayer[] = [];
         let index = 0;
         this.room.players.players.forEach((player) => {
+            if (player.isObserver) return; // Don't add observers
             list.push({
                 index: index++,
                 key: player.user.key,
