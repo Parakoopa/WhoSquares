@@ -26,6 +26,7 @@ export class DbToRoom {
         this.fillTurnManager(room);
         room._owner = room.players.getPlayerByPlayerKey(this.schema.owner);
         room._id = this.schema._id;
+        room._replay = this.schema.replay;
         return room;
     }
 

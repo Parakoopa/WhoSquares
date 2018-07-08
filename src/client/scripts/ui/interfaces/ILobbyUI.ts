@@ -1,4 +1,4 @@
 export interface ILobbyUI {
-    updateRoomList(rooms: string[] ): void;
+    updateRoomList(rooms: IRoomListResponse): void;
     updateGameInfo(info: string): void;
 }

@@ -14,7 +14,7 @@ export interface ILobbyViewProps {
 }
 
 export interface ILobbyViewState {
-    roomList: string[];
+    roomList: IRoomListResponse;
 }
 
 export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState> implements ILobbyUI {
@@ -24,9 +24,10 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
     constructor(props: ILobbyViewProps) {
         super(props);
 
-        this.state = {roomList: []};
+        this.state = {roomList: null};
 
         this.joinRoom = this.joinRoom.bind(this);
+        this.statsRoom = this.statsRoom.bind(this);
 
         Connection.initSocket();
 
@@ -50,8 +51,8 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
         this.lobby_backend = new Lobby(this);
 
         Connection._socket.emit("roomList");
-        Connection._socket.once("roomList", (roomList: {rooms: string[]}) => {
-            this.setState({roomList: roomList.rooms});
+        Connection._socket.once("roomList", (roomList: IRoomListResponse) => {
+            this.setState({roomList});
         });
     }
 
@@ -59,12 +60,16 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
         window.location.href = Routes.linkToGameHREF(roomname);
     }
 
+    private statsRoom(roomname: string) {
+        window.location.href = Routes.linkToGameStatsHREF(roomname);
+    }
+
     public updateGameInfo(info: string): void {
         App.showTextOnSnackbar(info);
     }
 
-    public updateRoomList(rooms: string[]): void {
-        this.setState({roomList: rooms});
+    public updateRoomList(roomList: IRoomListResponse): void {
+        this.setState({roomList});
     }
 
     public logout() {
@@ -80,7 +85,7 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
     public render() {
         return <div className={"content"}>
             <h3 className={"description"}> Available Rooms: </h3>
-            <RoomList roomlist={this.state.roomList} actionJoinRoom={this.joinRoom}/>
+            <RoomList roomlist={this.state.roomList} actionJoinRoom={this.joinRoom} actionStatsRoom={this.statsRoom}/>
             <NewRoomForm actionCreate={this.joinRoom}/>
         </div>;
     }

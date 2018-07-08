@@ -108,6 +108,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             Connection.setUsername("");
             window.location.href = Routes.linkToLoginHREF() + "/" + this.props.match.params.roomid;
         });
+        Connection._socket.once("gameEnded", () => {
+            window.location.href = Routes.linkToGameStatsHREF(this.props.match.params.roomid);
+        });
     }
 
     public getUsername() {
@@ -163,8 +166,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public updateWinner(winner: IPlayer, missionName: string): void {
-        // ToDo Display missionName and maybe description (so that players do understand why they lost)
-        // ToDo Display (re)-startGame button to room owner
+        // TODO: Show this also in chat
         this.setState({winner});
     }
 
@@ -207,9 +209,12 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                     <RoomInfo roomid={this.props.match.params.roomid}/>
                 </div>
                 <div className={"buttons"}>
-                    <GameControl gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
-                                 actionStartGame={this.startGame}
-                                 actionLeaveRoom={this.leaveRoom}
+                    <GameControl
+                        gameEnded={!!this.state.winner}
+                        gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
+                        actionStartGame={this.startGame}
+                        actionLeaveRoom={this.leaveRoom}
+                        roomid={this.props.match.params.roomid}
                     />
                 </div>
                 <div className={"room"}>

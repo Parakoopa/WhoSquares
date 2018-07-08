@@ -6,6 +6,7 @@ import {Routes} from "./Routes";
 import {LobbyView} from "./views/LobbyView";
 import {LoginView} from "./views/LoginView";
 import {RoomView} from "./views/RoomView";
+import {RoomStatsView} from "./views/RoomStatsView";
 
 export interface IAppProps {
     name: string;
@@ -45,6 +46,10 @@ export class App extends React.Component<IAppProps, IAppState> {
             {
                 path: Routes.GAME_DEF,
                 component: RoomView
+            },
+            {
+                path: Routes.GAME_STATS_DEF,
+                component: RoomStatsView
             }
         ];
 

@@ -7,6 +7,9 @@ import {ObjectID} from "bson";
 export class User implements IUserMongoSchema {
     public _id: ObjectID | null;
 
+    public gamesPlayed: number = 0;
+    public tilesPlaced: number = 0;
+
     constructor(
         public readonly name: string,
         public readonly key: string

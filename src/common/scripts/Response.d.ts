@@ -92,4 +92,47 @@ interface INotInRoomResponse extends IResponse {
 
 interface IRefreshResponse extends IResponse {
 }
-// ToDo add UpdateRoomList or JoinLobby Response
+
+interface IRoomListResponse extends IResponse {
+    rooms: Array<{
+        name: string;
+        key: string;
+        ended: boolean;
+    }>;
+}
+
+interface IRoomStatsResponse extends IResponse {
+    roomKey: string;
+    roomName: string;
+    gridSize: {
+        x: number;
+        y: number;
+    };
+    players: {
+        base: IPlayer;
+        missionName: string;
+        coverage: number; // 0 - 1
+        tilesPlaced: number;
+        owner: boolean;
+    };
+    general: {
+        coverage: number; // 0 - 1
+        tilesPlaced: number;
+        numberTurns: number;
+    };
+    replay: IReplayLogEntry[];
+}
+
+interface IUserStatsResponse extends IResponse {
+    userName: string;
+    tilesPlaced: number;
+    gamesPlayed: {
+        total: number;
+        won: number;
+    };
+}
+
+interface IGlobalStatsResponse extends IResponse {
+    tilesPlaced: number;
+    gamesPlayed: number;
+}

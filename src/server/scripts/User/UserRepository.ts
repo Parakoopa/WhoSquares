@@ -10,6 +10,8 @@ import {User} from "./User";
 export interface IUserMongoSchema extends IDatabaseModel {
     name: string;
     key: string;
+    tilesPlaced: number; // Stats. (Re)calculated after a game finished
+    gamesPlayed: number; // Stats. (Re)calculated after a game finished
 }
 
 export class UserRepository {

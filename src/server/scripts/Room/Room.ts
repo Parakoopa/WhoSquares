@@ -38,6 +38,8 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     private static _minGridSize: number = 3;
     private static _maxGridSize: number = 10;
     private _players: PlayerList;
+    /* package-private: **/
+    public _replay: IReplayLogEntry[];
 
     constructor(private _name: string, private _key: string, maxSize: number) {
         super();
@@ -46,6 +48,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
         this._turnManager = new TurnManager();
+        this._replay = [];
     }
 
     /**
@@ -334,4 +337,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         return !!this._serverGrid;
     }
 
+    public hasEnded() {
+        return this._gameEnded;
+    }
 }

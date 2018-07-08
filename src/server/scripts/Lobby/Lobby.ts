@@ -29,16 +29,8 @@ export class Lobby extends LobbyEvents {
         this.registerServerShutdown();
     }
 
-    private roomNames(): string[] {
-        const names: string[] = [];
-        for (const room of this._rooms) {
-            names.push(room.name);
-        }
-        return names;
-    }
-
     public sendLobby(client: Socket): IEvent {
-        return this.roomListEvent(client, this.roomNames());
+        return this.roomListEvent(client, this._rooms);
     }
 
     /**
@@ -56,6 +48,8 @@ export class Lobby extends LobbyEvents {
         if (room === null) {
             room = this.createRoom(req.roomName);
         }
+        // If the room has ended, it can't be joined or left
+        if (room.hasEnded()) return [this.roomHasEndedEvent(socket, room.name)];
         // Check if player already exists
         const existingPlayer = room.players.getPlayerByPlayerKey(user.key);
         if (existingPlayer) {
@@ -81,6 +75,8 @@ export class Lobby extends LobbyEvents {
     public leaveRoom(client: Socket, roomKey: string): IEvent[] {
         const room: Room = this.roomByKey(roomKey);
         if (room === null) return []; // ToDo notfiy client that room does not exist
+        // If the room has ended, it can't be joined or left
+        if (room.hasEnded()) return [this.roomHasEndedEvent(client, room.name)];
         const events = room.removeClient(client);
         if (room.isEmpty()) this.removeRoom(room);
         return events;
