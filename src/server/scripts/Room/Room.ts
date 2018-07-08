@@ -363,7 +363,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
             const informTurnEvent = this.informTurnEvent(sockets, curPlayer); // inform for next player color
             return [placedEvent, informTurnEvent];
         } else {
-             return [this.invalidPlacement(client, this.name)]; // ToDo change to cheat Response
+             return [this.invalidPlacement(client, this.name)];
         }
     }
 

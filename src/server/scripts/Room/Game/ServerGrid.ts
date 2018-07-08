@@ -76,9 +76,13 @@ export class ServerGrid {
      */
     public placeTile(player: Player, y: number, x: number): boolean {
         if (x < this._sizeX && y < this._sizeY) {
-            this._grid[y][x] = player;
-            return true;
-        } else return false; // ToDo Someone is cheating
+            const tileOwner = this._grid[y][x];
+            if (!tileOwner || tileOwner.color !== player.color) { // Can't recolor own tilex
+                 this._grid[y][x] = player;
+                 return true;
+             }
+        }
+        return false;
     }
 
     /**

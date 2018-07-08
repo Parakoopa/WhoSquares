@@ -169,6 +169,7 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     public onDown(sprite: Sprite) {
+  //      if (sprite.data.color === this._overColor) return; // Can't recolor own tiles
         this._requestEmitter.placeTile(sprite.data.y, sprite.data.x);
     }
 }
