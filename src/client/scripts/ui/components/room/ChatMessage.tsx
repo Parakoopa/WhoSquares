@@ -12,14 +12,17 @@ export class ChatMessage extends React.Component<IChatMessageProps, IChatMessage
 
     public render(): any {
         return (
-            <div className={`message`}>
-                <span className="username">
-                    { this.props.player.name }
+            <div>
+                <div className={`message`}>
+                    <div className={"arrow bottom right"}></div>
+                    <span className="username">
+                    {this.props.player.name}
                 </span>
-                <span>: </span>
-                <span className="message-body">
-                    { this.props.message }
+                    <span>: </span>
+                    <span className="message-body">
+                    {this.props.message}
                 </span>
+                </div>
             </div>
         );
     }
