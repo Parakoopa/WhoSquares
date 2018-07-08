@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MongoDB" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+    <deployment type="docker-compose.yml">
+      <settings>
+        <option name="services">
+          <list>
+            <option value="mongodb" />
+          </list>
+        </option>
+        <option name="sourceFilePath" value="deployment/local/docker-compose.yaml" />
+        <option name="startBrowserSettings">
+          <browser url="http://127.0.0.1" />
+        </option>
+      </settings>
+    </deployment>
+    <method />
+  </configuration>
+</component>

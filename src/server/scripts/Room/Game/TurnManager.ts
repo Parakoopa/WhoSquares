@@ -41,10 +41,18 @@ export class TurnManager {
 
     /**
      * Return player at turn
-     * @returns Client
+     * @returns Player
      */
     public curPlayer(): Player {
         return this._players[this._index];
+    }
+
+    /**
+     * Return player at turn (index)
+     * @returns number
+     */
+    public curIndex(): number {
+        return this._index;
     }
 
     /**
@@ -55,4 +63,10 @@ export class TurnManager {
         if (this._index >= this._players.length) this._index = 0;
     }
 
+    /**
+     * Manually set the current player index
+     */
+    public setCurIndex(index: number) {
+        this._index = index;
+    }
 }

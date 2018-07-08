@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 1px solid red;
+    border: 0 solid red;
 }
 
 .header {
@@ -35,7 +35,7 @@ body * {
 }
 
 #header {
-    flex-grow: 5;
+    flex-grow: 4;
     flex-shrink: 3;
     flex-basis: auto;
 }
@@ -47,10 +47,22 @@ body * {
     width: 100%;
 }
 
-#footer {
+.logout {
+    text-align: center;
+    margin-bottom: 0.5em;
+}
+
+.footer {
     flex-basis: auto;
     flex-grow: 1;
     flex-shrink: 5;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+.footerB {
+    font-style: italic;
+    font-size: 0.9em;
 }
 
 .view {
@@ -65,6 +77,10 @@ body * {
 
 .buttons {
     justify-items: center;
+}
+
+.emptyBox {
+    margin: 0 2.5em 0 0;
 }
 
 .description {
@@ -89,7 +105,6 @@ body * {
 }
 
 .input, .chatinput {
-    width: fit-content;
     margin: 0.5em;
     padding: 0.25em;
     color: White;
@@ -123,7 +138,7 @@ body * {
     flex-grow: 1;
     flex-shrink: 1;
     text-align: center;
-    height: 12.75em;
+    height: 16.6em;
     width: 10em;
 }
 
@@ -138,6 +153,58 @@ body * {
     font-size: 0.75em;
 }
 
+.message {
+    background-color: #162856;
+    border: 2px solid #7887AB;
+    border-radius: 3px;
+    width: 60%;
+    text-align: left;
+    padding: 0.5em 1em 0.5em 1em;
+    margin: 0.25em auto 0.25em 0.7em;
+    position: relative;
+}
+
+.message .arrow {
+    border-style: solid;
+    position: absolute;
+}
+
+.bottom {
+    border-color: #7887AB transparent transparent transparent;
+    border-width: 8px 0px 8px 8px;
+    bottom: 1em;
+    left: -0.6em;
+}
+
+.ownmessage {
+    background-color: #162856;
+    border: 2px solid #7887AB;
+    border-radius: 3px;
+    width: 60%;
+    text-align: right;
+    padding: 0.5em 1em 0.5em 1em;
+    margin: 0.25em 0.7em 0.25em auto;
+    position: relative;
+}
+
+.ownmessage .ownarrow {
+    border-style: solid;
+    position: absolute;
+}
+
+.ownbottom {
+    border-color: #7887AB transparent transparent transparent;
+    border-width: 8px 8px 8px 0px;
+    bottom: 1em;
+    right: -0.6em;
+}
+
+.username {
+    font-size: 0.95em;
+    color: #7887AB;
+    font-weight: 900;
+}
+
 .game {
     order: 1;
     width: 20em;
@@ -146,18 +213,16 @@ body * {
     margin: 0 auto;
 }
 
-
-
 /* ### SNACKBAR ###*/
 
 #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */
     min-width: 250px; /* Set a default minimum width */
     margin-left: -125px; /* Divide value of min-width by 2 */
-    background-color: #333; /* Black background color */
+    background-color: #162856; /* Black background color */
     color: #fff; /* White text color */
     text-align: center; /* Centered text */
-    border-radius: 2px; /* Rounded borders */
+    border-radius: 3px; /* Rounded borders */
     padding: 16px; /* Padding */
     position: fixed; /* Sit on top of the screen */
     z-index: 1; /* Add a z-index if needed */

@@ -2,12 +2,12 @@ import {IRoomUI} from "../../ui/interfaces/IRoomUI";
 import {RequestEmitter} from "../Emitter/RequestEmitter";
 import {RequestManager} from "../Emitter/RequestManager";
 import {LocalPlayer} from "../LocalPlayer";
-import {MissionDistributer} from "../MissionDistributer";
 import {OtherPlayer} from "../OtherPlayer";
 import {ResponseManager} from "../ResponseManager/ResponseManager";
 import {Grid} from "./grid/Grid";
 import {GridFactory} from "./grid/GridFactory";
 import {Utility} from "../Utility";
+import {Missions} from "../../../../common/scripts/Missions/Missions";
 
 export class Room {
 
@@ -32,7 +32,6 @@ export class Room {
                 private _ui: IRoomUI,
                 gridInfo: IPlayer[][] = null
     ) {
-        console.log("created room: " + _name);
         _localPlayer.room = this;
         this._otherPlayers = this.toOtherPlayers(otherPlayers);
         this._ui.updatePlayerList(this._otherPlayers);
@@ -83,7 +82,7 @@ export class Room {
     public startedGame(sizeX: number, sizeY: number, missionName: string): void {
         if (this._grid) this.destroyGrid();
         this._grid = GridFactory.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
-        this._localPlayer.mission = MissionDistributer.getMission(missionName);
+        this._localPlayer.mission = Missions.getMission(missionName);
         this.updateMission( this._localPlayer.mission);
     }
 
@@ -126,7 +125,7 @@ export class Room {
         const player: OtherPlayer = new OtherPlayer(otherPlayer);
         this.addPlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
-        // this._ui.updateGameInfo(otherPlayer.name + "joined");
+        this._ui.updateGameInfo(otherPlayer.name + "joined");
     }
 
     /**
@@ -172,7 +171,6 @@ export class Room {
 
     private getOtherPlayer(player: IPlayer): OtherPlayer {
         for (const otherPlayer of this._otherPlayers) {
-            // ToDo implement equals in real IPlayer on Client somehow
             if (Utility.equalsIPlayer(otherPlayer.player, player)) return otherPlayer;
         }
     }
@@ -205,9 +203,12 @@ export class Room {
     /**
      * Update Ui to display winner
      * @param {IPlayer} player
+     * @param missionName
+     * @param winTiles
      */
-    public updateWinner(player: IPlayer): void {
-        this._ui.updateWinner(player);
+    public updateWinner(player: IPlayer, missionName: string, winTiles: ITile[]): void {
+        this._grid.showWinTiles(winTiles);
+        this._ui.updateWinner(player, missionName);
     }
 
     /**
@@ -222,9 +223,9 @@ export class Room {
         this._ui.sendRoomMessage(player, message);
     }
 
-    public actionLeaveRoom(): void {
+    public actionLeaveRoom( callback: () => void): void {
         this._requestEmitter.leaveRoom();
-        this._ui.leftRoom();
+        callback();
     }
 
     /**
@@ -234,11 +235,15 @@ export class Room {
         this._localPlayer.room = null;
         this._localPlayer.isRoomOwner = false;
         this.destroyGrid();
-        // this._ui.updateGameInfo("left room");
         // destroy itself?
     }
 
     public hasGrid() {
         return !!this._grid;
     }
+
+    public updateGameInfo(info: string): void {
+        this._ui.updateGameInfo(info);
+    }
+
 }

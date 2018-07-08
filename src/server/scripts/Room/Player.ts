@@ -4,23 +4,25 @@
  * Observer flag determines whether player can interact with grid
  */
 import {Socket} from "socket.io";
+import {User} from "../User/User";
 
 export class Player implements IPlayer {
     public mission: IMission;
+    public name: string;
 
     /**
-     * @param name
-     * @param key
+     * @param user
      * @param socket
      * @param color
      * @param isObserver
      */
     constructor(
-        public name: string,
-        public key: string,
+        public user: User,
         public socket: Socket,
         public color: number,
         public isObserver: boolean = false
-    ) {}
+    ) {
+        this.name = user.name;
+    }
 
 }

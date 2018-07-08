@@ -6,6 +6,10 @@ import {TurnManager} from "./Game/TurnManager";
 import {RoomEvents} from "./RoomEvents";
 import {Player} from "./Player";
 import {Socket} from "socket.io";
+import {IDatabaseModel} from "../IDatabaseModel";
+import {ObjectID} from "bson";
+import {User} from "../User/User";
+import {RoomRepository} from "./RoomRepository";
 
 /**
  * A Room hosts a game for clients
@@ -15,16 +19,22 @@ import {Socket} from "socket.io";
  * Uses Missiondistributer to assign mission(s) to each player
  * Uses TurnManager to determine turn order of players
  */
-export class Room extends RoomEvents implements IRoom {
+export class Room extends RoomEvents implements IRoom, IDatabaseModel {
 
-    private _owner: Player;
-    private _players: Player[];
+    public _id: ObjectID | null; // Managed by the RoomRepository - MongoDB internal id.
+    /* package-private: **/
+    public _owner: Player;
+    /* package-private: **/
+    public _players: Player[];
     // A room is running if a server grid exists
-    private _serverGrid: ServerGrid;
+    /* package-private: **/
+    public _serverGrid: ServerGrid;
     private _colorDistr: ColorDistributer;
     private _missionDistr: MissionDistributer;
-    private _turnManager: TurnManager;
-    private _gameEnded: boolean;
+    /* package-private: **/
+    public _turnManager: TurnManager;
+    /* package-private: **/
+    public _gameEnded: boolean;
     private static _minGridSize: number = 3;
     private static _maxGridSize: number = 10;
 
@@ -145,15 +155,14 @@ export class Room extends RoomEvents implements IRoom {
      * Inform other clients that player has joined
      * @returns {string}
      * @param socket
-     * @param playerKey
-     * @param playerName
+     * @param user
      */
-    public AddClient(socket: Socket, playerKey: string, playerName: string): IEvent[] {
+    public AddClient(socket: Socket, user: User): IEvent[] {
         let player: Player;
         if (this._serverGrid) {
-            player = this.createObserver(socket, playerKey, playerName);
+            player = this.createObserver(socket, user);
         } else {
-            player = this.createPlayer(socket, playerKey, playerName);
+            player = this.createPlayer(socket, user);
         }
         this._players.push(player);
         if (!this._owner) this._owner = player;
@@ -187,24 +196,22 @@ export class Room extends RoomEvents implements IRoom {
     /**
      * Create a player that may not interact with the active game
      * @param socket
-     * @param key
-     * @param name
+     * @param user
      */
-    private createObserver(socket: Socket, key: string, name: string): Player {
+    private createObserver(socket: Socket, user: User): Player {
         const color = this._colorDistr.getFreeColor(this._players);
-        return new Player(name, key, socket, color, true);
+        return new Player(user, socket, color, true);
     }
 
     /**
      * Create a player that may interact with an active game
      * Assining color, turn order and mission
      * @param socket
-     * @param key
-     * @param name
+     * @param user
      */
-    private createPlayer(socket: Socket, key: string, name: string): Player {
+    private createPlayer(socket: Socket, user: User): Player {
         const color = this._colorDistr.getFreeColor(this._players);
-        const player: Player = new Player(name, key, socket, color, true);
+        const player: Player = new Player(user, socket, color, true);
         player.mission = this._missionDistr.getMission();
         return player;
     }
@@ -251,9 +258,7 @@ export class Room extends RoomEvents implements IRoom {
      */
     private assignNewOwner() {
         if (this.size() > 0) {
-            this._owner = this._players[0]; // Todo find better way to select new owner
-        } else {
-            // Todo Destroy room
+            this._owner = this._players[0];
         }
     }
 
@@ -270,9 +275,9 @@ export class Room extends RoomEvents implements IRoom {
         return sockets;
     }
 
-    public getPlayerByKey(playerKey: string): Player | null {
+    public getPlayerByPlayerKey(key: string): Player {
         for (const player of this._players) {
-            if (playerKey === player.key) return player;
+            if (key === player.user.key) return player;
         }
         return null;
     }
@@ -300,6 +305,10 @@ export class Room extends RoomEvents implements IRoom {
         const startEvents: IEvent[] = this.startEvent(this._players, this.name, sizeX, sizeY);
         const informTurnEvent: IEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
         startEvents.push(informTurnEvent);
+
+        // Save this room to the DB
+        RoomRepository.instance.save(this);
+
         return startEvents;
     }
 
@@ -343,17 +352,18 @@ export class Room extends RoomEvents implements IRoom {
         const sockets = this.getAllSockets();
         if (this._serverGrid.placeTile(player, y, x)) {
             const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
-            if (player.mission.check(player, this._serverGrid.gridInfo)) {
+            const winTiles = player.mission.check(player, this._serverGrid.gridInfo);
+            if (winTiles.length > 0) {
                 console.log("Client won his mission: " + player.color);
                 this._gameEnded = true;
-                return [placedEvent, this.winGameEvent(sockets, this.name, player)];
+                return [placedEvent, this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles)];
             }
             this._turnManager.setNextPlayer();
             const curPlayer = this._turnManager.curPlayer();
             const informTurnEvent = this.informTurnEvent(sockets, curPlayer); // inform for next player color
             return [placedEvent, informTurnEvent];
         } else {
-             return [this.invalidPlacement(client, this.name)]; // ToDo change to cheat Response
+             return [this.invalidPlacement(client, this.name)];
         }
     }
 
@@ -373,5 +383,9 @@ export class Room extends RoomEvents implements IRoom {
 
     private getAllSockets() {
         return this._players.map((pl) => pl.socket);
+    }
+
+    public hasStarted(): boolean {
+        return !!this._serverGrid;
     }
 }

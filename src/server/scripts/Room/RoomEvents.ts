@@ -16,6 +16,7 @@ export class RoomEvents {
      * @param {number} color
      * @param {IPlayer[]} otherPlayers
      * @param {IPlayer[][]} gridInfo
+     * @param roomOwner
      * @returns {IEvent}
      */
     public joinedEvent(
@@ -131,10 +132,12 @@ export class RoomEvents {
      * @param {Client[]} clients
      * @param {string} roomName
      * @param {IPlayer} player
+     * @param missionName
+     * @param winTiles
      * @returns {IEvent}
      */
-    public winGameEvent(clients: Socket[], roomName: string, player: IPlayer): IEvent {
-        const response: IWinGameResponse = {roomName, player: RoomEvents.stripPlayer(player)};
+    public winGameEvent(clients: Socket[], roomName: string, player: IPlayer, missionName: string, winTiles: ITile[]): IEvent {
+        const response: IWinGameResponse = {roomName, player: RoomEvents.stripPlayer(player), missionName, winTiles};
         return {clients, name: "winGame", response};
     }
 
