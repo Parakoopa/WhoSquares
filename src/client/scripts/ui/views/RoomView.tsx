@@ -19,6 +19,7 @@ import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
 import {MissionInfo} from "../components/room/MissionInfo";
 import {ShareRoomButton} from "../components/room/ShareRoomButton";
+import {LogoutButton} from "../components/header/LogoutButton";
 
 export interface IRoomViewProps extends RouteComponentProps<IRoomViewProps> {
     roomid: string;
@@ -107,6 +108,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.updateWinner = this.updateWinner.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.getRoomUrl = this.getRoomUrl.bind(this);
+        this.logout = this.logout.bind(this);
     }
 
     public getUsername() {
@@ -117,9 +119,23 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         return this.props.match.params.roomid;
     }
 
+    public logout() {
+        Connection.setUsername( "" );
+        Connection.setKey( "" );
+
+        if (this.state.room_backend !== null) {
+            this.state.room_backend.actionLeaveRoom( () => {
+                window.location.href = Routes.linkToLoginHREF();
+            });
+        }
+    }
+
     public leaveRoom() {
-        if (this.state.room_backend !== null)
-            this.state.room_backend.actionLeaveRoom();
+        if (this.state.room_backend !== null) {
+            this.state.room_backend.actionLeaveRoom( () => {
+                window.location.href = Routes.linkToLobbyHREF();
+            });
+        }
     }
 
     public updatePlayerList(players: OtherPlayer[]) {
@@ -161,10 +177,6 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.setState({gameStarted: true});
     }
 
-    public leftRoom() {
-        window.location.href = Routes.linkToLobbyHREF();
-    }
-
     public sendMessage(text: string) {
         if (this.state.room_backend)
             this.state.room_backend.actionSendRoomMessage(text);
@@ -180,6 +192,10 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public getRoomUrl() {
         return window.location.href;
+    }
+
+    public componentDidMount() {
+        LogoutButton.logOutFunction = this.logout;
     }
 
     public render() {
