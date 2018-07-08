@@ -24,7 +24,9 @@ export class RoomToDb {
             gridSize: {
                 x: this.room._serverGrid.sizeX,
                 y: this.room._serverGrid.sizeY
-            }
+            },
+            replay: this.room.replay,
+            stats: this.room.stats
         };
     }
 
@@ -32,6 +34,7 @@ export class RoomToDb {
         const list: IRoomMongoSchemaPlayer[] = [];
         let index = 0;
         this.room.players.players.forEach((player) => {
+            if (player.isObserver) return; // Don't add observers
             list.push({
                 index: index++,
                 key: player.user.key,

@@ -1,5 +1,6 @@
 import {IEvent} from "../Event";
 import {Socket} from "socket.io";
+import {Room} from "../Room/Room";
 
 /**
  * Eventbuilder for lobby specific events
@@ -9,10 +10,17 @@ export class LobbyEvents {
     /**
      * Return RoomList
      * @param {Socket} client
-     * @param rooms
+     * @param roomsRaw
      * @returns {}
      */
-    public roomListEvent(client: Socket, rooms: string[]): IEvent {
+    public roomListEvent(client: Socket, roomsRaw: Room[]): IEvent {
+        const rooms = roomsRaw.map((room) => {
+            return {
+                name: room.name,
+                key: room.key,
+                ended: room.hasEnded()
+            };
+        });
         return {clients: [client], name: "roomList", response: {rooms}};
     }
 
@@ -24,6 +32,16 @@ export class LobbyEvents {
      */
     public roomIsFullEvent(client: Socket, roomName: string): IEvent {
         return {clients: [client], name: "roomIsFull", response: {roomName}};
+    }
+
+    /**
+     * Return RoomHasEndedEvent
+     * @param {Socket} client
+     * @param {string} roomName
+     * @returns {IEvent}
+     */
+    public roomHasEndedEvent(client: Socket, roomName: string): IEvent {
+        return {clients: [client], name: "gameEnded", response: {roomName}};
     }
 
     /**

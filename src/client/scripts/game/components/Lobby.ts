@@ -22,13 +22,7 @@ export class Lobby {
         this._ui.updateGameInfo(info);
     }
 
-    public updateRoomList(rooms: string[]): void {
-        /* Deprecated?
-        let roomList = "Rooms: \n";
-        for (const room of rooms) {
-            roomList += room + "\n";
-        }
-        */
+    public updateRoomList(rooms: IRoomListResponse): void {
         this._ui.updateRoomList(rooms);
     }
 

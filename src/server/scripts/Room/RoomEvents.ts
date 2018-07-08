@@ -212,7 +212,7 @@ export class RoomEvents {
      * @param {IPlayer} player
      * @returns {IPlayer}
      */
-    private static stripPlayer(player: IPlayer): IPlayer {
+    public static stripPlayer(player: IPlayer): IPlayer {
         return {name: player.name, color: player.color, isObserver: player.isObserver};
     }
 }

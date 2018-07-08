@@ -10,12 +10,14 @@ export class Routes  {
     public static LOGIN_DEF: string = "/login/:jumpToRoom?";
     public static LOBBY_DEF: string = "/lobby";
     public static GAME_DEF: string = "/game/:roomid";
+    public static GAME_STATS_DEF: string = "/game-stats/:roomid";
 
     // Usable Routes
     private static APP: string = "/";
     private static LOGIN: string = "/login";
     private static LOBBY: string = "/lobby";
     private static GAME: string = "/game";
+    private static GAME_STATS: string = "/game-stats";
 
     public static linkToApp() {
         return Routes.APP;
@@ -47,5 +49,13 @@ export class Routes  {
 
     public static linkToGameHREF( roomid: string ) {
         return this.HREF_PREFIX + this.linkToGame(roomid);
+    }
+
+    public static linkToGameStats( roomid: string ) {
+        return Routes.GAME_STATS + "/" + roomid;
+    }
+
+    public static linkToGameStatsHREF( roomid: string ) {
+        return this.HREF_PREFIX + this.linkToGameStats(roomid);
     }
 }

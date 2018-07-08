@@ -10,6 +10,6 @@ export interface IGameState {
 export class Game extends React.Component<IGameProps, IGameState> {
 
     public render(): any {
-        return <div id="game" className={"game"}/>;
+        return <div className={"game"} id="game"/>;
     }
 }

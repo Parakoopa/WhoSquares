@@ -203,5 +203,4 @@ export class Room {
     public updateGameInfo(info: string): void {
         this._ui.updateGameInfo(info);
     }
-
 }

@@ -11,6 +11,7 @@ import {Player} from "./Player";
 import {PlayerList} from "./PlayerList";
 import {RoomEvents} from "./RoomEvents";
 import {RoomRepository} from "./RoomRepository";
+import {StatsManager} from "../Stats/StatsManager";
 
 /**
  * A Room hosts a game for clients
@@ -38,6 +39,10 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     private static _minGridSize: number = 3;
     private static _maxGridSize: number = 10;
     private _players: PlayerList;
+    public replay: IReplayLogEntry[];
+    /* Only to be touched by the StatsManager */
+    public stats: IRoomStats = null;
+    private _turnCounter: number = 0;
 
     constructor(private _name: string, private _key: string, maxSize: number) {
         super();
@@ -46,6 +51,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
         this._turnManager = new TurnManager();
+        this.replay = [];
     }
 
     /**
@@ -136,8 +142,10 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      */
     public AddClient(socket: Socket, user: User): IEvent[] {
         let player: Player;
-        if (this._serverGrid) {
+        if (this.hasStarted()) {
             player = this.createObserver(socket, user);
+            // If started, include this in the replay log
+            this.replay.push({player: RoomEvents.stripPlayer(player), type: "joined"} as ILogJoined);
         } else {
             player = this.createPlayer(socket, user);
         }
@@ -209,7 +217,11 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     public removeClient(client: Socket): IEvent[]  {
         const player = this._players.getPlayerForSocket(client);
         if (!player) return null;
-        if (this._serverGrid) this._serverGrid.removePlayer(player);
+        if (this.hasStarted()) {
+            this._serverGrid.removePlayer(player);
+            // If started, include this in the replay
+            this.replay.push({player: RoomEvents.stripPlayer(player), type: "left"} as ILogLeft);
+        }
         // if this players turn, remove it
         if (this._turnManager.curPlayer() === player) {
             this._turnManager.setNextPlayer();
@@ -309,11 +321,16 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         const sockets = this._players.getAllSockets();
         if (this._serverGrid.placeTile(player, y, x)) {
             const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
+            // Add tile to replay
+            this.replay.push({
+                player: RoomEvents.stripPlayer(player),
+                turnNo: ++this._turnCounter,
+                type: "tilePlaced",
+                x, y
+            } as ILogTilePlaced);
             const winTiles = player.mission.check(player, this._serverGrid.gridInfo);
             if (winTiles.length > 0) {
-                console.log("Client won his mission: " + player.color);
-                this._gameEnded = true;
-                return [placedEvent, this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles)];
+                return [placedEvent, this.processGameEnd(sockets, winTiles, player)];
             }
             this._turnManager.setNextPlayer();
             const curPlayer = this._turnManager.curPlayer();
@@ -324,9 +341,32 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         }
     }
 
+    /**
+     * Processes the end of the game
+     * - Sends winner event
+     * - Records winner in replay
+     * - Sets game end flag
+     * - Calculates room, user and global stats based on the outcome of the match.
+     * @param {SocketIO.Socket[]} sockets
+     * @param {ITile[]} winTiles
+     * @param {Player} player
+     * @returns {IEvent}
+     */
+    private processGameEnd(sockets: Socket[], winTiles: ITile[], player: Player): IEvent {
+        console.log("Client won his mission: " + player.color);
+        this._gameEnded = true;
+        // Add winning to replay
+        this.replay.push({player: RoomEvents.stripPlayer(player), type: "winner"} as ILogWinner);
+        // Update all kinds of stats information
+        StatsManager.processRoomEnd(this, player);
+        return this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles);
+    }
+
     public chatMessage(client: Socket, message: string): IEvent[] {
         const player: IPlayer = this._players.getPlayerForSocket(client);
         if (!player) return [this.invalidPlayerEvent(client, this.name)];
+        // Add chat message to replay
+        this.replay.push({player: RoomEvents.stripPlayer(player), message, type: "chat"} as ILogChatMessage);
         return [this.roomMessageEvent(this._players.getAllSockets(), this._name, player, message)];
     }
 
@@ -342,4 +382,19 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         return !!this._serverGrid;
     }
 
+    public hasEnded() {
+        return this._gameEnded;
+    }
+
+    public getCurrentTurnNumber() {
+        return this._turnCounter;
+    }
+
+    public getGridSizeX() {
+        return this._serverGrid.sizeX;
+    }
+
+    public getGridSizeY() {
+        return this._serverGrid.sizeY;
+    }
 }
