@@ -184,22 +184,26 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public render() {
         return (
-            <div className={"content"}>
-                <Game/>
-                <GameControl
-                    gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
-                    actionStartGame={this.startGame}
-                    actionLeaveRoom={this.leaveRoom}
-                />
-                <div className={"info"}>
-                    <RoomInfo roomid={this.props.match.params.roomid}/>
-                    <WinnerInfo winner={this.state.winner}/>
-                    <PlayerList players={this.state.players}/>
-                    <TurnInfo player={this.state.activePlayer}/>
-                    <MissionInfo mission={this.state.mission}/>
-                    <ShareRoomButton roomurl={this.getRoomUrl()}/>
-                    <div>
-                        <h3>Chat</h3>
+            <div>
+                <div className={"buttons"}>
+                    <GameControl gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
+                                 actionStartGame={this.startGame}
+                                 actionLeaveRoom={this.leaveRoom}
+                    />
+                </div>
+                <div className={"room"}>
+                    <Game/>
+                    <div className={"info"}>
+                        <div className={"infoContent"}>
+                            <RoomInfo roomid={this.props.match.params.roomid}/>
+                            <WinnerInfo winner={this.state.winner}/>
+                            <PlayerList players={this.state.players}/>
+                            <TurnInfo player={this.state.activePlayer}/>
+                            <MissionInfo mission={this.state.mission}/>
+                        </div>
+                    </div>
+                    <div className={"chat"}>
+                        <label>Chat</label>
                         <ChatMessages messages={this.state.messages}/>
                         <ChatInput onSend={this.sendMessage}/>
                     </div>

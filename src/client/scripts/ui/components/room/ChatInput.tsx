@@ -32,7 +32,8 @@ export class ChatInput extends React.Component<IChatInputProps, IChatInputState>
     public render(): any {
         return (
             <form className="chat-input" onSubmit={this.submitHandler}>
-                <input type="text"
+                <input className={"chatinput"}
+                       type="text"
                        onChange={this.textChangeHandler}
                        value={this.state.text}
                        placeholder="Write a message..."

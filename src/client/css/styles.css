@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 0 solid red;
+    border: 1px solid red;
 }
 
 .header {
@@ -44,6 +44,7 @@ body * {
     flex-grow: 10;
     flex-shrink: 1;
     flex-basis: available;
+    width: 100%;
 }
 
 #footer {
@@ -57,11 +58,13 @@ body * {
     text-align: center;
 }
 
-.content {
-    width: fit-content;
+.content, .buttons {
     text-align: center;
-    vertical-align: center;
     font-size: 1.25em;
+}
+
+.buttons {
+    justify-items: center;
 }
 
 .description {
@@ -79,17 +82,13 @@ body * {
 }
 
 .room {
-    min-width: 12em;
-    background-color: #162856;
-    border: 3px solid #7887AB;
-    font-size: 0.85em;
-    color: White;
-    margin: 0.5em;
-    padding: 0.25em 0.75em 0.25em 0.75em;
-    text-align: center;
+    width: 100%;
+    font-size: 1.25em;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-.input {
+.input, .chatinput {
     width: fit-content;
     margin: 0.5em;
     padding: 0.25em;
@@ -100,20 +99,54 @@ body * {
     text-align: center;
 }
 
-#empty {
-    padding: 0 1.5em 0 1.5em;
+.chatinput {
+    width: 88%;
+    font-size: 0.65em;
+    text-align: left;
 }
 
 .info {
-    margin-top: 1.1em;
+    order: 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.infoContent {
+    width: 10em;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chat {
+    order: 2;
+    flex-grow: 1;
+    flex-shrink: 1;
+    text-align: center;
+    height: 12.75em;
+    width: 10em;
+}
+
+.chat * {
+    word-wrap: break-word;
+}
+
+.messages {
+    height: 100%;
+    text-align: left;
+    overflow-y: scroll;
+    font-size: 0.75em;
 }
 
 .game {
-    width: 12em;
-    height: 12em;
+    order: 1;
+    width: 20em;
+    height: 20em;
     alignment: center;
     margin: 0 auto;
 }
+
+
 
 /* ### SNACKBAR ###*/
 
@@ -161,4 +194,25 @@ body * {
 @keyframes fadeout {
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
+}
+
+/* ### Scroll Bar ### */
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #061539;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #4F618F;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #7887AB;
 }

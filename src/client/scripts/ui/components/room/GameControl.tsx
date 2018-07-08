@@ -29,7 +29,7 @@ export class GameControl extends React.Component<IGameControlProps, IGameControl
     }
 
     public render(): any {
-        return <div id={"buttons"}>
+        return <div>
             {!this.props.gameAlreadyStarted
                 && <button className={"button"} onClick={this.startGame}>Start Game</button> }
             <button className={"button"} onClick={this.leaveRoom}>Leave Room</button>
