@@ -31,6 +31,6 @@ export class ShareRoomButton extends React.Component<IShareRoomButtonProps, ISha
     }
     
     public render(): any {
-        return <div><button onClick={this.shareRoom}>Share Room</button></div>;
+        return <div><button className={"button"} onClick={this.shareRoom}>Share Room</button></div>;
     }
 }

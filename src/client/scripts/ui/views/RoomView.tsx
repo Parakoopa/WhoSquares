@@ -211,6 +211,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                                  actionStartGame={this.startGame}
                                  actionLeaveRoom={this.leaveRoom}
                     />
+                    <ShareRoomButton roomurl={this.getRoomUrl()}/>
                 </div>
                 <div className={"room"}>
                     <Game/>
