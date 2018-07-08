@@ -21,6 +21,9 @@ export class User implements IUserMongoSchema {
     public static fromSchema(user: IUserMongoSchema) {
         const newUser = new User(user.name, user.key);
         newUser._id = user._id;
+        newUser.gamesPlayed = user.gamesPlayed;
+        newUser.gamesWon = user.gamesWon;
+        newUser.tilesPlaced = user.tilesPlaced;
         return newUser;
     }
 }

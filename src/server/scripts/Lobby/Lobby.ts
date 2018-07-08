@@ -151,4 +151,8 @@ export class Lobby extends LobbyEvents {
         process.on("SIGTERM", shutdownFunction);
         process.on("SIGINT", shutdownFunction);
     }
+
+    public getRooms() {
+        return this._rooms;
+    }
 }

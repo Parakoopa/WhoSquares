@@ -8,6 +8,8 @@ import {NewRoomForm} from "../components/lobby/NewRoomForm";
 import {RoomList} from "../components/lobby/RoomList";
 import {ILobbyUI} from "../interfaces/ILobbyUI";
 import {Routes} from "../Routes";
+import {UserStats} from "../components/misc-stats/UserStats";
+import {GeneralStats} from "../components/misc-stats/GeneralStats";
 
 export interface ILobbyViewProps {
     username: string;
@@ -87,6 +89,8 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
             <h3 className={"description"}> Available Rooms: </h3>
             <RoomList roomlist={this.state.roomList} actionJoinRoom={this.joinRoom} actionStatsRoom={this.statsRoom}/>
             <NewRoomForm actionCreate={this.joinRoom}/>
+            <UserStats playerKey={Connection.getKey()}/>
+            <GeneralStats/>
         </div>;
     }
 }

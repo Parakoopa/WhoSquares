@@ -218,7 +218,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                     />
                 </div>
                 <div className={"room"}>
-                    <Game/>
+                    <div className={"game"}><Game/></div>
                     <div className={"info"}>
                         <div className={"infoContent"}>
                             <WinnerInfo winner={this.state.winner}/>

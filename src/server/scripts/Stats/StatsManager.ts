@@ -5,6 +5,8 @@ import {RoomEvents} from "../Room/RoomEvents";
 import {Player} from "../Room/Player";
 import {UserRepository} from "../User/UserRepository";
 import {RoomRepository} from "../Room/RoomRepository";
+import {User} from "../User/User";
+import {GlobalStatsRepository} from "./GlobalStatsRepository";
 
 export class StatsManager {
     /**
@@ -39,7 +41,7 @@ export class StatsManager {
             });
         });
         // Collect grid stats
-        const gridSize = room._serverGrid.size;
+        const gridSize = room.getGridSizeX() * room.getGridSizeY();
         room.gridInfo.forEach((r) => {
             r.forEach((tile) => {
                 if (tile) {
@@ -72,32 +74,81 @@ export class StatsManager {
         RoomRepository.instance.save(room);
 
         // Update global stats
-        // TODO
+        GlobalStatsRepository.instance.get().then((globals) => {
+            globals.gamesPlayed += 1;
+            globals.tilesPlaced += generalStats.tilesPlaced;
+            // TODO: best user stat
+            GlobalStatsRepository.instance.save(globals);
+        });
     }
 
     /**
      * Send the room stats to the socket requesting it.
-     * TODO: error cases
      * @param {SocketIO.Socket} socket
      * @param {IRoomStatsRequest} req
+     * @param rooms
      * @returns {IEvent[]}
      */
-    public static sendRoomStats(socket: Socket, req: IRoomStatsRequest): IEvent[] {
-        return []; // TODO
+    public static sendRoomStats(socket: Socket, req: IRoomStatsRequest, rooms: Room[]): IEvent {
+        const room = rooms.find((r) => r.name === req.roomKey); // TODO: Misleading!
+        if (!room || !room.hasEnded()) {
+            // TODO: Better room not found response
+            console.log("Requested room not found or not over: " + req.roomKey);
+            return {clients: [socket], name: "roomStats", response: {}};
+        }
+        return {
+            clients: [socket],
+            name: "roomStats",
+            response: {
+                roomKey: room.key,
+                roomName: room.name,
+                gridSize: {
+                    x: room.getGridSizeX(),
+                    y: room.getGridSizeY()
+                },
+                stats: room.stats,
+                replay: room.replay
+            } as IRoomStatsResponse
+        };
     }
 
     /**
      * Send the user stats to the socket requesting it.
-     * TODO: error cases
      * @param {SocketIO.Socket} socket
      * @param {IRoomStatsRequest} req
+     * @param users
      * @returns {IEvent[]}
      */
-    public static sendUserStats(socket: Socket, req: IUserStatsRequest): IEvent[] {
-        return []; // TODO
+    public static sendUserStats(socket: Socket, req: IUserStatsRequest, users: Map<string, User>): IEvent {
+        const user = users.get(req.playerKey);
+        if (user === null) {
+            // TODO: Better user not found response
+            return {clients: [socket], name: "userStats", response: {}};
+        }
+        return {
+            clients: [socket],
+            name: "userStats",
+            response: {
+                userName: user.name,
+                tilesPlaced: user.tilesPlaced,
+                gamesPlayed: {
+                    total: user.gamesPlayed,
+                    won: user.gamesWon
+                }
+            } as IUserStatsResponse
+        };
     }
 
-    public static sendGlobalStats(socket: Socket, req: IGlobalStatsRequest): IEvent[] {
-        return []; // TODO
+    public static async sendGlobalStats(socket: Socket, req: IGlobalStatsRequest): Promise<IEvent> {
+        const globals = await GlobalStatsRepository.instance.get();
+        return {
+            clients: [socket],
+            name: "globalStats",
+            response: {
+                tilesPlaced: globals.tilesPlaced,
+                gamesPlayed: globals.gamesPlayed,
+                bestUserName: globals.bestUserName,
+            } as IGlobalStatsResponse
+        };
     }
 }

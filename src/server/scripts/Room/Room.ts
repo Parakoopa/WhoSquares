@@ -39,8 +39,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     private static _minGridSize: number = 3;
     private static _maxGridSize: number = 10;
     private _players: PlayerList;
-    /* package-private: **/
-    public _replay: IReplayLogEntry[];
+    public replay: IReplayLogEntry[];
     /* Only to be touched by the StatsManager */
     public stats: IRoomStats = null;
     private _turnCounter: number = 0;
@@ -52,7 +51,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
         this._turnManager = new TurnManager();
-        this._replay = [];
+        this.replay = [];
     }
 
     /**
@@ -146,7 +145,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         if (this.hasStarted()) {
             player = this.createObserver(socket, user);
             // If started, include this in the replay log
-            this._replay.push({player: RoomEvents.stripPlayer(player), type: "joined"} as ILogJoined);
+            this.replay.push({player: RoomEvents.stripPlayer(player), type: "joined"} as ILogJoined);
         } else {
             player = this.createPlayer(socket, user);
         }
@@ -213,7 +212,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         if (this.hasStarted()) {
             this._serverGrid.removePlayer(player);
             // If started, include this in the replay
-            this._replay.push({player: RoomEvents.stripPlayer(player), type: "left"} as ILogLeft);
+            this.replay.push({player: RoomEvents.stripPlayer(player), type: "left"} as ILogLeft);
         }
         // if this players turn, remove it
         if (this._turnManager.curPlayer() === player) {
@@ -315,7 +314,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         if (this._serverGrid.placeTile(player, y, x)) {
             const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
             // Add tile to replay
-            this._replay.push({
+            this.replay.push({
                 player: RoomEvents.stripPlayer(player),
                 turnNo: ++this._turnCounter,
                 type: "tilePlaced",
@@ -349,7 +348,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         console.log("Client won his mission: " + player.color);
         this._gameEnded = true;
         // Add winning to replay
-        this._replay.push({player: RoomEvents.stripPlayer(player), type: "winner"} as ILogWinner);
+        this.replay.push({player: RoomEvents.stripPlayer(player), type: "winner"} as ILogWinner);
         // Update all kinds of stats information
         StatsManager.processRoomEnd(this, player);
         return this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles);
@@ -359,7 +358,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         const player: IPlayer = this._players.getPlayerForSocket(client);
         if (!player) return [this.invalidPlayerEvent(client, this.name)];
         // Add chat message to replay
-        this._replay.push({player: RoomEvents.stripPlayer(player), message, type: "chat"} as ILogChatMessage);
+        this.replay.push({player: RoomEvents.stripPlayer(player), message, type: "chat"} as ILogChatMessage);
         return [this.roomMessageEvent(this._players.getAllSockets(), this._name, player, message)];
     }
 
@@ -381,5 +380,13 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
 
     public getCurrentTurnNumber() {
         return this._turnCounter;
+    }
+
+    public getGridSizeX() {
+        return this._serverGrid.sizeX;
+    }
+
+    public getGridSizeY() {
+        return this._serverGrid.sizeY;
     }
 }

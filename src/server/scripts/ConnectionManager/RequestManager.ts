@@ -45,14 +45,14 @@ export class RequestManager extends ResponseEmitter {
                 this.emitEvents(this._sessionManager.roomMessage(socket, req));
             });
             socket.on("roomStats", (req: IRoomStatsRequest) => {
-                this.emitEvents(StatsManager.sendRoomStats(socket, req));
+                this.emitEvents(this._sessionManager.sendRoomStats(socket, req));
             });
             socket.on("userStats", (req: IUserStatsRequest) => {
-                this.emitEvents(StatsManager.sendUserStats(socket, req));
+                this.emitEvents(this._sessionManager.sendUserStats(socket, req));
             });
-            socket.on("globalStats", (req: IGlobalStatsRequest) => {
-                this.emitEvents(StatsManager.sendGlobalStats(socket, req));
-            });
+            socket.on("globalStats", (async (req: IGlobalStatsRequest) => {
+                this.emitEvents(await this._sessionManager.sendGlobalStats(socket, req));
+            }));
         });
 
     }
