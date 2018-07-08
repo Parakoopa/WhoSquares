@@ -27,6 +27,7 @@ export class DbToRoom {
         room._owner = room.players.getPlayerByPlayerKey(this.schema.owner);
         room._id = this.schema._id;
         room._replay = this.schema.replay;
+        room.stats = this.schema.stats;
         return room;
     }
 

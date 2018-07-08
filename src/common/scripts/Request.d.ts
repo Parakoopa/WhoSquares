@@ -46,3 +46,14 @@ interface IRoomMessageRequest extends IRequest {
 interface IRegisterRequest extends IRequest {
     name: string;
 }
+
+interface IRoomStatsRequest extends IRequest {
+    roomKey: string;
+}
+
+interface IUserStatsRequest extends IRequest {
+    playerKey: string;
+}
+
+interface IGlobalStatsRequest extends IRequest {
+}

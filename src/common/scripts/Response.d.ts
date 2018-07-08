@@ -108,18 +108,7 @@ interface IRoomStatsResponse extends IResponse {
         x: number;
         y: number;
     };
-    players: {
-        base: IPlayer;
-        missionName: string;
-        coverage: number; // 0 - 1
-        tilesPlaced: number;
-        owner: boolean;
-    };
-    general: {
-        coverage: number; // 0 - 1
-        tilesPlaced: number;
-        numberTurns: number;
-    };
+    stats: IRoomStats;
     replay: IReplayLogEntry[];
 }
 
@@ -135,4 +124,5 @@ interface IUserStatsResponse extends IResponse {
 interface IGlobalStatsResponse extends IResponse {
     tilesPlaced: number;
     gamesPlayed: number;
+    bestUserName: string;
 }

@@ -12,6 +12,7 @@ export interface IUserMongoSchema extends IDatabaseModel {
     key: string;
     tilesPlaced: number; // Stats. (Re)calculated after a game finished
     gamesPlayed: number; // Stats. (Re)calculated after a game finished
+    gamesWon: number; // Stats. (Re)calculated after a game finished
 }
 
 export class UserRepository {

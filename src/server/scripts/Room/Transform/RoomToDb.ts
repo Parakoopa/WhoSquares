@@ -25,7 +25,8 @@ export class RoomToDb {
                 x: this.room._serverGrid.sizeX,
                 y: this.room._serverGrid.sizeY
             },
-            replay: this.room._replay
+            replay: this.room._replay,
+            stats: this.room.stats
         };
     }
 

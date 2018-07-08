@@ -8,6 +8,7 @@ export class User implements IUserMongoSchema {
     public _id: ObjectID | null;
 
     public gamesPlayed: number = 0;
+    public gamesWon: number = 0;
     public tilesPlaced: number = 0;
 
     constructor(
