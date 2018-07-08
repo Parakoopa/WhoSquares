@@ -1,14 +1,13 @@
 import * as React from "react";
 import {Connection} from "../../Connection";
+import {Lobby} from "../../game/components/Lobby";
+import {LocalPlayerManager} from "../../game/entity/LocalPlayer/LocalPlayerManager";
+import {App} from "../App";
+import {LogoutButton} from "../components/header/LogoutButton";
 import {NewRoomForm} from "../components/lobby/NewRoomForm";
 import {RoomList} from "../components/lobby/RoomList";
-import {Routes} from "../Routes";
-import {Lobby} from "../../game/components/Lobby";
 import {ILobbyUI} from "../interfaces/ILobbyUI";
-import {App} from "../App";
-import {LocalPlayer} from "../../game/LocalPlayer";
-import {Utility} from "../../game/Utility";
-import {LogoutButton} from "../components/header/LogoutButton";
+import {Routes} from "../Routes";
 
 export interface ILobbyViewProps {
     username: string;
@@ -36,12 +35,12 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
             return;
         }
 
-        if (!Utility.getLocalPlayer()) {
+        if (!LocalPlayerManager.getLocalPlayer()) {
             const color = parseInt("FF33FF", 16);
             const name = Connection.getUsername();
             const isObserver = true;
 
-            Utility.addLocalPlayer(
+            LocalPlayerManager.addLocalPlayer(
                 {name, color, isObserver},
                 Connection.getKey(),
                 Connection.getSocket()

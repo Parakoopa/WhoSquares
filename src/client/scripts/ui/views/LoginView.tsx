@@ -1,11 +1,11 @@
 import * as React from "react";
+import {RouteComponentProps} from "react-router-dom";
 import {Connection} from "../../Connection";
+import {Login} from "../../game/components/Login";
+import {LocalPlayerManager} from "../../game/entity/LocalPlayer/LocalPlayerManager";
+import {App} from "../App";
 import {ILoginUI} from "../interfaces/ILoginUI";
 import {Routes} from "../Routes";
-import {Login} from "../../game/components/Login";
-import {App} from "../App";
-import {Utility} from "../../game/Utility";
-import {RouteComponentProps} from "react-router-dom";
 
 export interface ILoginViewProps extends RouteComponentProps<{ jumpToRoom: string }> {
 }
@@ -38,7 +38,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
             const name = username;
             const isObserver = true;
 
-            Utility.addLocalPlayer(
+            LocalPlayerManager.addLocalPlayer(
                 {name, color, isObserver},
                 Connection.getKey(),
                 Connection.getSocket()
@@ -82,7 +82,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
             const color = parseInt("FF33FF", 16);
             const isObserver = true;
 
-            Utility.addLocalPlayer(
+            LocalPlayerManager.addLocalPlayer(
                 {name, color, isObserver},
                 Connection.getKey(),
                 Connection.getSocket()

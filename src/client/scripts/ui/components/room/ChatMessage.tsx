@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Utility} from "../../../game/Utility";
+import {LocalPlayerManager} from "../../../game/entity/LocalPlayer/LocalPlayerManager";
 
 export interface IChatMessageProps {
     player: IPlayer;
@@ -21,7 +21,7 @@ export class ChatMessage extends React.Component<IChatMessageProps, IChatMessage
     }
 
     public render(): any {
-        const own = Utility.equalsLocalPlayer( this.props.player );
+        const own = LocalPlayerManager.equalsLocalPlayer( this.props.player );
         const isOwn = own ? "own" : "";
 
         const styleUsername = {

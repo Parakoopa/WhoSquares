@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {Login} from "../../components/Login";
+import {Login} from "../../../components/Login";
 
 export class LoginUiListener {
 
