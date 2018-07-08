@@ -1,5 +1,3 @@
-import {OtherPlayer} from "../../game/OtherPlayer";
-
 export interface IRoomUI {
 
     leftRoom(): void;
@@ -8,7 +6,7 @@ export interface IRoomUI {
     // In Room Actions
    // startedGame(sizeX: number, sizeY: number, missionName: string): void;
    // placedTile(y: number, x: number, player: IPlayer): void;
-    updatePlayerList(players: OtherPlayer[] ): void;
+    updatePlayerList(players: IPlayer[] ): void;
     updateTurnInfo( player: IPlayer): void;
     updateWinner( winner: IPlayer, missionName: string): void;
     updateMission( mission: IMission): void;

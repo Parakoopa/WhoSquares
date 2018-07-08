@@ -1,4 +1,4 @@
-import {RequestEmitter} from "../../Emitter/RequestEmitter";
+import {RequestEmitter} from "../../../communication/requester/emitter/RequestEmitter";
 import {PhaserGame} from "../PhaserGame";
 import {Grid} from "./Grid";
 

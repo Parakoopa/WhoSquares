@@ -3,22 +3,21 @@ import {RouteComponentProps} from "react-router-dom";
 import {Connection} from "../../Connection";
 import {Login} from "../../game/components/Login";
 import {Room} from "../../game/components/Room";
-import {OtherPlayer} from "../../game/OtherPlayer";
-import {Utility} from "../../game/Utility";
+import {LocalPlayerManager} from "../../game/entity/LocalPlayer/LocalPlayerManager";
 import {App} from "../App";
 import {ChatInput} from "../components/room/ChatInput";
 import {ChatMessage} from "../components/room/ChatMessage";
 import {ChatMessages} from "../components/room/ChatMessages";
 import {Game} from "../components/room/Game";
 import {GameControl} from "../components/room/GameControl";
+import {MissionInfo} from "../components/room/MissionInfo";
 import {PlayerList} from "../components/room/PlayerList";
 import {RoomInfo} from "../components/room/RoomInfo";
+import {ShareRoomButton} from "../components/room/ShareRoomButton";
 import {TurnInfo} from "../components/room/TurnInfo";
 import {WinnerInfo} from "../components/room/WinnerInfo";
 import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
-import {MissionInfo} from "../components/room/MissionInfo";
-import {ShareRoomButton} from "../components/room/ShareRoomButton";
 
 export interface IRoomViewProps extends RouteComponentProps<IRoomViewProps> {
     roomid: string;
@@ -49,12 +48,12 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             return;
         }
 
-        if (!Utility.getLocalPlayer()) {
+        if (!LocalPlayerManager.getLocalPlayer()) {
             const color = parseInt("FF33FF", 16);
             const name = Connection.getUsername();
             const isObserver = true;
 
-            Utility.addLocalPlayer(
+            LocalPlayerManager.addLocalPlayer(
                 {name, color, isObserver},
                 Connection.getKey(),
                 Connection.getSocket()
@@ -66,10 +65,10 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         Connection._socket.once("joinedRoom", (resp: IJoinedResponse) => {
 
             // Update color from observer color to player color
-            const localPlayer = Utility.getLocalPlayer();
+            const localPlayer = LocalPlayerManager.getLocalPlayer();
             localPlayer.color = resp.color;
             // set whether localPlayer is new room owner
-            localPlayer.isRoomOwner = Utility.equalsIPlayer(resp.roomOwner, localPlayer.player);
+            localPlayer.isRoomOwner = LocalPlayerManager.equalsIPlayer(resp.roomOwner, localPlayer.player);
 
             const room_backend = new Room(
                 resp.roomKey,
@@ -122,8 +121,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             this.state.room_backend.actionLeaveRoom();
     }
 
-    public updatePlayerList(players: OtherPlayer[]) {
-        this.setState({players: [Utility.getLocalPlayer(), ...players].map((p) => p.player)});
+    public updatePlayerList(players: IPlayer[]) {
+        players.push(LocalPlayerManager.getLocalPlayer().player);
+        this.setState({players});
     }
 
     public otherJoinedRoom(player: IPlayer): void {
@@ -132,7 +132,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public otherLeftRoom(player: IPlayer): void {
         App.showTextOnSnackbar("Player '" + player.name + "' left room!");
-        this.setState({isOwner: Utility.getLocalPlayer().isRoomOwner});
+        this.setState({isOwner: LocalPlayerManager.getLocalPlayer().isRoomOwner});
     }
 
     public updateTurnInfo(activePlayer: IPlayer): void {

@@ -1,12 +1,9 @@
 import Socket = SocketIOClient.Socket;
 import {ILoginUI} from "../../ui/interfaces/ILoginUI";
-import {RequestEmitter} from "../Emitter/RequestEmitter";
-import {LocalPlayer} from "../LocalPlayer";
-import {ResponseManager} from "../ResponseManager/ResponseManager";
+import {ResponseManager} from "../communication/receiver/ResponseManager";
+import {LocalPlayer} from "../entity/LocalPlayer/LocalPlayer";
 
 export class Login {
-
-    private _requestEmitter: RequestEmitter;
 
     constructor(private _ui: ILoginUI, private _localPlayer: LocalPlayer = null) {
         ResponseManager.createLoginListener(this);

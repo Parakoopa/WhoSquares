@@ -1,5 +1,4 @@
 import * as React from "react";
-import {OtherPlayer} from "../../../game/OtherPlayer";
 
 export interface IPlayerListProps {
     players: IPlayer[];

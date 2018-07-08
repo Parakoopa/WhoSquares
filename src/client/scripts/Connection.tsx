@@ -1,7 +1,5 @@
 import * as React from "react";
-import {Routes} from "./ui/Routes";
-import {ResponseManager} from "./game/ResponseManager/ResponseManager";
-import {LocalPlayer} from "./game/LocalPlayer";
+import {ResponseManager} from "./game/communication/receiver/ResponseManager";
 
 export class Connection {
 

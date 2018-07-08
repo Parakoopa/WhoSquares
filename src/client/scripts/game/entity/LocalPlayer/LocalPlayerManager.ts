@@ -1,8 +1,8 @@
-import {RequestManager} from "./Emitter/RequestManager";
+import {RequestManager} from "../../communication/requester/RequestManager";
 import {LocalPlayer} from "./LocalPlayer";
 import Socket = SocketIOClient.Socket;
 
-export class Utility {
+export class LocalPlayerManager {
 
     private static _localPlayer: LocalPlayer;
 
