@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 0 solid red;
+    border: 1px solid red;
 }
 
 .header {
@@ -35,7 +35,7 @@ body * {
 }
 
 #header {
-    flex-grow: 5;
+    flex-grow: 4;
     flex-shrink: 3;
     flex-basis: auto;
 }
@@ -45,6 +45,11 @@ body * {
     flex-shrink: 1;
     flex-basis: available;
     width: 100%;
+}
+
+.logout {
+    text-align: center;
+    margin-bottom: 0.5em;
 }
 
 .footer {
@@ -133,7 +138,7 @@ body * {
     flex-grow: 1;
     flex-shrink: 1;
     text-align: center;
-    height: 12.75em;
+    height: 16.6em;
     width: 10em;
 }
 
@@ -197,7 +202,7 @@ body * {
 .username {
     font-size: 0.95em;
     color: #7887AB;
-    font-weight: bold;
+    font-weight: 900;
 }
 
 .game {
@@ -207,8 +212,6 @@ body * {
     alignment: center;
     margin: 0 auto;
 }
-
-
 
 /* ### SNACKBAR ###*/
 

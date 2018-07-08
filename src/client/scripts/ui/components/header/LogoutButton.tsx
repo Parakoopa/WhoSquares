@@ -16,6 +16,8 @@ export class LogoutButton extends React.Component<ILogoutButtonProps, ILogoutBut
     }
 
     public render(): any {
-        return <button onClick={this.logout}>Logout</button>;
+        return <div className={"logout"}>
+            <button className={"button"} onClick={this.logout}>Logout</button>
+        </div>;
     }
 }
