@@ -56,6 +56,9 @@ export class StatsManager {
 
         // Calculate user coverage + update user stats
         room.players.players.forEach((player) => {
+            if (player.isObserver) {
+                return; // Observers don't have stats
+            }
             const playerInRoomStatsMap = players.get(player.color);
             playerInRoomStatsMap.coverage = playerInRoomStatsMap.tilesPlaced / gridSize;
             player.user.tilesPlaced += playerInRoomStatsMap.tilesPlaced;
