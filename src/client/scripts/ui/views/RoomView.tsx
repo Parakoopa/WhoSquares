@@ -137,7 +137,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         }
     }
 
-    public updatePlayerList(players: IPlayer[]) {
+    public updatePlayerList(playerlist: IPlayer[]) {
+        const players = [];
+        for (const player of playerlist) {
+            players.push(player);
+        }
         players.push(LocalPlayerManager.getLocalPlayer().player);
         this.setState({players});
     }
