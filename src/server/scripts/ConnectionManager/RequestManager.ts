@@ -1,8 +1,8 @@
 import {Socket} from "socket.io";
 import SocketIO = require("socket.io");
 import {IEvent} from "../Event";
-import {SessionManager} from "./SessionManager";
 import {ResponseEmitter} from "./ResponseEmitter";
+import {SessionManager} from "./SessionManager";
 
 export class RequestManager extends ResponseEmitter {
 

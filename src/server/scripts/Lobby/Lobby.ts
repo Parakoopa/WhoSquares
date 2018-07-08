@@ -1,10 +1,10 @@
+import {Socket} from "socket.io";
 import {IEvent} from "../Event";
 import {Room} from "../Room/Room";
+import {RoomRepository} from "../Room/RoomRepository";
+import {User} from "../User/User";
 import {Utility} from "../Utility";
 import {LobbyEvents} from "./LobbyEvents";
-import {RoomRepository} from "../Room/RoomRepository";
-import {Socket} from "socket.io";
-import {User} from "../User/User";
 
 /**
  * Initializes Lobby and sets base values for rooms/
@@ -57,7 +57,7 @@ export class Lobby extends LobbyEvents {
             room = this.createRoom(req.roomName);
         }
         // Check if player already exists
-        const existingPlayer = room.getPlayerByPlayerKey(user.key);
+        const existingPlayer = room.players.getPlayerByPlayerKey(user.key);
         if (existingPlayer) {
             // Reconnect
             return room.reconnectClient(socket, existingPlayer);
