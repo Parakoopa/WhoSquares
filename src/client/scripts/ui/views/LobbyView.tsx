@@ -25,9 +25,9 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
     constructor(props: ILobbyViewProps) {
         super(props);
 
-        this.joinRoom = this.joinRoom.bind(this);
-
         this.state = {roomList: []};
+
+        this.joinRoom = this.joinRoom.bind(this);
 
         Connection.initSocket();
 
