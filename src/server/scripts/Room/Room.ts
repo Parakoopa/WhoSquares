@@ -221,7 +221,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     }
 
     /**
-     * Check if room is empty
+     * Check if room is empty (has no none-observers in it)
      * @returns {boolean}
      */
     public isEmpty(): boolean {

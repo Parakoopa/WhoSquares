@@ -69,13 +69,13 @@ export class SessionManager {
      */
     public placeTile(socket: Socket, req: IPlaceTileRequest): IEvent[] {
         const room = this._lobby.roomByKey(req.roomKey);
-        if (!room) return; // Todo return invalid roomkey response
+        if (!room) return []; // Todo return invalid roomkey response
         return room.placeTile(socket, req.y, req.x);
     }
 
     public roomMessage(socket: Socket, req: IRoomMessageRequest): IEvent[] {
         const room = this._lobby.roomByKey(req.roomKey);
-        if (!room) return; // Todo return invalid roomkey response
+        if (!room) return []; // Todo return invalid roomkey response
         return room.chatMessage(socket, req.message);
     }
 

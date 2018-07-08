@@ -32,7 +32,7 @@ export class PlayerList {
     }
 
     public get isEmpty(): boolean {
-        return this._players.length === 0;
+        return this._players.length === 0 || !this._players.find((p) => !p.isObserver);
     }
 
     public remove(val: Player): void {
