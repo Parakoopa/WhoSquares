@@ -5,8 +5,6 @@ import {RoomStatsUsers} from "../components/room-stats/RoomStatsUsers";
 import {RoomStatsGeneral} from "../components/room-stats/RoomStatsGeneral";
 import {Routes} from "../Routes";
 import {RoomStatsReplay} from "../components/room-stats/RoomStatsReplay";
-import {Utility} from "../../game/Utility";
-import {Room} from "../../game/components/Room";
 import {Connection} from "../../Connection";
 
 export interface IRoomStatsViewProps extends RouteComponentProps<IRoomStatsViewProps> {

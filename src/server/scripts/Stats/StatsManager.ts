@@ -27,7 +27,7 @@ export class StatsManager {
         };
         // Collect general player stats
         const players = new Map<number, IRoomStatsPlayer>();
-        room._players.forEach((player) => {
+        room.players.players.forEach((player) => {
             if (player.isObserver) {
                 return; // Observers don't have stats
             }
@@ -55,7 +55,7 @@ export class StatsManager {
         generalStats.coverage = generalStats.tilesPlaced / gridSize;
 
         // Calculate user coverage + update user stats
-        room._players.forEach((player) => {
+        room.players.players.forEach((player) => {
             const playerInRoomStatsMap = players.get(player.color);
             playerInRoomStatsMap.coverage = playerInRoomStatsMap.tilesPlaced / gridSize;
             player.user.tilesPlaced += playerInRoomStatsMap.tilesPlaced;

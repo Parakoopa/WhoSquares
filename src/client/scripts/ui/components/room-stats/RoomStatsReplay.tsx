@@ -14,22 +14,22 @@ export interface IRoomStatsReplayState {
 export class RoomStatsReplay extends React.Component<IRoomStatsReplayProps, IRoomStatsReplayState> {
     public render() {
         const rows = [
-            <tr>
+            <tr key={"head"}>
                 <th />
                 <th>Event</th>
             </tr>,
-            <tr>
+            <tr key={"start"}>
                 <td />
                 <td>The Game was started.</td>
             </tr>
         ];
-        this.props.replay.forEach((entry => {
+        this.props.replay.forEach(((entry, i) => {
             let concrete;
             switch (entry.type) {
                 case "tilePlaced":
                     concrete = entry as ILogTilePlaced;
                     rows.push(
-                        <tr>
+                        <tr key={i}>
                             <td>{concrete.turnNo}</td>
                             <td>{concrete.player.name} placed a tile at {concrete.x},{concrete.y}.</td>
                         </tr>
@@ -38,7 +38,7 @@ export class RoomStatsReplay extends React.Component<IRoomStatsReplayProps, IRoo
                 case "joined":
                     concrete = entry as ILogJoined;
                     rows.push(
-                        <tr>
+                        <tr key={i}>
                             <td />
                             <td>{concrete.player.name} joined as spectator.</td>
                         </tr>
@@ -47,7 +47,7 @@ export class RoomStatsReplay extends React.Component<IRoomStatsReplayProps, IRoo
                 case "left":
                     concrete = entry as ILogLeft;
                     rows.push(
-                        <tr>
+                        <tr key={i}>
                             <td />
                             <td>{concrete.player.name} left.</td>
                         </tr>
@@ -56,7 +56,7 @@ export class RoomStatsReplay extends React.Component<IRoomStatsReplayProps, IRoo
                 case "winner":
                     concrete = entry as ILogWinner;
                     rows.push(
-                        <tr>
+                        <tr key={i}>
                             <td />
                             <td>{concrete.player.name} won the game.</td>
                         </tr>
@@ -65,7 +65,7 @@ export class RoomStatsReplay extends React.Component<IRoomStatsReplayProps, IRoo
                 case "chat":
                     concrete = entry as ILogChatMessage;
                     rows.push(
-                        <tr>
+                        <tr key={i}>
                             <td />
                             {/* TODO: Possible injection */}
                             <td>{concrete.player.name} wrote:<br /><i>{concrete.message}</i></td>

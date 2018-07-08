@@ -13,22 +13,22 @@ export class RoomStatsUsers extends React.Component<IRoomStatsUsersProps, IRoomS
         // Put winner on top
         this.props.playerStats.sort((a, b) => a.winner ? -1 : 0);
         const list = [
-            <tr>
+            <tr key={"head"}>
                 <th>Player</th>
-                <th /> {/* Winner icon */}
+                <th />{/* Winner icon */}
                 <th colSpan={3}>Mission</th>
                 <th>Tiles Placed</th>
                 <th>Coverage %</th>
             </tr>
         ];
-        this.props.playerStats.forEach((stats) => {
-            let winnerTile = <td />
+        this.props.playerStats.forEach((stats, i) => {
+            let winnerTile = <td />;
             if (stats.winner) {
                 winnerTile = <td>Winner!</td>;
             }
             const mission = Missions.getMission(stats.missionName);
             list.push(
-               <tr className={stats.winner ? "player-row winner" : "player-row"}>
+               <tr key={i} className={stats.winner ? "player-row winner" : "player-row"}>
                    <td><span color={"#" + stats.base.color.toString(16)}>{stats.base.name}</span></td>
                    {winnerTile}
                    <td><img style={{width: "50px"}} src={mission.imgpath()} /></td>
