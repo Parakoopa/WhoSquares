@@ -6,6 +6,7 @@ import {PhaserGame} from "../PhaserGame";
 export class Grid {
 
     private _grid: Sprite[][];
+    private _highlightedSprites: Sprite[];
     private _isPhaserLoaded: Promise<Phaser.Game>;
 
     /**
@@ -27,6 +28,7 @@ export class Grid {
         game: PhaserGame,
         tileSize: number
     ) {
+        this._highlightedSprites = [];
         this._isPhaserLoaded = game.loaded();
         this._isPhaserLoaded.then((canvas) =>  {
             this.createGrid(canvas, tileName, tileSize);
@@ -61,10 +63,10 @@ export class Grid {
         console.log(game);
         console.log(game.world);
         const offset = this._sizeX * cellSize / 2.0;
-        const xOffset: number = game.world.centerX - offset;
-        const yOffset: number = game.world.centerY - offset;
+        const xOffset: number = game.world.centerX - offset + 5; // Need a minimal border (5) for exit events to work
+        const yOffset: number = game.world.centerY - offset + 5; // Need a minimal border (5) for exit events to work
         this._grid = [];
-
+        window.addEventListener("mouseout", this.resetHighlightedSprites, true);
         //  Creates x sprites for each frame (a frame is basically a row)
         for (let y = 0; y < this._sizeY; y++) {
             const row = [];
@@ -136,6 +138,7 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     private onOver(sprite: Sprite) {
+        this._highlightedSprites.push(sprite);
         sprite.tint = this._overColor;
     }
 
@@ -144,7 +147,14 @@ export class Grid {
      * @param {Phaser.Sprite} sprite
      */
     private onOut(sprite: Sprite) {
-        sprite.tint = sprite.data.color;
+        this.resetHighlightedSprites();
+    }
+
+    private resetHighlightedSprites() {
+        for (const sprite of this._highlightedSprites) {
+            sprite.tint = sprite.data.color;
+        }
+        this._highlightedSprites = [];
     }
 
     /**
