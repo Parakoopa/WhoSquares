@@ -5,6 +5,7 @@ import {Login} from "../../game/components/Login";
 import {Room} from "../../game/components/Room";
 import {LocalPlayerManager} from "../../game/entity/LocalPlayer/LocalPlayerManager";
 import {App} from "../App";
+import {LogoutButton} from "../components/header/LogoutButton";
 import {ChatInput} from "../components/room/ChatInput";
 import {ChatMessage} from "../components/room/ChatMessage";
 import {ChatMessages} from "../components/room/ChatMessages";
@@ -106,6 +107,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.updateWinner = this.updateWinner.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.getRoomUrl = this.getRoomUrl.bind(this);
+        this.logout = this.logout.bind(this);
     }
 
     public getUsername() {
@@ -116,9 +118,23 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         return this.props.match.params.roomid;
     }
 
+    public logout() {
+        Connection.setUsername( "" );
+        Connection.setKey( "" );
+
+        if (this.state.room_backend !== null) {
+            this.state.room_backend.actionLeaveRoom( () => {
+                window.location.href = Routes.linkToLoginHREF();
+            });
+        }
+    }
+
     public leaveRoom() {
-        if (this.state.room_backend !== null)
-            this.state.room_backend.actionLeaveRoom();
+        if (this.state.room_backend !== null) {
+            this.state.room_backend.actionLeaveRoom( () => {
+                window.location.href = Routes.linkToLobbyHREF();
+            });
+        }
     }
 
     public updatePlayerList(players: IPlayer[]) {
@@ -163,10 +179,6 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.setState({gameStarted: true});
     }
 
-    public leftRoom() {
-        window.location.href = Routes.linkToLobbyHREF();
-    }
-
     public sendMessage(text: string) {
         if (this.state.room_backend)
             this.state.room_backend.actionSendRoomMessage(text);
@@ -184,9 +196,16 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         return window.location.href;
     }
 
+    public componentDidMount() {
+        LogoutButton.logOutFunction = this.logout;
+    }
+
     public render() {
         return (
             <div>
+                <div className={"content"}>
+                    <RoomInfo roomid={this.props.match.params.roomid}/>
+                </div>
                 <div className={"buttons"}>
                     <GameControl gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
                                  actionStartGame={this.startGame}
@@ -197,7 +216,6 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                     <Game/>
                     <div className={"info"}>
                         <div className={"infoContent"}>
-                            <RoomInfo roomid={this.props.match.params.roomid}/>
                             <WinnerInfo winner={this.state.winner}/>
                             <PlayerList players={this.state.players}/>
                             <TurnInfo player={this.state.activePlayer}/>

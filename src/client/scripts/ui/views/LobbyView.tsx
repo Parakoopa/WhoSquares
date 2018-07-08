@@ -3,6 +3,7 @@ import {Connection} from "../../Connection";
 import {Lobby} from "../../game/components/Lobby";
 import {LocalPlayerManager} from "../../game/entity/LocalPlayer/LocalPlayerManager";
 import {App} from "../App";
+import {LogoutButton} from "../components/header/LogoutButton";
 import {NewRoomForm} from "../components/lobby/NewRoomForm";
 import {RoomList} from "../components/lobby/RoomList";
 import {ILobbyUI} from "../interfaces/ILobbyUI";
@@ -64,6 +65,16 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
 
     public updateRoomList(rooms: string[]): void {
         this.setState({roomList: rooms});
+    }
+
+    public logout() {
+        Connection.setUsername( "" );
+        Connection.setKey( "" );
+        window.location.href = Routes.linkToLoginHREF();
+    }
+
+    public componentDidMount() {
+        LogoutButton.logOutFunction = this.logout;
     }
 
     public render() {

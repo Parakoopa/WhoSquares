@@ -7,7 +7,7 @@ import {App} from "../App";
 import {ILoginUI} from "../interfaces/ILoginUI";
 import {Routes} from "../Routes";
 
-export interface ILoginViewProps extends RouteComponentProps<{jumpToRoom: string}> {
+export interface ILoginViewProps extends RouteComponentProps<{ jumpToRoom: string }> {
 }
 
 export interface ILoginViewState {
@@ -77,7 +77,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         Connection._socket.emit("register", {name});
         Connection._socket.once("registered", (resp: IRegisteredResponse) => {
             Connection.setKey(resp.key);
-            Connection.setUsername( name );
+            Connection.setUsername(name);
 
             const color = parseInt("FF33FF", 16);
             const isObserver = true;
@@ -93,7 +93,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
     }
 
     public componentDidMount() {
-        this.setState( {username: Connection.getUsername()});
+        this.setState({username: Connection.getUsername()});
     }
 
     private redirectAfterLogin(): string {
@@ -107,8 +107,8 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         return <div className={"content"}>
             <form onSubmit={this.handleSubmit}>
                 <h3 className={"description"}>username:</h3>
-                <div className={"content"}>
-                    <span id={"empty"}/>
+                <div className={"login"}>
+                    <span className={"emptyBox"}/>
                     <input className={"input"} type="text"
                            value={this.state.username} onChange={this.handleChange}/>
                     <input className={"button"} type="submit"
