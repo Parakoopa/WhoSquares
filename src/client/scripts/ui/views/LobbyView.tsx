@@ -8,6 +8,7 @@ import {ILobbyUI} from "../interfaces/ILobbyUI";
 import {App} from "../App";
 import {LocalPlayer} from "../../game/LocalPlayer";
 import {Utility} from "../../game/Utility";
+import {LogoutButton} from "../components/header/LogoutButton";
 
 export interface ILobbyViewProps {
     username: string;
@@ -65,6 +66,16 @@ export class LobbyView extends React.Component<ILobbyViewProps, ILobbyViewState>
 
     public updateRoomList(rooms: string[]): void {
         this.setState({roomList: rooms});
+    }
+
+    public logout() {
+        Connection.setUsername( "" );
+        Connection.setKey( "" );
+        window.location.href = Routes.linkToLoginHREF();
+    }
+
+    public componentDidMount() {
+        LogoutButton.logOutFunction = this.logout;
     }
 
     public render() {
