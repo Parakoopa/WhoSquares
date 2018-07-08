@@ -17,6 +17,7 @@ import {TurnInfo} from "../components/room/TurnInfo";
 import {WinnerInfo} from "../components/room/WinnerInfo";
 import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
+import {MissionInfo} from "../components/room/MissionInfo";
 
 export interface IRoomViewProps extends RouteComponentProps<IRoomViewProps> {
     roomid: string;
@@ -32,6 +33,7 @@ export interface IRoomViewState {
     room_backend: Room;
     gameStarted: boolean;
     isOwner: boolean;
+    mission: IMission;
 }
 
 export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> implements IRoomUI {
@@ -93,7 +95,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             messages: [],
             room_backend: null,
             gameStarted: false,
-            isOwner: false
+            isOwner: false,
+            mission: null
         };
 
         this.leaveRoom = this.leaveRoom.bind(this);
@@ -146,6 +149,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public updateMission(mission: IMission): void {
+        console.log( "updated mission!" );
+        this.setState({mission} );
     }
 
     public startGame() {
@@ -175,12 +180,17 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         return (
             <div className={"content"}>
                 <Game/>
-                <GameControl gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted} actionStartGame={this.startGame} actionLeaveRoom={this.leaveRoom}/>
+                <GameControl
+                    gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
+                    actionStartGame={this.startGame}
+                    actionLeaveRoom={this.leaveRoom}
+                />
                 <div className={"info"}>
                     <RoomInfo roomid={this.props.match.params.roomid}/>
                     <WinnerInfo winner={this.state.winner}/>
                     <PlayerList players={this.state.players}/>
                     <TurnInfo player={this.state.activePlayer}/>
+                    <MissionInfo mission={this.state.mission}/>
                     <div>
                         <h3>Chat</h3>
                         <ChatMessages messages={this.state.messages}/>

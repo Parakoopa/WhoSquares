@@ -89,6 +89,7 @@ export class Room {
 
     public updateMission(mission: IMission): void {
         this._localPlayer.mission = mission;
+        this._ui.updateMission(mission);
     }
 
     /**
