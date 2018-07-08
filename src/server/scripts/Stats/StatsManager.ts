@@ -121,7 +121,7 @@ export class StatsManager {
      */
     public static sendUserStats(socket: Socket, req: IUserStatsRequest, users: Map<string, User>): IEvent {
         const user = users.get(req.playerKey);
-        if (user === null) {
+        if (!user) {
             // TODO: Better user not found response
             return {clients: [socket], name: "userStats", response: {}};
         }
