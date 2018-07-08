@@ -15,6 +15,7 @@ interface IJoinedResponse extends IResponse {
     roomOwner: IPlayer;
     otherPlayers: IPlayer[];
     gridInfo: IPlayer[][];
+    mission: string; // Name of the current mission of the player. Only set if the game has already begun and the player rejoined.
 }
 
 interface IOtherJoinedResponse extends IResponse {

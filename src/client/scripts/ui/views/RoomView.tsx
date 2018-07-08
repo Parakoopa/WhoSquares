@@ -19,6 +19,7 @@ import {TurnInfo} from "../components/room/TurnInfo";
 import {WinnerInfo} from "../components/room/WinnerInfo";
 import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
+import {Missions} from "../../../../common/scripts/Missions/Missions";
 
 export interface IRoomViewProps extends RouteComponentProps<IRoomViewProps> {
     roomid: string;
@@ -100,6 +101,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                 this,
                 resp.gridInfo
             );
+
+            // Set mission data if received because this is a reconnect
+            if (resp.mission) {
+                room_backend.updateMission(Missions.getMission(resp.mission));
+            }
 
             this.setState({room_backend, gameStarted: room_backend.hasGrid(), isOwner: localPlayer.isRoomOwner});
         });

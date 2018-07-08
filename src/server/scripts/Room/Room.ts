@@ -146,7 +146,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
 
         const otherPlayers = this._players.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner);
+            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner, null);
         const otherSockets =  otherPlayers.map((otherPlayer) => otherPlayer.socket);
         const otherJoinedEvent: IEvent = this.otherJoinedEvent(otherSockets, this.name, player);
         return [joinedEvent, otherJoinedEvent];
@@ -164,7 +164,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         player.socket = socket;
         const otherPlayers = this._players.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner);
+            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner, player.mission.constructor.name);
         if (this._serverGrid == null) return [joinedEvent]; // No Grid (running game) => no TurnEvents
         const informTurnEvent = this.informTurnEvent(this._players.getAllSockets(), this._turnManager.curPlayer());
         return [joinedEvent, informTurnEvent];
