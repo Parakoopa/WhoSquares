@@ -171,7 +171,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
             otherPlayers,
             this.gridInfo,
             this._owner,
-            this.hasStarted() ? player.mission.constructor.name : null // Resend mission, but only if game has started
+            this.hasStarted() && !player.isObserver ? player.mission.constructor.name : null // Resend mission, but only if game has started
         );
         if (this._serverGrid == null) return [joinedEvent]; // No Grid (running game) => no TurnEvents
         const informTurnEvent = this.informTurnEvent(this._players.getAllSockets(), this._turnManager.curPlayer());
