@@ -27,8 +27,11 @@ export abstract class FormMission implements IMission {
 
                     const current_compare = grid[compareY][compareX];
 
-                    // Is current player equals to checked player
-                    if (!FormMission.equalsPlayer(current_compare, current)) {
+                    // Is current player equals to checked player and current player equals given player
+                    const formOk = FormMission.equalsPlayer(current_compare, current)
+                        && FormMission.equalsPlayer(current_compare, player);
+
+                    if (!formOk) {
                         currentFormCheck = false;
                         break;
                     }
