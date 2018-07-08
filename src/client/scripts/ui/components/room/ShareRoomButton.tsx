@@ -27,7 +27,7 @@ export class ShareRoomButton extends React.Component<IShareRoomButtonProps, ISha
         document.execCommand("copy");
         document.body.removeChild(el);
 
-        App.showTextOnSnackbar( "Url copied to clipboard!" );
+        App.showTextOnSnackbar( "Room-URL copied to clipboard!" );
     }
     
     public render(): any {
