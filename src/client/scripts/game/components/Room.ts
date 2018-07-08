@@ -223,9 +223,9 @@ export class Room {
         this._ui.sendRoomMessage(player, message);
     }
 
-    public actionLeaveRoom(): void {
+    public actionLeaveRoom( callback: () => void): void {
         this._requestEmitter.leaveRoom();
-        this._ui.leftRoom();
+        callback();
     }
 
     /**

@@ -2,7 +2,6 @@ import {OtherPlayer} from "../../game/OtherPlayer";
 
 export interface IRoomUI {
 
-    leftRoom(): void;
     otherLeftRoom(player: IPlayer): void;
     otherJoinedRoom(player: IPlayer): void;
     // In Room Actions
