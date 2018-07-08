@@ -347,7 +347,7 @@ export class Room extends RoomEvents implements IRoom {
             if (winTiles.length > 0) {
                 console.log("Client won his mission: " + player.color);
                 this._gameEnded = true;
-                return [placedEvent, this.winGameEvent(sockets, this.name, player, player.mission, winTiles)];
+                return [placedEvent, this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles)];
             }
             this._turnManager.setNextPlayer();
             const curPlayer = this._turnManager.curPlayer();

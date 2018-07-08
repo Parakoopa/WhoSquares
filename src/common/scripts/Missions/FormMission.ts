@@ -32,7 +32,7 @@ export abstract class FormMission implements IMission {
                         currentFormCheck = false;
                         break;
                     }
-                    winTiles.push({x: compareX, y: compareY, player});
+                    winTiles.push({x: compareX, y: compareY});
                 }
                 if (currentFormCheck) {
                     return winTiles;
@@ -40,7 +40,7 @@ export abstract class FormMission implements IMission {
             }
         }
 
-        return false;
+        return [];
     }
 
     private static equalsPlayer(player1: IPlayer, player2: IPlayer) {

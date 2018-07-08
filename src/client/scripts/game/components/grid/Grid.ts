@@ -60,11 +60,9 @@ export class Grid {
      * @constructor
      */
     private createGrid(game: Game, imageName: string, cellSize: number): void {
-        console.log(game);
-        console.log(game.world);
         const offset = this._sizeX * cellSize / 2.0;
-        const xOffset: number = game.world.centerX - offset + 5; // Need a minimal border (5) for exit events to work
-        const yOffset: number = game.world.centerY - offset + 5; // Need a minimal border (5) for exit events to work
+        const xOffset: number = game.world.centerX - offset + 10; //  // 10 Offset to allow mouse exit events
+        const yOffset: number = game.world.centerY - offset + 10; //  // 10 Offset to allow mouse exit events
         this._grid = [];
         window.addEventListener("mouseout", this.resetHighlightedSprites, true);
         //  Creates x sprites for each frame (a frame is basically a row)
@@ -117,6 +115,13 @@ export class Grid {
             }
         }
     }
+
+    public showWinTiles(winTiles: ITile[]) {
+        for (const tile of winTiles) {
+            this._grid[tile.y][tile.x].loadTexture("winTile");
+        }
+
+    }
     /**
      * Destroys each tile of the grid,
      * thus destroying the grid.
@@ -151,6 +156,7 @@ export class Grid {
     }
 
     private resetHighlightedSprites() {
+        if (!this._highlightedSprites) return; // This may not refer to grid as this eventListener is global
         for (const sprite of this._highlightedSprites) {
             sprite.tint = sprite.data.color;
         }

@@ -10,7 +10,7 @@ export interface IRoomUI {
    // placedTile(y: number, x: number, player: IPlayer): void;
     updatePlayerList(players: OtherPlayer[] ): void;
     updateTurnInfo( player: IPlayer): void;
-    updateWinner( winner: IPlayer): void;
+    updateWinner( winner: IPlayer, missionName: string): void;
     updateMission( mission: IMission): void;
     sendRoomMessage(player: IPlayer, message: string): void;
 

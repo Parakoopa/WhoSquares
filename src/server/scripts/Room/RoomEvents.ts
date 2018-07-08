@@ -132,12 +132,12 @@ export class RoomEvents {
      * @param {Client[]} clients
      * @param {string} roomName
      * @param {IPlayer} player
-     * @param mission
+     * @param missionName
      * @param winTiles
      * @returns {IEvent}
      */
-    public winGameEvent(clients: Socket[], roomName: string, player: IPlayer, mission: IMission, winTiles: ITile[]): IEvent {
-        const response: IWinGameResponse = {roomName, player: RoomEvents.stripPlayer(player), mission, winTiles};
+    public winGameEvent(clients: Socket[], roomName: string, player: IPlayer, missionName: string, winTiles: ITile[]): IEvent {
+        const response: IWinGameResponse = {roomName, player: RoomEvents.stripPlayer(player), missionName, winTiles};
         return {clients, name: "winGame", response};
     }
 

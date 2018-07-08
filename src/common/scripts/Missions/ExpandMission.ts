@@ -14,16 +14,21 @@ export class ExpandMission implements IMission {
         return "../../../img/mission_40percent.png";
     }
 
-    public check(player: IPlayer, grid: IPlayer[][]): boolean {
+    public check(localPlayer: IPlayer, grid: IPlayer[][]): ITile[] {
         let tileCount: number = 0;
-
-        for (const row of grid) {
-            for (const tilePlayer of row) {
-                if (tilePlayer === player) tileCount++;
+        const winTiles: ITile[] = [];
+        for (let y = 0; y < grid.length; y++) {
+            for (let x = 0; x < grid[y].length; x++) {
+                const player = grid[y][x];
+                if (player === localPlayer) {
+                    tileCount++;
+                    winTiles.push({x, y});
+                }
             }
         }
         const gridSize = grid.length * grid[0].length;
-        return tileCount * 100.0 / gridSize >= this._winPercentage;
+        if (tileCount * 100.0 / gridSize >= this._winPercentage) return winTiles;
+        else return [];
     }
 
 }

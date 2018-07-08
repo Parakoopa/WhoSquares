@@ -54,7 +54,7 @@ interface IInformTurnResponse extends IResponse {
 interface IWinGameResponse extends IResponse {
     roomName: string;
     player: IPlayer;
-    mission: IMission;
+    missionName: string;
     winTiles: ITile[];
 }
 
