@@ -125,7 +125,7 @@ export class Room {
         const player: OtherPlayer = new OtherPlayer(otherPlayer);
         this.addPlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
-        // this._ui.updateGameInfo(otherPlayer.name + "joined");
+        this._ui.updateGameInfo(otherPlayer.name + "joined");
     }
 
     /**
@@ -171,7 +171,6 @@ export class Room {
 
     private getOtherPlayer(player: IPlayer): OtherPlayer {
         for (const otherPlayer of this._otherPlayers) {
-            // ToDo implement equals in real IPlayer on Client somehow
             if (Utility.equalsIPlayer(otherPlayer.player, player)) return otherPlayer;
         }
     }
@@ -236,11 +235,15 @@ export class Room {
         this._localPlayer.room = null;
         this._localPlayer.isRoomOwner = false;
         this.destroyGrid();
-        // this._ui.updateGameInfo("left room");
         // destroy itself?
     }
 
     public hasGrid() {
         return !!this._grid;
     }
+
+    public updateGameInfo(info: string): void {
+        this._ui.updateGameInfo(info);
+    }
+
 }

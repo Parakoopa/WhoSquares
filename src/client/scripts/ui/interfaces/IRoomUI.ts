@@ -13,5 +13,5 @@ export interface IRoomUI {
     updateWinner( winner: IPlayer, missionName: string): void;
     updateMission( mission: IMission): void;
     sendRoomMessage(player: IPlayer, message: string): void;
-
+    updateGameInfo(info: string): void;
 }

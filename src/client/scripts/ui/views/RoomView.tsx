@@ -148,6 +148,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public updateWinner(winner: IPlayer, missionName: string): void {
         // ToDo Display missionName and maybe description (so that players do understand why they lost)
+        // ToDo Display (re)-startGame button to room owner
         this.setState({winner});
     }
 
