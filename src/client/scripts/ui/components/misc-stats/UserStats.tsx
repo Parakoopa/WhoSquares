@@ -32,6 +32,7 @@ export class UserStats extends React.Component<IUserStatsProps, IUserStatsState>
         Connection._socket.once("userStats", (resp: IUserStatsResponse) => {
             if (!resp.userName) {
                 // TODO: Better error handling
+                return;
             }
             this.setState({
                 loaded: true,
