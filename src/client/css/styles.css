@@ -139,13 +139,14 @@ body * {
 }
 
 .message {
-    background-color: #f8f8f8;
-    border: 1px solid #c8c8c8;
-    border-radius: 5px;
-    width: 110px;
-    text-align: center;
-    padding: 20px;
-    position: absolute;
+    background-color: #162856;
+    border: 1px solid #7887AB;
+    border-radius: 3px;
+    width: fit-content;
+    text-align: left;
+    padding: 1em;
+    margin: 0.25em 0.25em 0.25em 0.5em;
+    position: relative;
  }
 
 .message .arrow {
@@ -154,9 +155,10 @@ body * {
 }
 
 .bottom {
-    border-color: #c8c8c8 transparent transparent transparent;
-    border-width: 8px 8px 0px 8px;
-    bottom: -8px;
+    border-color: #7887AB transparent transparent transparent;
+    border-width: 8px 0px 8px 8px;
+    bottom: 1em;
+    left: -0.5em;
 }
 
 .game {
