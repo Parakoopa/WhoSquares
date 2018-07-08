@@ -1,4 +1,6 @@
 import * as React from "react";
+import {Utility} from "../../../game/Utility";
+import {App} from "../../App";
 
 export interface IChatMessageProps {
     player: IPlayer;
@@ -11,17 +13,20 @@ export interface IChatMessageState {
 export class ChatMessage extends React.Component<IChatMessageProps, IChatMessageState> {
 
     public render(): any {
+        const own = Utility.equalsLocalPlayer( this.props.player );
+        const className = own ? "message own" : "message";
+
         return (
             <div>
-                <div className={`message`}>
+                <div className={className}>
                     <div className={"arrow bottom right"}></div>
                     <span className="username">
-                    {this.props.player.name}
-                </span>
+                        { this.props.player.name }
+                    </span>
                     <span>: </span>
                     <span className="message-body">
-                    {this.props.message}
-                </span>
+                        { this.props.message }
+                    </span>
                 </div>
             </div>
         );
