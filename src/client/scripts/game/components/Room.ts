@@ -108,7 +108,7 @@ export class Room {
         this._localPlayer.isRoomOwner = LocalPlayerManager.equalsIPlayer(this._localPlayer.player, roomOwner);
         this._localPlayer.isRoomOwner = roomOwner === this._localPlayer.player;
         this.removePlayer(player);
-        this._grid.removePlayer(player);
+        if (this._grid) this._grid.removePlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
         // this._ui.updateGameInfo(player.name + "left");
     }
@@ -132,18 +132,6 @@ export class Room {
     }
 
     /**
-     * Try to get OtherPlayer of this room by its name
-     * @param {string} playerName
-     * @returns {OtherPlayer}
-     */
-    private playerByName(playerName: string): IPlayer {
-        for (const player of this._otherPlayers) {
-            if (player.name === playerName) return player;
-        }
-        return null;
-    }
-
-    /**
      *
      * @param {IPlayer} player
      */
@@ -158,9 +146,16 @@ export class Room {
      * @param {IPlayer} player
      */
     private removePlayer(player: IPlayer): void {
-        const index: number = this._otherPlayers.indexOf(player);
+        const index: number = this.getPlayerByIndex(player);
         if (index > -1) this._otherPlayers.splice(index, 1);
         this._ui.updatePlayerList(this._otherPlayers);
+    }
+
+    private getPlayerByIndex(otherPlayer: IPlayer): number {
+        for (let i = 0; i < this.otherPlayers.length; i++) {
+            if (LocalPlayerManager.equalsIPlayer(this._otherPlayers[i], otherPlayer)) return i;
+        }
+        return -1;
     }
 
     /**
