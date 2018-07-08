@@ -12,7 +12,9 @@ export class ResponseEmitter {
     private emitEvent(event: IEvent): void {
         console.log("Emitted to Players: " + event.name + " to: " + event.clients);
         for (let i = 0; i < event.clients.length; i++) {
-            event.clients[i].emit(event.name, event.response);
+            if (event.clients[i]) {
+                event.clients[i].emit(event.name, event.response);
+            }
         }
     }
 

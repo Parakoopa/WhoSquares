@@ -2,7 +2,9 @@ import {IEvent} from "../Event";
 import {Room} from "../Room/Room";
 import {Utility} from "../Utility";
 import {LobbyEvents} from "./LobbyEvents";
+import {RoomRepository} from "../Room/RoomRepository";
 import {Socket} from "socket.io";
+import {User} from "../User/User";
 
 /**
  * Initializes Lobby and sets base values for rooms/
@@ -17,6 +19,14 @@ export class Lobby extends LobbyEvents {
     constructor() {
         super();
         this._rooms = [];
+        // Asynchronously load all rooms that are stored in the database
+        RoomRepository.instance.getAll().then((rooms) => {
+            rooms.forEach((room) => {
+                this._rooms.push(room);
+            });
+        });
+        // Register server shutdown
+        this.registerServerShutdown();
     }
 
     private roomNames(): string[] {
@@ -37,17 +47,17 @@ export class Lobby extends LobbyEvents {
      * Otherwise tell room to add client
      * @param socket
      * @param req
-     * @param playerName
+     * @param user
      * @returns {string}
      * @constructor
      */
-    public joinRoom(socket: Socket, req: IJoinRoomRequest, playerName: string): IEvent[] {
+    public joinRoom(socket: Socket, req: IJoinRoomRequest, user: User): IEvent[] {
         let room: Room = this.roomByName(req.roomName);
         if (room === null) {
             room = this.createRoom(req.roomName);
         }
         // Check if player already exists
-        const existingPlayer = room.getPlayerByKey(req.playerKey);
+        const existingPlayer = room.getPlayerByPlayerKey(user.key);
         if (existingPlayer) {
             // Reconnect
             return room.reconnectClient(socket, existingPlayer);
@@ -56,7 +66,7 @@ export class Lobby extends LobbyEvents {
             if (room.size() > room.maxSize) {
                 return [this.roomIsFullEvent(socket, room.name)];
             }
-            return room.AddClient(socket, req.playerKey, playerName);
+            return room.AddClient(socket, user);
         }
     }
 
@@ -95,6 +105,8 @@ export class Lobby extends LobbyEvents {
         const index: number = this._rooms.indexOf(room);
         if (index < 0) return;
         this._rooms.splice(index, 1);
+        // Delete this room from the DB
+        RoomRepository.instance.delete(room);
     }
 
     /**
@@ -123,4 +135,24 @@ export class Lobby extends LobbyEvents {
         return null;
     }
 
+    /**
+     * If the server shuts down, write all rooms to the database before.
+     */
+    private registerServerShutdown() {
+        const shutdownFunction = (async () => {
+            const promises: Array<Promise<any>> = [];
+            console.log("[Lobby] Server shutting down... saving rooms.");
+            this._rooms.forEach((room) => {
+                // Don't save games that haven't started to the db
+                if (room.hasStarted()) {
+                    promises.push(RoomRepository.instance.save(room));
+                }
+            });
+            await Promise.all(promises);
+            console.log("[Lobby] Done!");
+            process.exit(0);
+        });
+        process.on("SIGTERM", shutdownFunction);
+        process.on("SIGINT", shutdownFunction);
+    }
 }

@@ -52,3 +52,18 @@ spec:
   selector:
     service: mongodb
   type: ClusterIP
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-volume-claim
+  labels:
+    service: mongodb
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi

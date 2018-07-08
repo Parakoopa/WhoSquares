@@ -1,12 +1,12 @@
-import {ExpandMission} from "../../../common/scripts/Missions/ExpandMission";
-import {FormMissionCircle} from "../../../common/scripts/Missions/FormMissionCircle";
-import {FormMissionL} from "../../../common/scripts/Missions/FormMissionL";
-import {FormMissionLineHorizontal} from "../../../common/scripts/Missions/FormMissionLineHorizontal";
-import {FormMissionLineVertical} from "../../../common/scripts/Missions/FormMissionLineVertical";
-import {FormMissionSquare} from "../../../common/scripts/Missions/FormMissionSquare";
-import {FormMissionT} from "../../../common/scripts/Missions/FormMissionT";
+import {ExpandMission} from "./ExpandMission";
+import {FormMissionCircle} from "./FormMissionCircle";
+import {FormMissionL} from "./FormMissionL";
+import {FormMissionLineHorizontal} from "./FormMissionLineHorizontal";
+import {FormMissionLineVertical} from "./FormMissionLineVertical";
+import {FormMissionSquare} from "./FormMissionSquare";
+import {FormMissionT} from "./FormMissionT";
 
-export class MissionDistributer {
+export class Missions {
 
     // ToDo somehow get rid of getMission and use dependency injection
     /**

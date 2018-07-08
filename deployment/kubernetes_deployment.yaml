@@ -79,7 +79,3 @@ spec:
         backend:
             serviceName: who-squares
             servicePort: 8080
-      - path: /db-admin/
-        backend:
-            serviceName: adminmongo
-            servicePort: 1234

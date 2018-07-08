@@ -3,12 +3,13 @@
  * 2 d array containing IPlayer.
  * The IPlayer represents the owner of the tile by indices
  */
+import {Player} from "../Player";
 
 export class ServerGrid {
 
     private readonly _sizeX: number;
     private readonly _sizeY: number;
-    private _grid: IPlayer[][];
+    private _grid: Player[][];
 
     constructor(sizeX: number, sizeY: number) {
         this._sizeX = sizeX;
@@ -18,9 +19,9 @@ export class ServerGrid {
 
     /**
      * returns the grid
-     * @returns {IPlayer[][]}
+     * @returns {Player[][]}
      */
-    get gridInfo(): IPlayer[][] {
+    get gridInfo(): Player[][] {
         return this._grid;
     }
 
@@ -29,7 +30,23 @@ export class ServerGrid {
      * @returns {number}
      */
     get size(): number {
-        return this._sizeY * this._sizeY;
+        return this._sizeX * this._sizeY;
+    }
+
+    /**
+     * return the amount of tiles in the grid
+     * @returns {number}
+     */
+    get sizeX(): number {
+        return this._sizeX;
+    }
+
+    /**
+     * return the amount of tiles in the grid
+     * @returns {number}
+     */
+    get sizeY(): number {
+        return this._sizeY;
     }
 
     /**
@@ -40,7 +57,7 @@ export class ServerGrid {
     private createGrid(sizeX: number, sizeY: number): void {
         const grid = [];
         for (let y = 0; y < sizeY; y++) {
-            const row: IPlayer[] = [];
+            const row: Player[] = [];
             for (let x = 0; x < sizeX; x++) {
                 row[x] = null;
             }
@@ -57,7 +74,7 @@ export class ServerGrid {
      * @param {number} x
      * @returns {boolean}
      */
-    public placeTile(player: IPlayer, y: number, x: number): boolean {
+    public placeTile(player: Player, y: number, x: number): boolean {
         if (x < this._sizeX && y < this._sizeY) {
             this._grid[y][x] = player;
             return true;
