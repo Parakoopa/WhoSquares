@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 1px solid red;
+    border: 0 solid red;
 }
 
 .header {
