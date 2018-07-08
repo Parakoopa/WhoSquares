@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 0 solid red;
+    border: 1px solid red;
 }
 
 .header {
@@ -76,6 +76,8 @@ body * {
 }
 
 .buttons {
+    display: flex;
+    flex-direction: row;
     justify-items: center;
 }
 
@@ -211,10 +213,8 @@ body * {
 
 .game {
     order: 1;
-    width: 20em;
-    height: 20em;
-    alignment: center;
-    margin: 0 auto;
+    height: auto;
+    width: auto;
 }
 
 /* ### SNACKBAR ###*/
