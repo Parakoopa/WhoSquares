@@ -18,6 +18,7 @@ import {WinnerInfo} from "../components/room/WinnerInfo";
 import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
 import {MissionInfo} from "../components/room/MissionInfo";
+import {ShareRoomButton} from "../components/room/ShareRoomButton";
 
 export interface IRoomViewProps extends RouteComponentProps<IRoomViewProps> {
     roomid: string;
@@ -105,6 +106,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.updateGameInfo = this.updateGameInfo.bind(this);
         this.updateWinner = this.updateWinner.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
+        this.getRoomUrl = this.getRoomUrl.bind(this);
     }
 
     public getUsername() {
@@ -176,6 +178,10 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.setState({messages});
     }
 
+    public getRoomUrl() {
+        return window.location.href;
+    }
+
     public render() {
         return (
             <div>
@@ -194,6 +200,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                             <PlayerList players={this.state.players}/>
                             <TurnInfo player={this.state.activePlayer}/>
                             <MissionInfo mission={this.state.mission}/>
+                            <ShareRoomButton roomurl={this.getRoomUrl()}/>
                         </div>
                     </div>
                     <div className={"chat"}>
