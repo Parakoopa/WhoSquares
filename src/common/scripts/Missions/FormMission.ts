@@ -1,6 +1,6 @@
 export abstract class FormMission implements IMission {
 
-    public check(player: IPlayer, grid: IPlayer[][]): boolean {
+    public check(player: IPlayer, grid: IPlayer[][]): ITile[] {
         const form = this.getForm();
 
         const gridHeight = grid.length;
@@ -9,6 +9,7 @@ export abstract class FormMission implements IMission {
         for (let x = 0; x < grid.length; x++) {
             for (let y = 0; y < grid[x].length; y++) {
                 const current = grid[y][x];
+                const winTiles: ITile[] = [];
 
                 if (current == null)
                     continue;
@@ -31,14 +32,15 @@ export abstract class FormMission implements IMission {
                         currentFormCheck = false;
                         break;
                     }
+                    winTiles.push({x: compareX, y: compareY});
                 }
-
-                if (currentFormCheck)
-                    return true;
+                if (currentFormCheck) {
+                    return winTiles;
+                }
             }
         }
 
-        return false;
+        return [];
     }
 
     private static equalsPlayer(player1: IPlayer, player2: IPlayer) {

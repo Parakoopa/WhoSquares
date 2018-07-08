@@ -32,7 +32,6 @@ export class Room {
                 private _ui: IRoomUI,
                 gridInfo: IPlayer[][] = null
     ) {
-        console.log("created room: " + _name);
         _localPlayer.room = this;
         this._otherPlayers = this.toOtherPlayers(otherPlayers);
         this._ui.updatePlayerList(this._otherPlayers);
@@ -205,9 +204,12 @@ export class Room {
     /**
      * Update Ui to display winner
      * @param {IPlayer} player
+     * @param missionName
+     * @param winTiles
      */
-    public updateWinner(player: IPlayer): void {
-        this._ui.updateWinner(player);
+    public updateWinner(player: IPlayer, missionName: string, winTiles: ITile[]): void {
+        this._grid.showWinTiles(winTiles);
+        this._ui.updateWinner(player, missionName);
     }
 
     /**

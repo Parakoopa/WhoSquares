@@ -36,7 +36,7 @@ export class RoomUiListener {
             this._room.placedTile(resp.y, resp.x, resp.player);
         });
         socket.on("winGame", (resp: IWinGameResponse) => {
-            this._room.updateWinner(resp.player);
+            this._room.updateWinner(resp.player, resp.missionName, resp.winTiles);
         });
         socket.on("informTurn", (resp: IInformTurnResponse) => {
             this._room.updateTurnInfo(resp.player);

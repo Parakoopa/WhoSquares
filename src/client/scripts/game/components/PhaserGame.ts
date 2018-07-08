@@ -14,8 +14,8 @@ export class PhaserGame {
      * Start UpdateLoop (Client only Updates UI & Logic stuff only by Server Events)
      */
     constructor() {
-        const width = document.getElementById("game").clientWidth;
-        const height = document.getElementById("game").clientHeight;
+        const width = document.getElementById("game").clientWidth + 20; // 20 Offset to allow mouse exit events
+        const height = document.getElementById("game").clientHeight + 20;  // 20 Offset to allow mouse exit events
         const self = this;
 
         this._loaded = new Promise((resolve, reject) => {
@@ -24,6 +24,7 @@ export class PhaserGame {
                     this.scale.pageAlignHorizontally = true;
                     this.scale.pageAlignVertically = true;
                     this.load.image("gridTile", "./img/square32_grey.png");
+                    this.load.image("winTile", "./img/square32_win.png");
                 },
                 create() {
                     resolve(this);

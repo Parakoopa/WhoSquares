@@ -343,10 +343,11 @@ export class Room extends RoomEvents implements IRoom {
         const sockets = this.getAllSockets();
         if (this._serverGrid.placeTile(player, y, x)) {
             const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
-            if (player.mission.check(player, this._serverGrid.gridInfo)) {
+            const winTiles = player.mission.check(player, this._serverGrid.gridInfo);
+            if (winTiles.length > 0) {
                 console.log("Client won his mission: " + player.color);
                 this._gameEnded = true;
-                return [placedEvent, this.winGameEvent(sockets, this.name, player)];
+                return [placedEvent, this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles)];
             }
             this._turnManager.setNextPlayer();
             const curPlayer = this._turnManager.curPlayer();
