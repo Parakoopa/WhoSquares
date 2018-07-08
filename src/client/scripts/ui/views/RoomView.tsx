@@ -43,6 +43,27 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     constructor(props: IRoomViewProps) {
         super(props);
 
+        this.state = {
+            players: [],
+            activePlayer: null,
+            winner: null,
+            login: null,
+            messages: [],
+            room_backend: null,
+            gameStarted: false,
+            isOwner: false,
+            mission: null
+        };
+
+        this.leaveRoom = this.leaveRoom.bind(this);
+        this.startGame = this.startGame.bind(this);
+        this.updatePlayerList = this.updatePlayerList.bind(this);
+        this.updateGameInfo = this.updateGameInfo.bind(this);
+        this.updateWinner = this.updateWinner.bind(this);
+        this.sendMessage = this.sendMessage.bind(this);
+        this.getRoomUrl = this.getRoomUrl.bind(this);
+        this.logout = this.logout.bind(this);
+
         Connection.initSocket();
 
         if (!Connection.getKey() || !Connection.getUsername()) {
@@ -88,27 +109,6 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             Connection.setUsername("");
             window.location.href = Routes.linkToLoginHREF() + "/" + this.props.match.params.roomid;
         });
-
-        this.state = {
-            players: [],
-            activePlayer: null,
-            winner: null,
-            login: null,
-            messages: [],
-            room_backend: null,
-            gameStarted: false,
-            isOwner: false,
-            mission: null
-        };
-
-        this.leaveRoom = this.leaveRoom.bind(this);
-        this.startGame = this.startGame.bind(this);
-        this.updatePlayerList = this.updatePlayerList.bind(this);
-        this.updateGameInfo = this.updateGameInfo.bind(this);
-        this.updateWinner = this.updateWinner.bind(this);
-        this.sendMessage = this.sendMessage.bind(this);
-        this.getRoomUrl = this.getRoomUrl.bind(this);
-        this.logout = this.logout.bind(this);
     }
 
     public getUsername() {
