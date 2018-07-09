@@ -350,6 +350,31 @@ body * {
     margin-right: auto;
 }
 
+/* ## STATS ## */
+
+.statsTable {
+    min-width: 15em;
+    max-width: 70em;
+    background-color: #061539;
+    border: 3px solid #2E4272;
+    border-radius: 3px;
+    text-align: left;
+    padding: 0.5em;
+    margin: auto;
+    position: relative;
+    border-collapse: collapse;
+}
+
+.statsTable td, .statsTable th {
+    border: 1px solid #2E4272;
+    padding: 0.5em;
+}
+
+.player-row.winner{
+    background: rgba(166, 140, 0, 0.4);
+    font-size: 1.2em;
+}
+
 /* ### SNACKBAR ###*/
 
 #snackbar {

@@ -41,7 +41,7 @@ export class GeneralStats extends React.Component<IGeneralStatsProps, IGeneralSt
         if (this.state.loaded) {
             return <div className="global-stats">
                 <h3>Global Statistics:</h3>
-                <table>
+                <table className={"statsTable"}>
                     <tbody>
                         <tr>
                             <th>Games Played:</th>
