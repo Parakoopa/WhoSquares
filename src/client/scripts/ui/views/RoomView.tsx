@@ -128,11 +128,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public logout() {
-        Connection.setUsername( "" );
-        Connection.setKey( "" );
+        Connection.setUsername("");
+        Connection.setKey("");
 
         if (this.state.room_backend !== null) {
-            this.state.room_backend.actionLeaveRoom( () => {
+            this.state.room_backend.actionLeaveRoom(() => {
                 window.location.href = Routes.linkToLoginHREF();
             });
         }
@@ -140,7 +140,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public leaveRoom() {
         if (this.state.room_backend !== null) {
-            this.state.room_backend.actionLeaveRoom( () => {
+            this.state.room_backend.actionLeaveRoom(() => {
                 window.location.href = Routes.linkToLobbyHREF();
             });
         }
@@ -156,11 +156,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public otherJoinedRoom(player: IPlayer): void {
-        App.showTextOnSnackbar("Player '" + player.name + "' joined room!");
+        App.showTextOnSnackbar("Player " + player.name + " joined room!");
     }
 
     public otherLeftRoom(player: IPlayer): void {
-        App.showTextOnSnackbar("Player '" + player.name + "' left room!");
+        App.showTextOnSnackbar("Player " + player.name + " left room!");
         this.setState({isOwner: LocalPlayerManager.getLocalPlayer().isRoomOwner});
     }
 
@@ -181,8 +181,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public updateMission(mission: IMission): void {
-        console.log( "updated mission!" );
-        this.setState({mission} );
+        console.log("updated mission!");
+        this.setState({mission});
     }
 
     public startGame() {
@@ -231,9 +231,10 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                 <div className={"room"}>
                     <Game/>
                     <div className={"info"}>
-                        <div className={"infoContent"}>
+                        <div className={"infoMission"}>
                             <MissionInfo mission={this.state.mission}/>
-                            <br/>
+                        </div>
+                        <div className={"infoPlayers"}>
                             <PlayerList
                                 players={this.state.players}
                                 winner={this.state.winner}

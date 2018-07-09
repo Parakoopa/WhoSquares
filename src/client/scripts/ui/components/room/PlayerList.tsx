@@ -23,7 +23,12 @@ export class PlayerList extends React.Component<IPlayerListProps, IPlayerListSta
         });
 
         return <div>
-            <label>Players: </label>
+            <label className={"title"}>Players</label>
+            <img alt="Players"
+                 className={"iconPlayers"}
+                 src={"../../img/icons/Players.png"}
+                 width="30em" height="30em"
+            />
             <div className={"players"}>
                 {playerlist}
             </div>

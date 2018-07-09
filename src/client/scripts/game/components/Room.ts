@@ -120,7 +120,7 @@ export class Room {
     public otherJoinedRoom(player: IPlayer): void {
         this.addPlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
-        this._ui.updateGameInfo(player.name + "joined");
+        this._ui.updateGameInfo(player.name + " joined");
     }
 
     /**

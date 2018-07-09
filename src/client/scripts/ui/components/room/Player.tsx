@@ -34,12 +34,17 @@ export class Player extends React.Component<IPlayerProps, IPlayerState> {
         return (
             <div>
                 <div className={className}>
-                    <div>
-                        { isWinner ? <img src="../../../img/mission_Square.png"/> : null}
-                    </div>
-                    <div style={styleUsername} className="username">
+                    <span>
+                        { isWinner ?
+                            <img className={"winnerIcon"} src="../../../../img/icons/Winner_True.png"
+                                 width={"20em"} height={"20em"} /> :
+                            <img className={"winnerIcon"} src="../../../../img/icons/Winner_False.png"
+                                 width={"20em"} height={"20em"} />
+                        }
+                    </span>
+                    <span style={styleUsername} className="username">
                         {this.props.player.name}
-                    </div>
+                    </span>
                 </div>
             </div>
         );

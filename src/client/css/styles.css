@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 1px solid red;
+    border: 0 solid red;
 }
 
 .header {
@@ -164,37 +164,76 @@ body * {
     flex-shrink: 1;
 }
 
-.infoContent {
-    width: 10em;
+.infoMission, .infoPlayers {
+    width: 15em;
+    background-color: #162856;
+    border: 3px solid #7887AB;
+    border-radius: 3px;
     text-align: left;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 0.5em;
+    margin: 0.5em 0 0.5em auto;
+    position: relative;
+}
+
+.title {
+    vertical-align: top;
+    font-weight: bolder;
+    margin-left: 5em;
+}
+
+.iconMission {
+    text-align: right;
+    padding: 0.25em;
+    margin: 0.1em;
+    position: relative;
+    left: 5.2em;
+    bottom: 0.5em;
+}
+
+.iconPlayers {
+    text-align: right;
+    padding: 0.25em;
+    margin: 0.1em;
+    position: relative;
+    left: 5.2em;
+    bottom: 0.5em;
 }
 
 .directive {
-    text-align: right;
-    font-weight: bolder;
+    text-align: left;
+    font-style: italic;
+}
+
+.missionBlock {
+    margin-top: -0.75em;
 }
 
 .missionImg {
     text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-top: 0.5em;
 }
 
 .players {
     list-style-type: none;
-    margin: 0;
+    margin: -1em 0 0;
     font-size: 0.9em;
-    -webkit-padding-start: 1em;
+    -webkit-padding-start: 0.25em;
 }
 
 .player {
 }
 
 .turn {
+    background-color: #2E4272;
 }
 
 .winner {
+}
 
+.winnerIcon {
+    vertical-align: sub;
 }
 
 .chat {
@@ -268,12 +307,14 @@ body * {
     font-size: 0.95em;
     color: #7887AB;
     font-weight: 900;
+    vertical-align: bottom;
 }
 
 .game {
     order: 1;
     width: 20em;
     height: 20em;
+    text-align: center;
     margin: 0 2em 1em 0;
 }
 
