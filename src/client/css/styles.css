@@ -52,6 +52,10 @@ body * {
     margin-bottom: 0.5em;
 }
 
+.smallB {
+    font-size: 0.85em;
+}
+
 .footer {
     flex-basis: auto;
     flex-grow: 1;
@@ -76,8 +80,6 @@ body * {
 }
 
 .buttons {
-    display: flex;
-    flex-direction: row;
     justify-items: center;
 }
 
@@ -213,8 +215,6 @@ body * {
 
 .game {
     order: 1;
-    height: auto;
-    width: auto;
 }
 
 /* ### SNACKBAR ###*/
