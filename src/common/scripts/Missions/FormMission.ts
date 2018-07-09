@@ -1,3 +1,5 @@
+import {Helper} from "./Helper";
+
 export abstract class FormMission implements IMission {
 
     public check(player: IPlayer, grid: IPlayer[][]): ITile[] {
@@ -46,16 +48,14 @@ export abstract class FormMission implements IMission {
         return [];
     }
 
-    private static equalsPlayer(player1: IPlayer, player2: IPlayer) {
-        if (player1 == null && player2 == null)
-            return true;
-
-        if ((player1 == null && player2 != null) || (player1 != null && player2 == null))
-            return false;
-
-        return player1.name === player2.name
-            && player1.color === player2.color
-            && player1.isObserver === player2.isObserver;
+    /**
+     * @deprecated Use the Missions method instead.
+     * @param {IPlayer} player1
+     * @param {IPlayer} player2
+     * @returns {boolean}
+     */
+    private static equalsPlayer(player1: IPlayer, player2: IPlayer): boolean {
+        return Helper.equalsPlayer(player1, player2);
     }
 
     public abstract getForm(): number[][];

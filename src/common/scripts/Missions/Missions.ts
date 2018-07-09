@@ -1,10 +1,11 @@
-import {ExpandMission} from "./ExpandMission";
-import {FormMissionCircle} from "./FormMissionCircle";
-import {FormMissionL} from "./FormMissionL";
-import {FormMissionLineHorizontal} from "./FormMissionLineHorizontal";
-import {FormMissionLineVertical} from "./FormMissionLineVertical";
-import {FormMissionSquare} from "./FormMissionSquare";
-import {FormMissionT} from "./FormMissionT";
+import {FormMissionCircle} from "./Missions/FormMissionCircle";
+import {FormMissionL} from "./Missions/FormMissionL";
+import {FormMissionLineHorizontal} from "./Missions/FormMissionLineHorizontal";
+import {FormMissionLineVertical} from "./Missions/FormMissionLineVertical";
+import {FormMissionT} from "./Missions/FormMissionT";
+import {Cover15Mission} from "./Missions/Cover15Mission";
+import {ConnectEdges} from "./Missions/ConnectEdges";
+import {ConnectTwoEdgesAnyColor} from "./Missions/ConnectTwoEdgesAnyColor";
 
 export class Missions {
 
@@ -16,8 +17,8 @@ export class Missions {
      */
     public static getMission(missionName: string): IMission {
        switch (missionName) {
-           case "ExpandMission":
-               return new ExpandMission();
+           case "Cover15Mission":
+               return new Cover15Mission();
            case "FormMissionCircle":
                return new FormMissionCircle();
            case "FormMissionL":
@@ -26,13 +27,14 @@ export class Missions {
                return new FormMissionLineHorizontal();
            case "FormMissionLineVertical":
                return new FormMissionLineVertical();
-           case "FormMissionSquare":
-               return new FormMissionSquare();
            case "FormMissionT":
                return new FormMissionT();
+           case "ConnectEdges":
+               return new ConnectEdges();
+           case "ConnectTwoEdgesAnyColor":
+               return new ConnectTwoEdgesAnyColor();
 
        }
        return undefined;
     }
-
 }

@@ -1,4 +1,4 @@
-import {FormMission} from "./FormMission";
+import {FormMission} from "../FormMission";
 
 export class FormMissionCircle extends FormMission {
 

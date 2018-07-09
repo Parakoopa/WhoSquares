@@ -1,18 +1,4 @@
-export class ExpandMission implements IMission {
-
-    private _winPercentage: number = 40;
-
-    public description(): string {
-        return "";
-    }
-
-    public name(): string {
-        return "Capture 40% of the grid!";
-    }
-
-    public imgpath(): string {
-        return "../../../img/mission_40percent.png";
-    }
+export abstract class CoverMission implements IMission {
 
     public check(localPlayer: IPlayer, grid: IPlayer[][]): ITile[] {
         let tileCount: number = 0;
@@ -27,8 +13,16 @@ export class ExpandMission implements IMission {
             }
         }
         const gridSize = grid.length * grid[0].length;
-        if (tileCount * 100.0 / gridSize >= this._winPercentage) return winTiles;
+        if (tileCount * 100.0 / gridSize >= this.getWinPercentage()) return winTiles;
         else return [];
     }
+
+    public abstract description(): string;
+
+    public abstract imgpath(): string;
+
+    public abstract name(): string;
+
+    protected abstract getWinPercentage(): number;
 
 }

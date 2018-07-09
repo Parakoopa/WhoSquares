@@ -36,8 +36,8 @@ export class StatsManager {
                 missionName: player.mission.constructor.name,
                 coverage: 0, // updated while iterating over grid
                 tilesPlaced: 0, // updated while iterating over grid
-                owner: player === room._owner,
-                winner: player === winner
+                owner: player.color === room._owner.color,
+                winner: player.color === winner.color
             });
         });
         // Collect grid stats
@@ -63,7 +63,7 @@ export class StatsManager {
             playerInRoomStatsMap.coverage = playerInRoomStatsMap.tilesPlaced / gridSize;
             player.user.tilesPlaced += playerInRoomStatsMap.tilesPlaced;
             player.user.gamesPlayed += 1;
-            if (player === winner) {
+            if (player.color === winner.color) {
                 player.user.gamesWon += 1;
             }
             UserRepository.instance.save(player.user);
