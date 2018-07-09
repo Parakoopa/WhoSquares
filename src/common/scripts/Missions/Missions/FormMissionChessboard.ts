@@ -11,7 +11,7 @@ export class FormMissionChessboard extends FormMission {
     }
 
     public imgpath(): string {
-        return "../../../img/mission_T.png";
+        return "../../../img/mission_Chessboard.png";
     }
 
     public getForm(): number[][] {
