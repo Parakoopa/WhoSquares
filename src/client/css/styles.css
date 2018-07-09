@@ -264,7 +264,7 @@ body * {
     background-color: #061539;
     border: 3px solid #2E4272;
     border-radius: 3px;
-    height: 19.25em;
+    height: 18.35em;
     width: 15em;
     margin: 0.5em 0.5em 0;
     padding: 0.5em;
@@ -279,7 +279,7 @@ body * {
 }
 
 .messages {
-    height: 20em;
+    height: 19em;
     text-align: left;
     font-size: 0.75em;
 }
@@ -342,7 +342,7 @@ body * {
     width: 20em;
     height: 20em;
     text-align: center;
-    margin: 0 2em 1em 0;
+    margin: -0.45em 2em 1em 0;
 }
 
 .middle {
