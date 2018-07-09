@@ -157,6 +157,16 @@ body * {
     -webkit-padding-start: 1em;
 }
 
+.player {
+}
+
+.turn {
+}
+
+.winner {
+
+}
+
 .chat {
     order: 2;
     flex-grow: 1;
