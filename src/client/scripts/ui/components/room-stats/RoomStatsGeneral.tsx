@@ -13,11 +13,10 @@ export interface IRoomStatsGeneralState {
 
 export class RoomStatsGeneral extends React.Component<IRoomStatsGeneralProps, IRoomStatsGeneralState> {
     public render() {
-        return <table className={"middle"}>
-            <tbody>
-                <tr>
-                    <th colSpan={2}><h4>Overall statistics</h4></th>
-                </tr>
+        return <div>
+            <h3>Overall</h3>
+            <table className={"statsTable"}>
+                <tbody>
                 <tr>
                     <th>Tiles Placed:</th>
                     <td>{this.props.generalStats.tilesPlaced}</td>
@@ -30,7 +29,8 @@ export class RoomStatsGeneral extends React.Component<IRoomStatsGeneralProps, IR
                     <th>Number of Turns:</th>
                     <td>{this.props.generalStats.numberTurns}</td>
                 </tr>
-            </tbody>
-        </table>;
+                </tbody>
+        </table>
+        </div>;
     }
 }

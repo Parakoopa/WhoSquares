@@ -46,7 +46,7 @@ export class UserStats extends React.Component<IUserStatsProps, IUserStatsState>
         if (this.state.loaded) {
             return <div className="global-stats">
                 <h3>Statistics for {this.state.stats.userName}:</h3>
-                <table>
+                <table className={"statsTable"}>
                     <tbody>
                         <tr>
                             <th>Games Played:</th>

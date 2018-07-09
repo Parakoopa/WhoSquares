@@ -11,26 +11,31 @@ export interface IRoomStatsUsersState {
 export class RoomStatsUsers extends React.Component<IRoomStatsUsersProps, IRoomStatsUsersState> {
     public render() {
         // Put winner on top
-        this.props.playerStats.sort((a, b) => a.winner ? -1 : 0);
+        this.props.playerStats.sort((a, b) =>
+            a.winner ?
+                -1 :
+                b.winner ?
+                    1 :
+                    b.tilesPlaced - a.tilesPlaced
+        );
         const list = [
             <tr key={"head"}>
                 <th>Player</th>
-                <th />{/* Winner icon */}
                 <th colSpan={3}>Mission</th>
-                <th>Tiles Placed</th>
-                <th>Coverage %</th>
+                <th>Tiles&nbsp;Placed</th>
+                <th>Coverage&nbsp;%</th>
             </tr>
         ];
         this.props.playerStats.forEach((stats, i) => {
-            let winnerTile = <td />;
-            if (stats.winner) {
-                winnerTile = <td>Winner!</td>;
-            }
+            const crown = stats.winner ?
+                        <img className={"winnerIcon"} src="../../../../img/icons/Winner_True.png"
+                             width={"20em"} height={"20em"} /> :
+                        <img className={"winnerIcon"} src="../../../../img/icons/Winner_False.png"
+                             width={"20em"} height={"20em"} />;
             const mission = Missions.getMission(stats.missionName);
             list.push(
                <tr key={i} className={stats.winner ? "player-row winner" : "player-row"}>
-                   <td><span color={"#" + stats.base.color.toString(16)}>{stats.base.name}</span></td>
-                   {winnerTile}
+                   <td>{crown}<span color={"#" + stats.base.color.toString(16)}>{stats.base.name}</span></td>
                    <td><img style={{width: "50px"}} src={mission.imgpath()} /></td>
                    <td>{mission.name()}</td>
                    <td>{mission.description()}</td>
@@ -39,10 +44,13 @@ export class RoomStatsUsers extends React.Component<IRoomStatsUsersProps, IRoomS
                </tr>
             );
         });
-        return <table className={"middle"}>
-            <tbody>
+        return <div>
+            <h3>Players</h3>
+            <table className={"statsTable"}>
+                <tbody>
                 {list}
-            </tbody>
-        </table>;
+                </tbody>
+            </table>
+        </div>;
     }
 }
