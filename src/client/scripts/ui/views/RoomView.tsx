@@ -242,10 +242,19 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                             />
                         </div>
                     </div>
-                    <div className={"chat"}>
-                        <label>Chat</label>
-                        <ChatMessages messages={this.state.messages}/>
-                        <ChatInput onSend={this.sendMessage}/>
+                    <div className={"chatContainer"}>
+                        <div className={"chat"}>
+                            <label className={"chatTitle"}>Chat</label>
+                            <img alt="Mission"
+                                 className={"iconChat"}
+                                 src={"../../img/icons/Chat.png"}
+                                 width="30em" height="30em"
+                            />
+                            <div className={"chatBody"}>
+                                <ChatMessages messages={this.state.messages}/>
+                            </div>
+                            <ChatInput onSend={this.sendMessage}/>
+                        </div>
                     </div>
                 </div>
             </div>
