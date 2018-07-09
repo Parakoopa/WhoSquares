@@ -29,44 +29,16 @@ export class App extends React.Component<IAppProps, IAppState> {
     }
 
     public render(): any {
-        const routes = [
-            {
-                path: Routes.APP_DEF,
-                exact: true,
-                component: LoginView
-            },
-            {
-                path: Routes.LOGIN_DEF,
-                component: LoginView
-            },
-            {
-                path: Routes.LOBBY_DEF,
-                component: LobbyView
-            },
-            {
-                path: Routes.GAME_DEF,
-                component: RoomView
-            },
-            {
-                path: Routes.GAME_STATS_DEF,
-                component: RoomStatsView
-            }
-        ];
-
         return <div className={"app"}>
             <div id={"header"}>
                 <Header />
             </div>
             <div id={"body"}>
-                {routes.map((route, index) => (
-                    <Route
-                        key={index}
-                        path={route.path}
-                        exact={route.exact}
-                        component={route.component}
-                    />
-                ))}
-
+                <Route path={Routes.APP_DEF} exact={true} component={LoginView} />
+                <Route path={Routes.LOGIN_DEF} component={LoginView} />
+                <Route path={Routes.LOBBY_DEF} component={LobbyView} />
+                <Route path={Routes.GAME_DEF} component={RoomView} />
+                <Route path={Routes.GAME_STATS_DEF} component={RoomStatsView} />
             </div>
             <div id="snackbar"/>
             <div id={"footer"}>

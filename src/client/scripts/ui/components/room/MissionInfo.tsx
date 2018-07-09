@@ -33,16 +33,17 @@ export class MissionInfo extends React.Component<IMissionInfoProps, IMissionInfo
     public render(): any {
         return (
             <div>
-                <div>
-                    <label>Your Mission: </label>
-                    <label className={"directive"}>{this.getMissionName()}</label>
-                </div>
-                <div>
-                    <label>What to do: </label>
+                <label className={"title"}>Mission</label>
+                <img alt="Mission"
+                     className={"iconMission"}
+                     src={"../../img/icons/Mission.png"}
+                     width="30em" height="30em"
+                />
+                <div className={"missionBlock"}>
                     <label className={"directive"}>{this.getMissionDesc()}</label>
-                </div>
-                <div className={"missionImg"}>
-                    <img src={this.getMissionImgPath()}/>
+                    <div className={"missionImg"}>
+                        <img src={this.getMissionImgPath()}/>
+                    </div>
                 </div>
             </div>
         );

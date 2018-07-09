@@ -52,6 +52,34 @@ body * {
     margin-bottom: 0.5em;
 }
 
+.roomHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.roomHeader * {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.roomName {
+    margin-bottom: 0;
+}
+
+.shareButton {
+    background: unset;
+    border: unset;
+}
+
+.shareButton:hover {
+    background: url("../img/icons/Share_Hover.png");
+}
+
+.button:hover {
+    background-color: #2E4272;
+}
+
 .smallB {
     font-size: 0.85em;
 }
@@ -62,6 +90,7 @@ body * {
     flex-shrink: 5;
     font-size: 0.85em;
     text-align: center;
+    padding-bottom: 0.75em;
 }
 
 .footerB {
@@ -80,6 +109,7 @@ body * {
 }
 
 .buttons {
+    margin-top: 0.5em;
     justify-items: center;
 }
 
@@ -132,48 +162,125 @@ body * {
     order: 0;
     flex-grow: 1;
     flex-shrink: 1;
+    margin-left: 0.5em;
+    padding-right: 1em;
+    width: 16em;
 }
 
-.infoContent {
-    width: 10em;
+.infoMission, .infoPlayers {
+    width: 15em;
+    background-color: #061539;
+    border: 3px solid #2E4272;
+    border-radius: 3px;
     text-align: left;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 0.5em;
+    margin: 0.5em 0 0.5em auto;
+    position: relative;
+}
+
+.title {
+    vertical-align: top;
+    font-weight: bolder;
+    margin-left: 5em;
+}
+
+.chatTitle {
+    vertical-align: top;
+    font-weight: bolder;
+}
+
+.iconMission {
+    text-align: right;
+    padding: 0.25em;
+    margin: 0.1em;
+    position: relative;
+    left: 5.2em;
+    bottom: 0.5em;
+}
+
+.iconPlayers {
+    text-align: right;
+    padding: 0.25em;
+    margin: 0.1em;
+    position: relative;
+    left: 5.2em;
+    bottom: 0.5em;
+}
+
+.iconChat {
+    text-align: right;
+    padding: 0.25em;
+    margin: 0.1em;
+    position: relative;
+    left: 6em;
+    bottom: 0.5em;
 }
 
 .directive {
-    text-align: right;
-    font-weight: bolder;
+    text-align: left;
+    font-style: italic;
+}
+
+.missionBlock {
+    margin-top: -0.75em;
 }
 
 .missionImg {
     text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-top: 0.5em;
 }
 
 .players {
     list-style-type: none;
-    margin: 0;
+    margin: -1em 0 0;
     font-size: 0.9em;
-    -webkit-padding-start: 1em;
+    -webkit-padding-start: 0.25em;
 }
 
-.chat {
+.player {
+}
+
+.turn {
+    background-color: #2E4272;
+}
+
+.winner {
+}
+
+.winnerIcon {
+    vertical-align: sub;
+}
+
+.chatContainer {
     order: 2;
     flex-grow: 1;
     flex-shrink: 1;
+}
+
+.chat {
     text-align: center;
-    height: 16.6em;
-    width: 10em;
+    background-color: #061539;
+    border: 3px solid #2E4272;
+    border-radius: 3px;
+    height: 18.35em;
+    width: 15em;
+    margin: 0.5em 0.5em 0;
+    padding: 0.5em;
 }
 
 .chat * {
     word-wrap: break-word;
 }
 
-.messages {
-    height: 100%;
-    text-align: left;
+.chatBody {
     overflow-y: scroll;
+}
+
+.messages {
+    height: 19em;
+    text-align: left;
     font-size: 0.75em;
 }
 
@@ -227,13 +334,15 @@ body * {
     font-size: 0.95em;
     color: #7887AB;
     font-weight: 900;
+    vertical-align: bottom;
 }
 
 .game {
     order: 1;
     width: 20em;
     height: 20em;
-    margin: 0 2em 1em 0;
+    text-align: center;
+    margin: -0.45em 2em 1em 0;
 }
 
 .middle {

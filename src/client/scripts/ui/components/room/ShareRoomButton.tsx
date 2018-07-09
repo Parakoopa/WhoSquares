@@ -7,6 +7,7 @@ export interface IShareRoomButtonProps {
 }
 
 export interface IShareRoomButtonState {
+    imgsource: string;
 }
 
 export class ShareRoomButton extends React.Component<IShareRoomButtonProps, IShareRoomButtonState> {
@@ -17,7 +18,7 @@ export class ShareRoomButton extends React.Component<IShareRoomButtonProps, ISha
         this.shareRoom = this.shareRoom.bind(this);
     }
 
-    public shareRoom( event: any ) {
+    public shareRoom(event: any) {
         event.preventDefault();
 
         const el = document.createElement("textarea");
@@ -27,10 +28,17 @@ export class ShareRoomButton extends React.Component<IShareRoomButtonProps, ISha
         document.execCommand("copy");
         document.body.removeChild(el);
 
-        App.showTextOnSnackbar( "Room-URL copied to clipboard!" );
+        App.showTextOnSnackbar("Room-URL copied to clipboard!");
     }
-    
+
     public render(): any {
-        return <div><button className={"button"} onClick={this.shareRoom}>Share Room</button></div>;
+        return <div>
+            <button className={"shareButton"} onClick={this.shareRoom}>
+                <img alt="Share Room"
+                     src="../../../../img/icons/Share.png"
+                     width="15em" height="15em"
+                />
+            </button>
+        </div>;
     }
 }

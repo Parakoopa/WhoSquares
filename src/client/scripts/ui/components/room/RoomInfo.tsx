@@ -10,6 +10,8 @@ export interface IRoomInfoState {
 export class RoomInfo extends React.Component<IRoomInfoProps, IRoomInfoState> {
 
     public render(): any {
-        return <div><h3>{this.props.roomid}</h3></div>;
+        return <div>
+            <h3 className={"roomName"}>{this.props.roomid}</h3>
+        </div>;
     }
 }
