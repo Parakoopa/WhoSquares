@@ -5,13 +5,16 @@ export class ColorDistributer {
            parseInt("FF3333", 16), // red
            parseInt("FF9933", 16), // orange
            parseInt("FFFF33", 16), // yellow
-           parseInt("00FF00", 16), // green
+           parseInt("11FF00", 16), // green
            parseInt("33FFFF", 16), // lightblue
            parseInt("9933FF", 16), // darkblue
            parseInt("FF33FF", 16), // purple
            parseInt("FF3399", 16), // pink
-           parseInt("FF33FF", 16), // grey?
-            // Todo grey, black, white
+           parseInt("FF675B", 16), // beige/orange
+           parseInt("576EFF", 16), // blue
+           parseInt("FFFFFF", 16), // white
+           parseInt("F2FF8E", 16), // very bright green
+           parseInt("FFA6C5", 16), // very bright pink
         ];
 
     /**
