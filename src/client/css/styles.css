@@ -274,12 +274,9 @@ body * {
     word-wrap: break-word;
 }
 
-.chatBody {
-    overflow-y: scroll;
-}
-
 .messages {
     height: 19em;
+    overflow-y: scroll;
     text-align: left;
     font-size: 0.75em;
 }
