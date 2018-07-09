@@ -29,12 +29,11 @@ export class TurnInfo extends React.Component<ITurnInfoProps, ITurnInfoState> {
     public render(): any {
         const styleTurnInfo = {
             color: this.getActivePlayerColorHtml(),
-            fontWeight: 900,
         };
 
         return <div>
-            <label>Turn Info: </label>
-            <label style={styleTurnInfo}>
+            <label>Next: </label>
+            <label className={"directive"} style={styleTurnInfo}>
                 {this.getActivePlayerName()}
             </label>
         </div>;
