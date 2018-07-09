@@ -23,6 +23,10 @@ export class ResponseEmitter {
      * @param {IEvent[]} events
      */
     public emitEvents(events: IEvent[]): void {
+        if (events === null || events === undefined) {
+            console.warn("Events was null");
+            return;
+        }
         for (let i = 0; i < events.length; i++) {
             this.emitEvent(events[i]);
         }
