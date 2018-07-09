@@ -231,13 +231,14 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                     <Game/>
                     <div className={"info"}>
                         <div className={"infoContent"}>
-                            <WinnerInfo winner={this.state.winner}/>
-                            <PlayerList players={this.state.players}/>
-                            <TurnInfo player={this.state.activePlayer}/>
-                            <MissionInfo mission={this.state.mission}/>
                             <div className={"smallB"}>
                                 <ShareRoomButton roomurl={this.getRoomUrl()}/>
                             </div>
+                            <MissionInfo mission={this.state.mission}/>
+                            <br/>
+                            <TurnInfo player={this.state.activePlayer}/>
+                            <WinnerInfo winner={this.state.winner}/>
+                            <PlayerList players={this.state.players}/>
                         </div>
                     </div>
                     <div className={"chat"}>

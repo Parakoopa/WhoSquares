@@ -141,6 +141,13 @@ body * {
     margin-right: auto;
 }
 
+.players {
+    list-style-type: none;
+    margin: 0;
+    font-size: 0.9em;
+    -webkit-padding-start: 1em;
+}
+
 .chat {
     order: 2;
     flex-grow: 1;
@@ -215,6 +222,9 @@ body * {
 
 .game {
     order: 1;
+    width: 20em;
+    height: 20em;
+    margin: 0 2em 1em 0;
 }
 
 /* ### SNACKBAR ###*/

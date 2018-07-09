@@ -33,7 +33,7 @@ export class TurnInfo extends React.Component<ITurnInfoProps, ITurnInfoState> {
         };
 
         return <div>
-            <label>Turn Info: </label>
+            <label>Next: </label>
             <label style={styleTurnInfo}>
                 {this.getActivePlayerName()}
             </label>
