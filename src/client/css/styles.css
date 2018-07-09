@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 0 solid red;
+    border: 1px solid red;
 }
 
 .header {
@@ -52,6 +52,34 @@ body * {
     margin-bottom: 0.5em;
 }
 
+.roomHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.roomHeader * {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.roomName {
+    margin-bottom: 0;
+}
+
+.shareButton {
+    background: unset;
+    border: unset;
+}
+
+.shareButton:hover {
+    background: url("../img/icons/Share_Hover.png");
+}
+
+.button:hover {
+    background-color: #2E4272;
+}
+
 .smallB {
     font-size: 0.85em;
 }
@@ -62,6 +90,7 @@ body * {
     flex-shrink: 5;
     font-size: 0.85em;
     text-align: center;
+    padding-bottom: 0.75em;
 }
 
 .footerB {
@@ -80,6 +109,7 @@ body * {
 }
 
 .buttons {
+    margin-top: 0.5em;
     justify-items: center;
 }
 
@@ -174,6 +204,7 @@ body * {
     text-align: center;
     height: 16.6em;
     width: 10em;
+    margin-bottom: 3.5em;
 }
 
 .chat * {
