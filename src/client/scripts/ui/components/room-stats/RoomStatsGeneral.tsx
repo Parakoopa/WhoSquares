@@ -13,7 +13,7 @@ export interface IRoomStatsGeneralState {
 
 export class RoomStatsGeneral extends React.Component<IRoomStatsGeneralProps, IRoomStatsGeneralState> {
     public render() {
-        return <table>
+        return <table className={"middle"}>
             <tbody>
                 <tr>
                     <th colSpan={2}><h4>Overall statistics</h4></th>

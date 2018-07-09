@@ -17,6 +17,9 @@ export class WinnerInfo extends React.Component<IWinnerInfoProps, IWinnerInfoSta
     }
 
     public render(): any {
-        return <div><label>Winner: {this.getWinnerName()}</label></div>;
+        return <div>
+            <label>Winner: </label>
+            <label className={"directive"}>{this.getWinnerName()}</label>
+        </div>;
     }
 }

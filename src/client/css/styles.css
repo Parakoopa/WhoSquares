@@ -9,7 +9,7 @@ html, body {
 }
 
 body * {
-    border: 1px solid red;
+    border: 0 solid red;
 }
 
 .header {
@@ -141,6 +141,15 @@ body * {
     margin-right: auto;
 }
 
+.directive {
+    text-align: right;
+    font-weight: bolder;
+}
+
+.missionImg {
+    text-align: center;
+}
+
 .players {
     list-style-type: none;
     margin: 0;
@@ -225,6 +234,11 @@ body * {
     width: 20em;
     height: 20em;
     margin: 0 2em 1em 0;
+}
+
+.middle {
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* ### SNACKBAR ###*/

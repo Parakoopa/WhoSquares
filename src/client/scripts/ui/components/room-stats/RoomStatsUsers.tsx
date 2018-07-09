@@ -39,7 +39,7 @@ export class RoomStatsUsers extends React.Component<IRoomStatsUsersProps, IRoomS
                </tr>
             );
         });
-        return <table>
+        return <table className={"middle"}>
             <tbody>
                 {list}
             </tbody>

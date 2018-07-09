@@ -76,7 +76,7 @@ export class RoomStatsReplay extends React.Component<IRoomStatsReplayProps, IRoo
         }));
         return <div className={"replay-room"}>
             <h3>Replay</h3>
-            <table>
+            <table className={"middle"}>
                 <tbody>
                     {rows}
                 </tbody>

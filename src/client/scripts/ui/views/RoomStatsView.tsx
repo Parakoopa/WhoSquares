@@ -57,9 +57,11 @@ export class RoomStatsView extends React.Component<IRoomStatsViewProps, IRoomSta
                     <RoomInfo roomid={this.props.match.params.roomid}/>
                     <h2>Statistics</h2>
                 </div>
-                <RoomStatsUsers playerStats={this.state.stats.stats.players}/>
-                <RoomStatsGeneral generalStats={this.state.stats.stats.general}/>
-                <RoomStatsReplay stats={this.state.stats.stats} replay={this.state.stats.replay}/>
+                <div className={"content"}>
+                    <RoomStatsUsers playerStats={this.state.stats.stats.players}/>
+                    <RoomStatsGeneral generalStats={this.state.stats.stats.general}/>
+                    <RoomStatsReplay stats={this.state.stats.stats} replay={this.state.stats.replay}/>
+                </div>
             </div>;
         } else {
             return <div>
