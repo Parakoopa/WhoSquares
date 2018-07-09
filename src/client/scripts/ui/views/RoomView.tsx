@@ -39,7 +39,6 @@ export interface IRoomViewState {
 }
 
 export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> implements IRoomUI {
-
     constructor(props: IRoomViewProps) {
         super(props);
 
@@ -109,6 +108,10 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
             this.setState({room_backend, gameStarted: room_backend.hasGrid(), isOwner: localPlayer.isRoomOwner});
         });
+
+        Connection._socket.on("disconnect", this.onDisconnect);
+        Connection._socket.on("reconnecting", this.onDisconnect);
+
         Connection._socket.once("nameNotRegistered", () => {
             Connection.setKey("");
             Connection.setUsername("");
@@ -117,6 +120,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         Connection._socket.once("gameEnded", () => {
             window.location.href = Routes.linkToGameStatsHREF(this.props.match.params.roomid);
         });
+    }
+
+    public componentWillUnmount() {
+        Connection._socket.removeEventListener("disconnect", this.onDisconnect);
+        Connection._socket.removeEventListener("reconnecting", this.onDisconnect);
     }
 
     public getUsername() {
@@ -210,6 +218,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public componentDidMount() {
         LogoutButton.logOutFunction = this.logout;
+    }
+
+    public onDisconnect() {
+        // TODO: Better reconnect
+        window.location.reload();
     }
 
     public render() {

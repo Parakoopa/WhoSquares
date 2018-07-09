@@ -95,6 +95,7 @@ export class PlayerList {
                 return player;
             }
         }
+        return null;
     }
 
     /**
