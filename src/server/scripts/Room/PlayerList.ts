@@ -85,7 +85,15 @@ export class PlayerList {
 
     public getPlayerForSocket(socket: Socket): Player {
         for (const player of this._players) {
-            if (socket === player.socket) return player;
+            if (socket.client.id === player.socket.client.id) {
+                // TODO: Nasty bug! Sometimes the socket object changes but no actual disconnection happens?
+                // This can lead to more issues, hopefully this fixes most of them.
+                if (socket !== player.socket) {
+                    // Update new socket reference.
+                    player.socket = socket;
+                }
+                return player;
+            }
         }
     }
 
