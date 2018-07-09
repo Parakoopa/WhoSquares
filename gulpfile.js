@@ -20,7 +20,6 @@ gulp.task("js", function () {
     })
         .require('react')
         .require('react-dom')
-        .require('react-dom')
         .require('react-router')
         .require('react-router-dom')
         .plugin(tsify, {project: "./src/client/tsconfig.json"})
