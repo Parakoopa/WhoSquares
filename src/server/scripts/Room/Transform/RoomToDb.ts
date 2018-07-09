@@ -1,6 +1,5 @@
-import {IRoomMongoSchema, IRoomMongoSchemaPlayer} from "../RoomRepository";
 import {Room} from "../Room";
-import {ObjectID} from "bson";
+import {IRoomMongoSchema, IRoomMongoSchemaPlayer} from "../RoomRepository";
 
 /**
  * Transforms a {Room} to a {IRoomMongoSchema}
@@ -25,14 +24,17 @@ export class RoomToDb {
             gridSize: {
                 x: this.room._serverGrid.sizeX,
                 y: this.room._serverGrid.sizeY
-            }
+            },
+            replay: this.room.replay,
+            stats: this.room.stats
         };
     }
 
     private getPlayers(): IRoomMongoSchemaPlayer[] {
         const list: IRoomMongoSchemaPlayer[] = [];
         let index = 0;
-        this.room._players.forEach((player) => {
+        this.room.players.players.forEach((player) => {
+            if (player.isObserver) return; // Don't add observers
             list.push({
                 index: index++,
                 key: player.user.key,

@@ -15,6 +15,7 @@ interface IJoinedResponse extends IResponse {
     roomOwner: IPlayer;
     otherPlayers: IPlayer[];
     gridInfo: IPlayer[][];
+    mission: string; // Name of the current mission of the player. Only set if the game has already begun and the player rejoined.
 }
 
 interface IOtherJoinedResponse extends IResponse {
@@ -92,4 +93,37 @@ interface INotInRoomResponse extends IResponse {
 
 interface IRefreshResponse extends IResponse {
 }
-// ToDo add UpdateRoomList or JoinLobby Response
+
+interface IRoomListResponse extends IResponse {
+    rooms: Array<{
+        name: string;
+        key: string;
+        ended: boolean;
+    }>;
+}
+
+interface IRoomStatsResponse extends IResponse {
+    roomKey: string;
+    roomName: string;
+    gridSize: {
+        x: number;
+        y: number;
+    };
+    stats: IRoomStats;
+    replay: IReplayLogEntry[];
+}
+
+interface IUserStatsResponse extends IResponse {
+    userName: string;
+    tilesPlaced: number;
+    gamesPlayed: {
+        total: number;
+        won: number;
+    };
+}
+
+interface IGlobalStatsResponse extends IResponse {
+    tilesPlaced: number;
+    gamesPlayed: number;
+    bestUserName: string;
+}

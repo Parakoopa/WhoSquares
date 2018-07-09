@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {Room} from "../../components/Room";
+import {Room} from "../../../components/Room";
 
 // ToDo rename into messageListener or smth like that
 export class RoomUiListener {

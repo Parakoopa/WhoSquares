@@ -96,6 +96,10 @@ body * {
     padding: 0.25em 0.75em 0.25em 0.75em;
     text-align: center;
 }
+.button.gray {
+    background-color: #545454;
+    border: 3px solid #ababab;
+}
 
 .room {
     width: 100%;

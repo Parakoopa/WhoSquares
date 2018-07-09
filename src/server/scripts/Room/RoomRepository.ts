@@ -24,6 +24,8 @@ export interface IRoomMongoSchema extends IDatabaseModel {
         y: number;
     };
     grid: string[][]; // player key or null
+    replay: IReplayLogEntry[]; // Replay logbook. Used to record all game activities
+    stats: IRoomStats; // Calculated stats, based on the end of the game
 }
 
 export interface IRoomMongoSchemaPlayer {

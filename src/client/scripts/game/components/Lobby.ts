@@ -1,9 +1,7 @@
 import {ILobbyUI} from "../../ui/interfaces/ILobbyUI";
-import {IRoomUI} from "../../ui/interfaces/IRoomUI";
-import {RequestEmitter} from "../Emitter/RequestEmitter";
-import {RequestManager} from "../Emitter/RequestManager";
-import {LocalPlayer} from "../LocalPlayer";
-import {ResponseManager} from "../ResponseManager/ResponseManager";
+import {ResponseManager} from "../communication/receiver/ResponseManager";
+import {RequestEmitter} from "../communication/requester/emitter/RequestEmitter";
+import {RequestManager} from "../communication/requester/RequestManager";
 import {Room} from "./Room";
 
 export class Lobby {
@@ -24,13 +22,7 @@ export class Lobby {
         this._ui.updateGameInfo(info);
     }
 
-    public updateRoomList(rooms: string[]): void {
-        /* Deprecated?
-        let roomList = "Rooms: \n";
-        for (const room of rooms) {
-            roomList += room + "\n";
-        }
-        */
+    public updateRoomList(rooms: IRoomListResponse): void {
         this._ui.updateRoomList(rooms);
     }
 

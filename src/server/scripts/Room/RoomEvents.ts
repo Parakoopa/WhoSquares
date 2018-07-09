@@ -17,11 +17,13 @@ export class RoomEvents {
      * @param {IPlayer[]} otherPlayers
      * @param {IPlayer[][]} gridInfo
      * @param roomOwner
+     * @param mission
      * @returns {IEvent}
      */
     public joinedEvent(
         client: Socket, roomName: string, roomKey: string,
-        color: number, otherPlayers: IPlayer[], gridInfo: IPlayer[][], roomOwner: IPlayer
+        color: number, otherPlayers: IPlayer[], gridInfo: IPlayer[][], roomOwner: IPlayer,
+        mission: string
     ): IEvent {
         if (gridInfo) {
             // Convert all Players in the Grid into real IPlayers.
@@ -36,7 +38,8 @@ export class RoomEvents {
             color,
             otherPlayers: otherPlayers.map((op) => RoomEvents.stripPlayer(op)),
             gridInfo,
-            roomOwner: RoomEvents.stripPlayer(roomOwner)
+            roomOwner: RoomEvents.stripPlayer(roomOwner),
+            mission
         };
         return{clients: [client], name: "joinedRoom", response};
     }
@@ -209,7 +212,7 @@ export class RoomEvents {
      * @param {IPlayer} player
      * @returns {IPlayer}
      */
-    private static stripPlayer(player: IPlayer): IPlayer {
+    public static stripPlayer(player: IPlayer): IPlayer {
         return {name: player.name, color: player.color, isObserver: player.isObserver};
     }
 }

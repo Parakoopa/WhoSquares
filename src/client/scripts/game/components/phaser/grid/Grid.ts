@@ -1,6 +1,6 @@
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
-import {RequestEmitter} from "../../Emitter/RequestEmitter";
+import {RequestEmitter} from "../../../communication/requester/emitter/RequestEmitter";
 import {PhaserGame} from "../PhaserGame";
 
 export class Grid {
@@ -111,6 +111,7 @@ export class Grid {
                 if (player.color === sprite.data.color) {
                     sprite.tint = 0x555555; // Initially Grey
                     sprite.data.color = 0x555555;
+                    sprite.loadTexture("gridTile");
                 }
             }
         }

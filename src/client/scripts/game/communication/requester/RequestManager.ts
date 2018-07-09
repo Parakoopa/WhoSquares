@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {RequestEmitter} from "./RequestEmitter";
+import {RequestEmitter} from "./emitter/RequestEmitter";
 
 export class RequestManager {
 

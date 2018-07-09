@@ -1,17 +1,15 @@
-import {IRoomUI} from "../../ui/interfaces/IRoomUI";
-import {RequestEmitter} from "../Emitter/RequestEmitter";
-import {RequestManager} from "../Emitter/RequestManager";
-import {LocalPlayer} from "../LocalPlayer";
-import {OtherPlayer} from "../OtherPlayer";
-import {ResponseManager} from "../ResponseManager/ResponseManager";
-import {Grid} from "./grid/Grid";
-import {GridFactory} from "./grid/GridFactory";
-import {Utility} from "../Utility";
 import {Missions} from "../../../../common/scripts/Missions/Missions";
+import {IRoomUI} from "../../ui/interfaces/IRoomUI";
+import {ResponseManager} from "../communication/receiver/ResponseManager";
+import {RequestEmitter} from "../communication/requester/emitter/RequestEmitter";
+import {RequestManager} from "../communication/requester/RequestManager";
+import {LocalPlayer} from "../entity/LocalPlayer/LocalPlayer";
+import {LocalPlayerManager} from "../entity/LocalPlayer/LocalPlayerManager";
+import {Grid} from "./phaser/grid/Grid";
+import {GridFactory} from "./phaser/grid/GridFactory";
 
 export class Room {
 
-    private _otherPlayers: OtherPlayer[];
     private readonly _requestEmitter: RequestEmitter;
     private _grid: Grid;
 
@@ -21,19 +19,18 @@ export class Room {
      * @param _key
      * @param _name
      * @param _localPlayer
-     * @param {IPlayer[]} otherPlayers
+     * @param _otherPlayers
      * @param _ui
      * @param gridInfo
      */
     constructor(private _key: string,
                 private _name: string,
                 private _localPlayer: LocalPlayer,
-                otherPlayers: IPlayer[],
+                private _otherPlayers: IPlayer[],
                 private _ui: IRoomUI,
                 gridInfo: IPlayer[][] = null
     ) {
         _localPlayer.room = this;
-        this._otherPlayers = this.toOtherPlayers(otherPlayers);
         this._ui.updatePlayerList(this._otherPlayers);
         this._requestEmitter = RequestManager.requestEmitter;
         ResponseManager.createRoomUIListener(this);
@@ -54,9 +51,9 @@ export class Room {
 
     /**
      *
-     * @returns {OtherPlayer[]}
+     * @returns {IPlayer[]}
      */
-    public get otherPlayers(): OtherPlayer[] {
+    public get otherPlayers(): IPlayer[] {
         return this._otherPlayers;
     }
 
@@ -108,24 +105,22 @@ export class Room {
      */
     public otherLeftRoom(player: IPlayer, roomOwner: IPlayer): void {
         // set whether localPlayer is new room owner
-        this._localPlayer.isRoomOwner = Utility.equalsIPlayer(this._localPlayer.player, roomOwner);
+        this._localPlayer.isRoomOwner = LocalPlayerManager.equalsIPlayer(this._localPlayer.player, roomOwner);
         this._localPlayer.isRoomOwner = roomOwner === this._localPlayer.player;
-        const otherPlayer = this.getOtherPlayer(player);
-        this.removePlayer(otherPlayer);
-        this._grid.removePlayer(player);
+        this.removePlayer(player);
+        if (this._grid) this._grid.removePlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
         // this._ui.updateGameInfo(player.name + "left");
     }
 
     /**
      * Create new Otherplayer and tell room to add it
-     * @param {IPlayer} otherPlayer
+     * @param player
      */
-    public otherJoinedRoom(otherPlayer: IPlayer): void {
-        const player: OtherPlayer = new OtherPlayer(otherPlayer);
+    public otherJoinedRoom(player: IPlayer): void {
         this.addPlayer(player);
         this._ui.updatePlayerList(this._otherPlayers);
-        this._ui.updateGameInfo(otherPlayer.name + "joined");
+        this._ui.updateGameInfo(player.name + "joined");
     }
 
     /**
@@ -137,67 +132,30 @@ export class Room {
     }
 
     /**
-     * Try to get OtherPlayer of this room by its name
-     * @param {string} playerName
-     * @returns {OtherPlayer}
+     *
+     * @param {IPlayer} player
      */
-    private playerByName(playerName: string): OtherPlayer {
-        for (const player of this._otherPlayers) {
-            if (player.name === playerName) return player;
-        }
-        return null;
-    }
-
-    /**
-     * Add OtherPlayer to this room if not contained yet
-     * ToDo might have to be adjusted dis/reconnect Responses are added
-     * @param {OtherPlayer} player
-     */
-    private addPlayer(player: OtherPlayer): void {
+    private addPlayer(player: IPlayer): void {
         if (this._otherPlayers.includes(player)) return;
         this._otherPlayers.push(player);
         this._ui.updatePlayerList(this._otherPlayers);
     }
 
     /**
-     * Remove OtherPlayer from this room if it exists
-     * @param {OtherPlayer} player
+     *
+     * @param {IPlayer} player
      */
-    private removePlayer(player: OtherPlayer): void {
-        const index: number = this._otherPlayers.indexOf(player);
+    private removePlayer(player: IPlayer): void {
+        const index: number = this.getPlayerByIndex(player);
         if (index > -1) this._otherPlayers.splice(index, 1);
         this._ui.updatePlayerList(this._otherPlayers);
     }
 
-    private getOtherPlayer(player: IPlayer): OtherPlayer {
-        for (const otherPlayer of this._otherPlayers) {
-            if (Utility.equalsIPlayer(otherPlayer.player, player)) return otherPlayer;
+    private getPlayerByIndex(otherPlayer: IPlayer): number {
+        for (let i = 0; i < this.otherPlayers.length; i++) {
+            if (LocalPlayerManager.equalsIPlayer(this._otherPlayers[i], otherPlayer)) return i;
         }
-    }
-
-    /**
-     * Convert IPlayers to OtherPlayers
-     * @param {IPlayer[]} players
-     * @returns {OtherPlayer[]}
-     */
-    private toOtherPlayers(players: IPlayer[]): OtherPlayer[] {
-        const otherPlayers = []; // Reset on Join Room
-        for (const player of players) {
-            otherPlayers.push(new OtherPlayer(player));
-        }
-        return otherPlayers;
-    }
-
-    /**
-     * Deprecated?
-     * @param {IPlayer[]} players
-     */
-    private addPlayers(players: IPlayer[]): void {
-        this._otherPlayers = []; // Reset on Join Room
-        for (const player of players) {
-            this._otherPlayers.push(new OtherPlayer(player));
-            this._ui.updatePlayerList(this._otherPlayers);
-        }
+        return -1;
     }
 
     /**
@@ -245,5 +203,4 @@ export class Room {
     public updateGameInfo(info: string): void {
         this._ui.updateGameInfo(info);
     }
-
 }

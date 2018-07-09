@@ -1,8 +1,8 @@
 import {Socket} from "socket.io";
 import SocketIO = require("socket.io");
-import {IEvent} from "../Event";
-import {SessionManager} from "./SessionManager";
 import {ResponseEmitter} from "./ResponseEmitter";
+import {SessionManager} from "./SessionManager";
+import {StatsManager} from "../Stats/StatsManager";
 
 export class RequestManager extends ResponseEmitter {
 
@@ -44,6 +44,15 @@ export class RequestManager extends ResponseEmitter {
             socket.on("roomMessage", (req: IRoomMessageRequest) => {
                 this.emitEvents(this._sessionManager.roomMessage(socket, req));
             });
+            socket.on("roomStats", (req: IRoomStatsRequest) => {
+                this.emitEvents(this._sessionManager.sendRoomStats(socket, req));
+            });
+            socket.on("userStats", (req: IUserStatsRequest) => {
+                this.emitEvents(this._sessionManager.sendUserStats(socket, req));
+            });
+            socket.on("globalStats", (async (req: IGlobalStatsRequest) => {
+                this.emitEvents(await this._sessionManager.sendGlobalStats(socket, req));
+            }));
         });
 
     }

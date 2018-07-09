@@ -1,15 +1,17 @@
+import {ObjectID} from "bson";
+import {Socket} from "socket.io";
 import {IEvent} from "../Event";
+import {IDatabaseModel} from "../IDatabaseModel";
+import {User} from "../User/User";
 import {ColorDistributer} from "./Game/ColorDistributer";
 import {MissionDistributer} from "./Game/MissionDistributer";
 import {ServerGrid} from "./Game/ServerGrid";
 import {TurnManager} from "./Game/TurnManager";
-import {RoomEvents} from "./RoomEvents";
 import {Player} from "./Player";
-import {Socket} from "socket.io";
-import {IDatabaseModel} from "../IDatabaseModel";
-import {ObjectID} from "bson";
-import {User} from "../User/User";
+import {PlayerList} from "./PlayerList";
+import {RoomEvents} from "./RoomEvents";
 import {RoomRepository} from "./RoomRepository";
+import {StatsManager} from "../Stats/StatsManager";
 
 /**
  * A Room hosts a game for clients
@@ -25,7 +27,6 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     /* package-private: **/
     public _owner: Player;
     /* package-private: **/
-    public _players: Player[];
     // A room is running if a server grid exists
     /* package-private: **/
     public _serverGrid: ServerGrid;
@@ -37,14 +38,20 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     public _gameEnded: boolean;
     private static _minGridSize: number = 3;
     private static _maxGridSize: number = 10;
+    private _players: PlayerList;
+    public replay: IReplayLogEntry[];
+    /* Only to be touched by the StatsManager */
+    public stats: IRoomStats = null;
+    private _turnCounter: number = 0;
 
-    constructor(private _name: string, private _key: string, private _maxSize: number) {
+    constructor(private _name: string, private _key: string, maxSize: number) {
         super();
-        this._players = [];
+        this._players = new PlayerList(maxSize);
        // this._clientMap = new Map<Client, LocalPlayer>();
         this._colorDistr = new ColorDistributer();
         this._missionDistr = new MissionDistributer();
         this._turnManager = new TurnManager();
+        this.replay = [];
     }
 
     /**
@@ -63,32 +70,8 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         return this._key;
     }
 
-    /**
-     * Transform LocalPlayers into IPlayer
-     * to avoid sending secret-keys
-     * @returns {IPlayer[]}
-     */
-    public get players(): IPlayer[] {
-        const players: IPlayer[] = [];
-        for (const player of this._players) {
-            players.push(player);
-        }
-        return players;
-    }
-
-    /**
-     * Return all players of a room except the given one
-     * @param {Player} player
-     * @returns {Player[]}
-     */
-    public getPlayersExcept(player: IPlayer): Player[] {
-        const players: Player[] = [];
-        for (const needle of  this._players) {
-            if (needle !== player) {
-                players.push(needle);
-            }
-        }
-        return players;
+    public get players(): PlayerList {
+        return this._players;
     }
 
     /**
@@ -96,7 +79,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @returns {number}
      */
     public get maxSize(): number {
-        return this._maxSize;
+        return this._players.maxSize;
     }
 
     /**
@@ -124,7 +107,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * Tells room to create a game
      */
     public startGame(client: Socket, sizeX: number, sizeY: number): IEvent[] {
-        const player = this.getPlayerForSocket(client);
+        const player = this._players.getPlayerForSocket(client);
         if (this._owner !== player) return [this.notOwnerEvent(client, this.name)];
 
         const sizes = Room.adjustGameSize(sizeX, sizeY);
@@ -159,17 +142,19 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      */
     public AddClient(socket: Socket, user: User): IEvent[] {
         let player: Player;
-        if (this._serverGrid) {
+        if (this.hasStarted()) {
             player = this.createObserver(socket, user);
+            // If started, include this in the replay log
+            this.replay.push({player: RoomEvents.stripPlayer(player), type: "joined"} as ILogJoined);
         } else {
             player = this.createPlayer(socket, user);
         }
         this._players.push(player);
         if (!this._owner) this._owner = player;
 
-        const otherPlayers = this.getPlayersExcept(player);
+        const otherPlayers = this._players.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner);
+            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner, null);
         const otherSockets =  otherPlayers.map((otherPlayer) => otherPlayer.socket);
         const otherJoinedEvent: IEvent = this.otherJoinedEvent(otherSockets, this.name, player);
         return [joinedEvent, otherJoinedEvent];
@@ -185,11 +170,19 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      */
     public reconnectClient(socket: Socket, player: Player): IEvent[] {
         player.socket = socket;
-        const otherPlayers = this.getPlayersExcept(player);
+        const otherPlayers = this._players.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
-            socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner);
+            socket,
+            this._name,
+            this._key,
+            player.color,
+            otherPlayers,
+            this.gridInfo,
+            this._owner,
+            this.hasStarted() && !player.isObserver ? player.mission.constructor.name : null // Resend mission, but only if game has started
+        );
         if (this._serverGrid == null) return [joinedEvent]; // No Grid (running game) => no TurnEvents
-        const informTurnEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
+        const informTurnEvent = this.informTurnEvent(this._players.getAllSockets(), this._turnManager.curPlayer());
         return [joinedEvent, informTurnEvent];
     }
 
@@ -199,7 +192,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @param user
      */
     private createObserver(socket: Socket, user: User): Player {
-        const color = this._colorDistr.getFreeColor(this._players);
+        const color = this._colorDistr.getFreeColor(this._players.players);
         return new Player(user, socket, color, true);
     }
 
@@ -210,7 +203,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @param user
      */
     private createPlayer(socket: Socket, user: User): Player {
-        const color = this._colorDistr.getFreeColor(this._players);
+        const color = this._colorDistr.getFreeColor(this._players.players);
         const player: Player = new Player(user, socket, color, true);
         player.mission = this._missionDistr.getMission();
         return player;
@@ -222,70 +215,46 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @constructor
      */
     public removeClient(client: Socket): IEvent[]  {
-        const player = this.getPlayerForSocket(client);
+        const player = this._players.getPlayerForSocket(client);
         if (!player) return null;
-        if (this._serverGrid) this._serverGrid.removePlayer(player);
+        if (this.hasStarted()) {
+            this._serverGrid.removePlayer(player);
+            // If started, include this in the replay
+            this.replay.push({player: RoomEvents.stripPlayer(player), type: "left"} as ILogLeft);
+        }
         // if this players turn, remove it
         if (this._turnManager.curPlayer() === player) {
             this._turnManager.setNextPlayer();
             this._turnManager.removePlayer(player);
         }
         // remove client from room
-        const index = this._players.indexOf(player);
-        if (index > -1)this._players.splice(index, 1);
+        this._players.remove(player);
         if (this._owner === player) this.assignNewOwner();
 
         if (!player) return []; // Player was not in room?
 
         const leftEvent: IEvent = this.leftEvent(client, this._name);
-        const otherLeftEvent: IEvent = this.otherLeftEvent(this.getPlayerSocketsExcept(client), this.name, player, this._owner);
+        const otherLeftEvent: IEvent = this.otherLeftEvent(this._players.getPlayerSocketsExcept(client), this.name, player, this._owner);
         if (!this._serverGrid || this.isEmpty()) return [leftEvent, otherLeftEvent];
-        const turnInfoEvent: IEvent = this.informTurnEvent(this.getPlayerSocketsExcept(client), this._turnManager.curPlayer());
+        const turnInfoEvent: IEvent = this.informTurnEvent(this._players.getPlayerSocketsExcept(client), this._turnManager.curPlayer());
         return [leftEvent, otherLeftEvent, turnInfoEvent];
     }
 
     /**
-     * Check if room is empty
+     * Check if room is empty (has no none-observers in it)
      * @returns {boolean}
      */
     public isEmpty(): boolean {
-        return this.size() === 0;
+        return this._players.isEmpty;
     }
 
     /**
      * Assign new room owner if available (chronologically)
      * Room already gets deleted if emptyin lobby //Todo move delete room (this) from lobby to here?
      */
-    private assignNewOwner() {
-        if (this.size() > 0) {
-            this._owner = this._players[0];
-        }
-    }
-
-    /**
-     * Returns all sockets for players except the given one
-     * @param {Socket} socket
-     * @returns {Socket[]}
-     */
-    public getPlayerSocketsExcept(socket: Socket): Socket[] {
-        const sockets: Socket[] = [];
-        for (const curPlayer of this._players) {
-            if (socket !== curPlayer.socket) sockets.push(curPlayer.socket);
-        }
-        return sockets;
-    }
-
-    public getPlayerByPlayerKey(key: string): Player {
-        for (const player of this._players) {
-            if (key === player.user.key) return player;
-        }
-        return null;
-    }
-
-    public getPlayerForSocket(socket: Socket): Player {
-        for (const player of this._players) {
-            if (socket === player.socket) return player;
-        }
+    private assignNewOwner(): void {
+           const player =  this._players.first;
+           if (player) this._owner = player;
     }
 
     /**
@@ -302,8 +271,8 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         this._gameEnded = false;
         this._serverGrid = new ServerGrid(sizeX, sizeY);
         this.assignMissions();
-        const startEvents: IEvent[] = this.startEvent(this._players, this.name, sizeX, sizeY);
-        const informTurnEvent: IEvent = this.informTurnEvent(this.getAllSockets(), this._turnManager.curPlayer());
+        const startEvents: IEvent[] = this.startEvent(this._players.players, this.name, sizeX, sizeY);
+        const informTurnEvent: IEvent = this.informTurnEvent(this._players.getAllSockets(), this._turnManager.curPlayer());
         startEvents.push(informTurnEvent);
 
         // Save this room to the DB
@@ -313,7 +282,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     }
 
     private assignMissions(): void {
-        for (const player of this._players) {
+        for (const player of this._players.players) {
             player.mission = this._missionDistr.getMission();
         }
     }
@@ -323,7 +292,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * and adds all to turnmanager order
      */
     private observerToPlayer(): void {
-        for (const player of this._players) {
+        for (const player of this._players.players) {
             player.isObserver = false;
             this._turnManager.addPlayer(player);
         }
@@ -341,7 +310,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      */
     public placeTile(client: Socket, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
         if (this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
-        const player: Player = this.getPlayerForSocket(client);
+        const player: Player = this._players.getPlayerForSocket(client);
         if (!player) return [this.invalidPlayerEvent(client, this.name)];
         if (player.isObserver) {
             return [this.observerEvent(client)];
@@ -349,14 +318,19 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         if (player !== this._turnManager.curPlayer()) {
             return [this.notYourTurnEvent(client, this.name)];
         }
-        const sockets = this.getAllSockets();
+        const sockets = this._players.getAllSockets();
         if (this._serverGrid.placeTile(player, y, x)) {
             const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
+            // Add tile to replay
+            this.replay.push({
+                player: RoomEvents.stripPlayer(player),
+                turnNo: ++this._turnCounter,
+                type: "tilePlaced",
+                x, y
+            } as ILogTilePlaced);
             const winTiles = player.mission.check(player, this._serverGrid.gridInfo);
             if (winTiles.length > 0) {
-                console.log("Client won his mission: " + player.color);
-                this._gameEnded = true;
-                return [placedEvent, this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles)];
+                return [placedEvent, this.processGameEnd(sockets, winTiles, player)];
             }
             this._turnManager.setNextPlayer();
             const curPlayer = this._turnManager.curPlayer();
@@ -367,10 +341,33 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         }
     }
 
+    /**
+     * Processes the end of the game
+     * - Sends winner event
+     * - Records winner in replay
+     * - Sets game end flag
+     * - Calculates room, user and global stats based on the outcome of the match.
+     * @param {SocketIO.Socket[]} sockets
+     * @param {ITile[]} winTiles
+     * @param {Player} player
+     * @returns {IEvent}
+     */
+    private processGameEnd(sockets: Socket[], winTiles: ITile[], player: Player): IEvent {
+        console.log("Client won his mission: " + player.color);
+        this._gameEnded = true;
+        // Add winning to replay
+        this.replay.push({player: RoomEvents.stripPlayer(player), type: "winner"} as ILogWinner);
+        // Update all kinds of stats information
+        StatsManager.processRoomEnd(this, player);
+        return this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles);
+    }
+
     public chatMessage(client: Socket, message: string): IEvent[] {
-        const player: IPlayer = this.getPlayerForSocket(client);
+        const player: IPlayer = this._players.getPlayerForSocket(client);
         if (!player) return [this.invalidPlayerEvent(client, this.name)];
-        return [this.roomMessageEvent(this.getAllSockets(), this._name, player, message)];
+        // Add chat message to replay
+        this.replay.push({player: RoomEvents.stripPlayer(player), message, type: "chat"} as ILogChatMessage);
+        return [this.roomMessageEvent(this._players.getAllSockets(), this._name, player, message)];
     }
 
     /**
@@ -378,14 +375,26 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @returns {number}
      */
     public size(): number {
-        return this._players.length;
-    }
-
-    private getAllSockets() {
-        return this._players.map((pl) => pl.socket);
+        return this._players.size();
     }
 
     public hasStarted(): boolean {
         return !!this._serverGrid;
+    }
+
+    public hasEnded() {
+        return this._gameEnded;
+    }
+
+    public getCurrentTurnNumber() {
+        return this._turnCounter;
+    }
+
+    public getGridSizeX() {
+        return this._serverGrid.sizeX;
+    }
+
+    public getGridSizeY() {
+        return this._serverGrid.sizeY;
     }
 }

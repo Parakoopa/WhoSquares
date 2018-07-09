@@ -5,6 +5,7 @@ import {Lobby} from "../Lobby/Lobby";
 import {Utility} from "../Utility";
 import {User} from "../User/User";
 import {UserRepository} from "../User/UserRepository";
+import {StatsManager} from "../Stats/StatsManager";
 
 /**
  * Used to manage login/room list/register etc. requests
@@ -69,13 +70,13 @@ export class SessionManager {
      */
     public placeTile(socket: Socket, req: IPlaceTileRequest): IEvent[] {
         const room = this._lobby.roomByKey(req.roomKey);
-        if (!room) return; // Todo return invalid roomkey response
+        if (!room) return []; // Todo return invalid roomkey response
         return room.placeTile(socket, req.y, req.x);
     }
 
     public roomMessage(socket: Socket, req: IRoomMessageRequest): IEvent[] {
         const room = this._lobby.roomByKey(req.roomKey);
-        if (!room) return; // Todo return invalid roomkey response
+        if (!room) return []; // Todo return invalid roomkey response
         return room.chatMessage(socket, req.message);
     }
 
@@ -101,5 +102,17 @@ export class SessionManager {
 
     public sendLobby(socket: SocketIO.Socket): IEvent[] {
         return [this._lobby.sendLobby(socket)];
+    }
+
+    public sendRoomStats(socket: Socket, req: IRoomStatsRequest): IEvent[] {
+        return [StatsManager.sendRoomStats(socket, req, this._lobby.getRooms())];
+    }
+
+    public sendUserStats(socket: Socket, req: IUserStatsRequest): IEvent[] {
+        return [StatsManager.sendUserStats(socket, req, this._registeredNames)];
+    }
+
+    public async sendGlobalStats(socket: Socket, req: IGlobalStatsRequest): Promise<IEvent[]> {
+        return [await StatsManager.sendGlobalStats(socket, req)];
     }
 }

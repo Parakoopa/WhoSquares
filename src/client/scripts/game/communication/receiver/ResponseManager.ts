@@ -1,10 +1,10 @@
 import Socket = SocketIOClient.Socket;
-import {Lobby} from "../components/Lobby";
-import {Login} from "../components/Login";
-import {Room} from "../components/Room";
-import {LobbyUiListener} from "./Listener/LobbyUiListener";
-import {LoginUiListener} from "./Listener/LoginUiListener";
-import {RoomUiListener} from "./Listener/RoomUiListener";
+import {Lobby} from "../../components/Lobby";
+import {Login} from "../../components/Login";
+import {Room} from "../../components/Room";
+import {LobbyUiListener} from "./listener/LobbyUiListener";
+import {LoginUiListener} from "./listener/LoginUiListener";
+import {RoomUiListener} from "./listener/RoomUiListener";
 
 export class ResponseManager {
 

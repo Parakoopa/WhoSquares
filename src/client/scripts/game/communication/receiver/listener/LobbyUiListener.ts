@@ -1,5 +1,5 @@
 import Socket = SocketIOClient.Socket;
-import {Lobby} from "../../components/Lobby";
+import {Lobby} from "../../../components/Lobby";
 
 export class LobbyUiListener {
 

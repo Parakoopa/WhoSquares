@@ -1,9 +1,9 @@
-import {IRoomMongoSchema} from "../RoomRepository";
-import {Room} from "../Room";
+import {Missions} from "../../../../common/scripts/Missions/Missions";
+import {UserRepository} from "../../User/UserRepository";
 import {ServerGrid} from "../Game/ServerGrid";
 import {Player} from "../Player";
-import {UserRepository} from "../../User/UserRepository";
-import {Missions} from "../../../../common/scripts/Missions/Missions";
+import {Room} from "../Room";
+import {IRoomMongoSchema} from "../RoomRepository";
 
 /**
  * Transforms a {IRoomMongoSchema} to a {Room}
@@ -21,16 +21,17 @@ export class DbToRoom {
             this.schema.maxSize
         );
         room._gameEnded = this.schema.hasEnded;
-        room._players = await this.buildPlayers();
+        await this.buildPlayers(room);
         room._serverGrid = this.buildGrid(room);
         this.fillTurnManager(room);
-        room._owner = room.getPlayerByPlayerKey(this.schema.owner);
+        room._owner = room.players.getPlayerByPlayerKey(this.schema.owner);
         room._id = this.schema._id;
+        room.replay = this.schema.replay;
+        room.stats = this.schema.stats;
         return room;
     }
 
-    private async buildPlayers(): Promise<Player[]> {
-        const playerObjs: Player[] = [];
+    private async buildPlayers(room: Room): Promise<Player[]> {
         for (const player of this.schema.players) {
             const playerObj = new Player(
                 await UserRepository.instance.getByKey(player.key),
@@ -39,9 +40,9 @@ export class DbToRoom {
                 false
             );
             playerObj.mission = Missions.getMission(player.missionName);
-            playerObjs.push(playerObj);
+            room.players.push(playerObj);
         }
-        return playerObjs;
+        return room.players.players;
     }
 
     private buildGrid(room: Room): ServerGrid {
@@ -52,7 +53,7 @@ export class DbToRoom {
         for (let y = 0; y < this.schema.gridSize.y; y++) {
             for (let x = 0; x < this.schema.gridSize.x; x++) {
                 if (this.schema.grid[y][x]) {
-                    grid.placeTile(room.getPlayerByPlayerKey(
+                    grid.placeTile(room.players.getPlayerByPlayerKey(
                         this.schema.grid[y][x]
                     ), y, x);
                 }
@@ -62,7 +63,7 @@ export class DbToRoom {
     }
 
     private fillTurnManager(room: Room) {
-        room._players.forEach((player) => {
+        room.players.players.forEach((player) => {
             room._turnManager.addPlayer(player);
         });
         room._turnManager.setCurIndex(this.schema.currentTurn);

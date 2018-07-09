@@ -3,23 +3,23 @@ import {RouteComponentProps} from "react-router-dom";
 import {Connection} from "../../Connection";
 import {Login} from "../../game/components/Login";
 import {Room} from "../../game/components/Room";
-import {OtherPlayer} from "../../game/OtherPlayer";
-import {Utility} from "../../game/Utility";
+import {LocalPlayerManager} from "../../game/entity/LocalPlayer/LocalPlayerManager";
 import {App} from "../App";
+import {LogoutButton} from "../components/header/LogoutButton";
 import {ChatInput} from "../components/room/ChatInput";
 import {ChatMessage} from "../components/room/ChatMessage";
 import {ChatMessages} from "../components/room/ChatMessages";
 import {Game} from "../components/room/Game";
 import {GameControl} from "../components/room/GameControl";
+import {MissionInfo} from "../components/room/MissionInfo";
 import {PlayerList} from "../components/room/PlayerList";
 import {RoomInfo} from "../components/room/RoomInfo";
+import {ShareRoomButton} from "../components/room/ShareRoomButton";
 import {TurnInfo} from "../components/room/TurnInfo";
 import {WinnerInfo} from "../components/room/WinnerInfo";
 import {IRoomUI} from "../interfaces/IRoomUI";
 import {Routes} from "../Routes";
-import {MissionInfo} from "../components/room/MissionInfo";
-import {ShareRoomButton} from "../components/room/ShareRoomButton";
-import {LogoutButton} from "../components/header/LogoutButton";
+import {Missions} from "../../../../common/scripts/Missions/Missions";
 
 export interface IRoomViewProps extends RouteComponentProps<IRoomViewProps> {
     roomid: string;
@@ -71,12 +71,12 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
             return;
         }
 
-        if (!Utility.getLocalPlayer()) {
+        if (!LocalPlayerManager.getLocalPlayer()) {
             const color = parseInt("FF33FF", 16);
             const name = Connection.getUsername();
             const isObserver = true;
 
-            Utility.addLocalPlayer(
+            LocalPlayerManager.addLocalPlayer(
                 {name, color, isObserver},
                 Connection.getKey(),
                 Connection.getSocket()
@@ -88,10 +88,10 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         Connection._socket.once("joinedRoom", (resp: IJoinedResponse) => {
 
             // Update color from observer color to player color
-            const localPlayer = Utility.getLocalPlayer();
+            const localPlayer = LocalPlayerManager.getLocalPlayer();
             localPlayer.color = resp.color;
             // set whether localPlayer is new room owner
-            localPlayer.isRoomOwner = Utility.equalsIPlayer(resp.roomOwner, localPlayer.player);
+            localPlayer.isRoomOwner = LocalPlayerManager.equalsIPlayer(resp.roomOwner, localPlayer.player);
 
             const room_backend = new Room(
                 resp.roomKey,
@@ -102,12 +102,20 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                 resp.gridInfo
             );
 
+            // Set mission data if received because this is a reconnect
+            if (resp.mission) {
+                room_backend.updateMission(Missions.getMission(resp.mission));
+            }
+
             this.setState({room_backend, gameStarted: room_backend.hasGrid(), isOwner: localPlayer.isRoomOwner});
         });
         Connection._socket.once("nameNotRegistered", () => {
             Connection.setKey("");
             Connection.setUsername("");
             window.location.href = Routes.linkToLoginHREF() + "/" + this.props.match.params.roomid;
+        });
+        Connection._socket.once("gameEnded", () => {
+            window.location.href = Routes.linkToGameStatsHREF(this.props.match.params.roomid);
         });
     }
 
@@ -138,8 +146,13 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         }
     }
 
-    public updatePlayerList(players: OtherPlayer[]) {
-        this.setState({players: [Utility.getLocalPlayer(), ...players].map((p) => p.player)});
+    public updatePlayerList(playerlist: IPlayer[]) {
+        const players = [];
+        for (const player of playerlist) {
+            players.push(player);
+        }
+        players.push(LocalPlayerManager.getLocalPlayer().player);
+        this.setState({players});
     }
 
     public otherJoinedRoom(player: IPlayer): void {
@@ -148,7 +161,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
 
     public otherLeftRoom(player: IPlayer): void {
         App.showTextOnSnackbar("Player '" + player.name + "' left room!");
-        this.setState({isOwner: Utility.getLocalPlayer().isRoomOwner});
+        this.setState({isOwner: LocalPlayerManager.getLocalPlayer().isRoomOwner});
     }
 
     public updateTurnInfo(activePlayer: IPlayer): void {
@@ -163,8 +176,7 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
     }
 
     public updateWinner(winner: IPlayer, missionName: string): void {
-        // ToDo Display missionName and maybe description (so that players do understand why they lost)
-        // ToDo Display (re)-startGame button to room owner
+        // TODO: Show this also in chat
         this.setState({winner});
     }
 
@@ -207,9 +219,12 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                     <RoomInfo roomid={this.props.match.params.roomid}/>
                 </div>
                 <div className={"buttons"}>
-                    <GameControl gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
-                                 actionStartGame={this.startGame}
-                                 actionLeaveRoom={this.leaveRoom}
+                    <GameControl
+                        gameEnded={!!this.state.winner}
+                        gameAlreadyStarted={!this.state.isOwner || this.state.gameStarted}
+                        actionStartGame={this.startGame}
+                        actionLeaveRoom={this.leaveRoom}
+                        roomid={this.props.match.params.roomid}
                     />
                 </div>
                 <div className={"room"}>
