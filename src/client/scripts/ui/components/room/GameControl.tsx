@@ -12,6 +12,9 @@ export interface IGameControlProps {
 export interface IGameControlState {
 }
 
+/**
+ * Defines a GameControl-Component. The buttons disappear and appear with different gamestati!
+ */
 export class GameControl extends React.Component<IGameControlProps, IGameControlState> {
 
     constructor(props: IGameControlProps) {

@@ -16,8 +16,16 @@ export interface IAppState {
 
 }
 
+/**
+ * Managed the Header, the Views (over Routes), the Footer and the Snackbar.
+ */
 export class App extends React.Component<IAppProps, IAppState> {
 
+    /**
+     * Shows a Text on the Snackbar.
+     *
+     * @param {string} text
+     */
     public static showTextOnSnackbar( text: string ) {
         const snackbar = document.getElementById("snackbar");
         snackbar.className = "show";

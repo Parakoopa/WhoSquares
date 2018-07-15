@@ -7,8 +7,16 @@ export interface IMissionInfoProps {
 export interface IMissionInfoState {
 }
 
+/**
+ * Defines the MissionInfo-Component, that shows the Mission to the User.
+ */
 export class MissionInfo extends React.Component<IMissionInfoProps, IMissionInfoState> {
 
+    /**
+     * Gets the MissionName. Empty if Mission is null!
+     *
+     * @returns {string}
+     */
     public getMissionName(): string {
         if (this.props.mission == null)
             return "";
@@ -16,6 +24,11 @@ export class MissionInfo extends React.Component<IMissionInfoProps, IMissionInfo
             return this.props.mission.name();
     }
 
+    /**
+     * Gets the MissionName. Empty if Mission is null!
+     *
+     * @returns {string}
+     */
     public getMissionDesc(): string {
         if (this.props.mission == null)
             return "";
@@ -23,6 +36,11 @@ export class MissionInfo extends React.Component<IMissionInfoProps, IMissionInfo
             return this.props.mission.description();
     }
 
+    /**
+     * Gets the MissionImageSource. Empty if Mission is null!
+     *
+     * @returns {string}
+     */
     public getMissionImgPath(): string {
         if (this.props.mission == null)
             return "";

@@ -1,6 +1,10 @@
 import * as React from "react";
 import {ResponseManager} from "./game/communication/receiver/ResponseManager";
 
+/**
+ * Contains the Socket for the Client-Connection and
+ * all localStorage-Functions like storing the Key and the Username.
+ */
 export class Connection {
 
     public static _socket: SocketIOClient.Socket;

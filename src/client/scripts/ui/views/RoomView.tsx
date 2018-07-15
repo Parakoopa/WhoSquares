@@ -63,6 +63,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.getRoomUrl = this.getRoomUrl.bind(this);
         this.logout = this.logout.bind(this);
 
+        // Initialize the Socket and logs the User in.
+
         Connection.initSocket();
 
         if (!Connection.getKey() || !Connection.getUsername()) {
@@ -81,6 +83,8 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
                 Connection.getSocket()
             );
         }
+
+        // Joins a Room
 
         Room.actionJoinRoom(this.props.match.params.roomid);
 
@@ -135,6 +139,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         return this.props.match.params.roomid;
     }
 
+    /**
+     * Logs out the User
+     */
     public logout() {
         Connection.setUsername("");
         Connection.setKey("");
@@ -146,6 +153,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         }
     }
 
+    /**
+     * Leaves the Room and links to lobby, if everything went good.
+     */
     public leaveRoom() {
         if (this.state.room_backend !== null) {
             this.state.room_backend.actionLeaveRoom(() => {
@@ -154,6 +164,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         }
     }
 
+    /**
+     * Updates the Playerlist
+     *
+     * @param {IPlayer[]} playerlist
+     */
     public updatePlayerList(playerlist: IPlayer[]) {
         const players = [];
         for (const player of playerlist) {
@@ -163,15 +178,30 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.setState({players});
     }
 
+    /**
+     * Notify the user if someone joined
+     *
+     * @param {IPlayer} player
+     */
     public otherJoinedRoom(player: IPlayer): void {
         App.showTextOnSnackbar("Player " + player.name + " joined room!");
     }
 
+    /**
+     * Notify the user if someone left
+     *
+     * @param {IPlayer} player
+     */
     public otherLeftRoom(player: IPlayer): void {
         App.showTextOnSnackbar("Player " + player.name + " left room!");
         this.setState({isOwner: LocalPlayerManager.getLocalPlayer().isRoomOwner});
     }
 
+    /**
+     * Updates the TurnInfo
+     *
+     * @param {IPlayer} activePlayer
+     */
     public updateTurnInfo(activePlayer: IPlayer): void {
         this.setState({activePlayer});
         if (!this.state.gameStarted) {
@@ -179,31 +209,61 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         }
     }
 
+    /**
+     * Shows Text on Snackbar.
+     *
+     * @param {string} info
+     */
     public updateGameInfo(gameInfo: string): void {
         App.showTextOnSnackbar(gameInfo);
     }
 
+    /**
+     * Updates the Winner
+     *
+     * @param {IPlayer} winner
+     * @param {string} missionName
+     */
     public updateWinner(winner: IPlayer, missionName: string): void {
         // TODO: Show this also in chat
         this.setState({winner});
     }
 
+    /**
+     * Updates the Mission
+     *
+     * @param {IMission} mission
+     */
     public updateMission(mission: IMission): void {
         console.log("updated mission!");
         this.setState({mission});
     }
 
+    /**
+     * Starts the Game
+     */
     public startGame() {
         if (this.state.room_backend)
             this.state.room_backend.actionStartGame(10, 10);
         this.setState({gameStarted: true});
     }
 
+    /**
+     * Send a Message to the Server.
+     *
+     * @param {string} text
+     */
     public sendMessage(text: string) {
         if (this.state.room_backend)
             this.state.room_backend.actionSendRoomMessage(text);
     }
 
+    /**
+     * Gets a new Message
+     *
+     * @param {IPlayer} player
+     * @param {string} message
+     */
     public sendRoomMessage(player: IPlayer, message: string): void {
         const messages = this.state.messages;
 
@@ -212,6 +272,11 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         this.setState({messages});
     }
 
+    /**
+     * Gets the RoomURL
+     *
+     * @returns {string}
+     */
     public getRoomUrl() {
         return window.location.href;
     }
@@ -220,6 +285,9 @@ export class RoomView extends React.Component<IRoomViewProps, IRoomViewState> im
         LogoutButton.logOutFunction = this.logout;
     }
 
+    /**
+     * If Disconnected, reconnect!
+     */
     public onDisconnect() {
         // TODO: Better reconnect
         window.location.reload();

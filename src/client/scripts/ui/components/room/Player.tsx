@@ -10,6 +10,9 @@ export interface IPlayerProps {
 export interface IPlayerState {
 }
 
+/**
+ * Defines a Player for the Playerlist.
+ */
 export class Player extends React.Component<IPlayerProps, IPlayerState> {
     private getActivePlayerColorHtml(): string {
         let color;

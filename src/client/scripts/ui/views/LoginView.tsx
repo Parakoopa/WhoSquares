@@ -14,6 +14,9 @@ export interface ILoginViewState {
     username: string;
 }
 
+/**
+ * Defines the LoginView-Component.
+ */
 export class LoginView extends React.Component<ILoginViewProps, ILoginViewState> implements ILoginUI {
 
     private login_backend: Login;
@@ -33,6 +36,7 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         const username = Connection.getUsername();
         const key = Connection.getKey();
 
+        // If Username and Key already there, create localPlayer and link to Lobby!
         if (key && username) {
             const color = parseInt("FF33FF", 16);
             const name = username;
@@ -50,10 +54,20 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
 
     }
 
+    /**
+     * Shows Text on Snackbar.
+     *
+     * @param {string} info
+     */
     public updateGameInfo(info: string): void {
         App.showTextOnSnackbar(info);
     }
 
+    /**
+     * Checks if the username is set.
+     *
+     * @returns {boolean}
+     */
     private validateForm() {
         if (this.state.username === undefined)
             return false;
@@ -71,6 +85,9 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         this.login();
     }
 
+    /**
+     * Sends the login to the server and if everything went good, liks to lobby.
+     */
     private login(): void {
         const name = this.state.username;
 
@@ -96,6 +113,10 @@ export class LoginView extends React.Component<ILoginViewProps, ILoginViewState>
         this.setState({username: Connection.getUsername()});
     }
 
+    /**
+     * Links to Lobby if not jumping to room
+     * @returns {string}
+     */
     private redirectAfterLogin(): string {
         if (this.props.match.params.jumpToRoom) {
             return Routes.linkToGameHREF(this.props.match.params.jumpToRoom);

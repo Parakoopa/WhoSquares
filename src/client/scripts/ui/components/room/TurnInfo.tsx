@@ -7,6 +7,9 @@ export interface ITurnInfoProps {
 export interface ITurnInfoState {
 }
 
+/**
+ * Defines the TurnInfo-Component.
+ */
 export class TurnInfo extends React.Component<ITurnInfoProps, ITurnInfoState> {
 
     private getActivePlayerColorHtml(): string {

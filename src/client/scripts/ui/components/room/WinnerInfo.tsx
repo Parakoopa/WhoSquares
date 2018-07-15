@@ -7,8 +7,16 @@ export interface IWinnerInfoProps {
 export interface IWinnerInfoState {
 }
 
+/**
+ * Defines the WinnerInfo-Component.
+ */
 export class WinnerInfo extends React.Component<IWinnerInfoProps, IWinnerInfoState> {
 
+    /**
+     * Gets the WinnerName, empty if null.
+     *
+     * @returns {string}
+     */
     public getWinnerName(): string {
         if (this.props.winner == null)
             return "";

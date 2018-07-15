@@ -7,6 +7,9 @@ export interface IFooterProps {
 export interface IFooterState {
 }
 
+/**
+ * Defines the Footer-Component.
+ */
 export class Footer extends React.Component<IFooterProps, IFooterState> {
 
     public render(): any {

@@ -6,6 +6,9 @@ export interface ILogoutButtonProps {
 export interface ILogoutButtonState {
 }
 
+/**
+ * Component for Logout. Needs to get a logOutFunction at creating!
+ */
 export class LogoutButton extends React.Component<ILogoutButtonProps, ILogoutButtonState> {
 
     public static logOutFunction: () => void;

@@ -12,10 +12,14 @@ export interface IPlayerListProps {
 export interface IPlayerListState {
 }
 
+/**
+ * Defines the Playerlist-Component.
+ */
 export class PlayerList extends React.Component<IPlayerListProps, IPlayerListState> {
 
     public render(): any {
 
+        // Maps the Playernames to individual Players for the Playerlist
         const playerlist = this.props.players.map((player, i) => {
             const isWinner = LocalPlayerManager.equalsIPlayer(this.props.winner, player);
             const isTurn = LocalPlayerManager.equalsIPlayer(this.props.turn, player);

@@ -7,6 +7,9 @@ export interface IRoomInfoProps {
 export interface IRoomInfoState {
 }
 
+/**
+ * Defines the RoomInfo-Component.
+ */
 export class RoomInfo extends React.Component<IRoomInfoProps, IRoomInfoState> {
 
     public render(): any {

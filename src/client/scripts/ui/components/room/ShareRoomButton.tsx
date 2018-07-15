@@ -10,6 +10,9 @@ export interface IShareRoomButtonState {
     imgsource: string;
 }
 
+/**
+ * Defines the ShareRoomButton
+ */
 export class ShareRoomButton extends React.Component<IShareRoomButtonProps, IShareRoomButtonState> {
 
     constructor(props: IShareRoomButtonProps) {
@@ -18,6 +21,12 @@ export class ShareRoomButton extends React.Component<IShareRoomButtonProps, ISha
         this.shareRoom = this.shareRoom.bind(this);
     }
 
+    /**
+     * If Button was clicked, the Room-Url will copied into the Clipboard
+     * and a litte Notification will appear in the Snackbar.
+     *
+     * @param event
+     */
     public shareRoom(event: any) {
         event.preventDefault();
 
