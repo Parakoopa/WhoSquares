@@ -95,7 +95,7 @@ export class Grid {
 
     /**
      * Assign an IPlayer to a specific tile in grid
-     * Tint the color based on the players color
+     * Tint the color based on the list color
      * Always saves the base color
      * @param {IPlayer} player
      * @param {number} x

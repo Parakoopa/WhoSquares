@@ -9,7 +9,7 @@ import {Grid} from "./phaser/grid/Grid";
 import {GridFactory} from "./phaser/grid/GridFactory";
 
 /**
- * Manages players joining leaving, game logic & chat
+ * Manages list joining leaving, game logic & chat
  */
 export class Room {
 
@@ -189,7 +189,7 @@ export class Room {
     }
 
     /**
-     * Update Ui for current players turn
+     * Update Ui for current list turn
      * @param {IPlayer} player
      */
     public updateTurnInfo(player: IPlayer): void {

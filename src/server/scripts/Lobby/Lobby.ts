@@ -8,12 +8,10 @@ import {LobbyEvents} from "./LobbyEvents";
 
 /**
  * Initializes Lobby and sets base values for rooms/
- * ToDo make given values room specific via input fields being fillable by client
  */
 export class Lobby extends LobbyEvents {
 
     private readonly _rooms: Room[];
-    private _minimumClientsPerGame: number = 1; // TODO: Use!
     private _maxRoomSize: number = 10;
 
     constructor() {

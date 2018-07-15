@@ -1,8 +1,8 @@
 export class Utility {
 
     /**
-     * MOVE INTO SOME NEW UTILITY CLASS
      * Generate Unique Identifier
+     * (Not guaranteed but sufficient for now)
      * @returns {string}
      * @constructor
      */
@@ -15,23 +15,6 @@ export class Utility {
         }
 
         return s4() + s4() + "-" + s4() + "-" + s4() + "-" + s4() + "-" + s4() + s4() + s4();
-
-        //
-        // const ms = new Date().getTime();
-        //
-        // switch (ms % 10) {
-        //     case 0: return "Bob";
-        //     case 1: return "Stella";
-        //     case 2: return "Marco";
-        //     case 3: return "Tim";
-        //     case 4: return "Alex";
-        //     case 5: return "Robin";
-        //     case 6: return "Udo";
-        //     case 7: return "Freddy";
-        //     case 8: return "Inge";
-        //     case 9: return "Spongebob";
-        //     default: return "MS-" + ms;
-        // }
     }
 
 }

@@ -1,5 +1,5 @@
-import {IEvent} from "../Event";
 import {Socket} from "socket.io";
+import {IEvent} from "../Event";
 import {Room} from "../Room/Room";
 
 /**

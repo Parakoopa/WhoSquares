@@ -1,10 +1,10 @@
-import {Room} from "./Room";
+import {ObjectID, ObjectId} from "bson";
 import {Collection} from "mongodb";
 import {DatabaseConnection} from "../DatabaseConnection";
-import {ObjectID, ObjectId} from "bson";
 import {IDatabaseModel} from "../IDatabaseModel";
-import {RoomToDb} from "./Transform/RoomToDb";
+import {Room} from "./Room";
 import {DbToRoom} from "./Transform/DbToRoom";
+import {RoomToDb} from "./Transform/RoomToDb";
 
 /**
  * The interface of a room as saved in the database
