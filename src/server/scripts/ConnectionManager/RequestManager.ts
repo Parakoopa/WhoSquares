@@ -2,13 +2,15 @@ import {Socket} from "socket.io";
 import SocketIO = require("socket.io");
 import {ResponseEmitter} from "./ResponseEmitter";
 import {SessionManager} from "./SessionManager";
-import {StatsManager} from "../Stats/StatsManager";
 
 export class RequestManager extends ResponseEmitter {
 
     private _io: SocketIO.Server;
     private _sessionManager: SessionManager;
 
+    /**
+     * @param {SocketIO.Server} io
+     */
     constructor( io: SocketIO.Server ) {
         super();
         this._io = io;

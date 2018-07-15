@@ -3,6 +3,11 @@ import Game = Phaser.Game;
 import {RequestEmitter} from "../../../communication/requester/emitter/RequestEmitter";
 import {PhaserGame} from "../PhaserGame";
 
+/**
+ * Manages the grid consisting of tiles.
+ * F.e. interaction, creation, etc.
+ *
+ */
 export class Grid {
 
     private _grid: Sprite[][];
@@ -90,7 +95,7 @@ export class Grid {
 
     /**
      * Assign an IPlayer to a specific tile in grid
-     * Tint the color based on the players color
+     * Tint the color based on the list color
      * Always saves the base color
      * @param {IPlayer} player
      * @param {number} x
@@ -105,6 +110,10 @@ export class Grid {
         });
     }
 
+    /**
+     * Resets all tiles of a player to base values.
+     * @param {IPlayer} player
+     */
     public removePlayer(player: IPlayer): void {
         for (const row of this._grid) {
             for (const sprite of row) {
@@ -117,6 +126,10 @@ export class Grid {
         }
     }
 
+    /**
+     * Replaces given tiles with another image to highlight them.
+     * @param {ITile[]} winTiles
+     */
     public showWinTiles(winTiles: ITile[]) {
         for (const tile of winTiles) {
             this._grid[tile.y][tile.x].loadTexture("winTile");
@@ -156,6 +169,10 @@ export class Grid {
         this.resetHighlightedSprites();
     }
 
+    /**
+     * Resets the onOver effect on all tiles
+     * (Tiles with onOver effect get stored in given list)
+     */
     private resetHighlightedSprites() {
         if (!this._highlightedSprites) return; // This may not refer to grid as this eventListener is global
         for (const sprite of this._highlightedSprites) {

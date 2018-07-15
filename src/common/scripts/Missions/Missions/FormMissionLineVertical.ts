@@ -2,18 +2,30 @@ import {FormMission} from "../FormMission";
 
 export class FormMissionLineVertical extends FormMission {
 
+    /**
+     * @returns {string}
+     */
     public description(): string {
         return "Create a vertical line!";
     }
 
+    /**
+     * @returns {string}
+     */
     public name(): string {
         return "Vertical line";
     }
 
+    /**
+     * @returns {string}
+     */
     public imgpath(): string {
         return "../../../img/mission_Vertical.png";
     }
 
+    /**
+     * @returns {number[][]}
+     */
     public getForm(): number[][] {
         return [
             [0, 0],

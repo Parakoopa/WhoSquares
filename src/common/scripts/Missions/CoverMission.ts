@@ -1,5 +1,10 @@
 export abstract class CoverMission implements IMission {
 
+    /**
+     * @param {IPlayer} localPlayer
+     * @param {IPlayer[][]} grid
+     * @returns {ITile[]}
+     */
     public check(localPlayer: IPlayer, grid: IPlayer[][]): ITile[] {
         let tileCount: number = 0;
         const winTiles: ITile[] = [];
@@ -17,12 +22,24 @@ export abstract class CoverMission implements IMission {
         else return [];
     }
 
+    /**
+     * @returns {string}
+     */
     public abstract description(): string;
 
+    /**
+     * @returns {string}
+     */
     public abstract imgpath(): string;
 
+    /**
+     * @returns {string}
+     */
     public abstract name(): string;
 
+    /**
+     * @returns {number}
+     */
     protected abstract getWinPercentage(): number;
 
 }

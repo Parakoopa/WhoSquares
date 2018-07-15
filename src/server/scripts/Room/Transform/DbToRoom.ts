@@ -42,7 +42,7 @@ export class DbToRoom {
             playerObj.mission = Missions.getMission(player.missionName);
             room.players.push(playerObj);
         }
-        return room.players.players;
+        return room.players.list;
     }
 
     private buildGrid(room: Room): ServerGrid {
@@ -63,7 +63,7 @@ export class DbToRoom {
     }
 
     private fillTurnManager(room: Room) {
-        room.players.players.forEach((player) => {
+        room.players.list.forEach((player) => {
             room._turnManager.addPlayer(player);
         });
         room._turnManager.setCurIndex(this.schema.currentTurn);

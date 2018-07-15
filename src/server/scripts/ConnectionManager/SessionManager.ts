@@ -74,6 +74,12 @@ export class SessionManager {
         return room.placeTile(socket, req.y, req.x);
     }
 
+    /**
+     *
+     * @param {SocketIO.Socket} socket
+     * @param {IRoomMessageRequest} req
+     * @returns {[]}
+     */
     public roomMessage(socket: Socket, req: IRoomMessageRequest): IEvent[] {
         const room = this._lobby.roomByKey(req.roomKey);
         if (!room) return []; // Todo return invalid roomkey response
@@ -100,18 +106,41 @@ export class SessionManager {
         return [connectedEvent];
     }
 
+    /**
+     *
+     * @param {SocketIO.Socket} socket
+     * @returns {[]}
+     */
     public sendLobby(socket: SocketIO.Socket): IEvent[] {
         return [this._lobby.sendLobby(socket)];
     }
 
+    /**
+     *
+     * @param {SocketIO.Socket} socket
+     * @param {IRoomStatsRequest} req
+     * @returns {[]}
+     */
     public sendRoomStats(socket: Socket, req: IRoomStatsRequest): IEvent[] {
         return [StatsManager.sendRoomStats(socket, req, this._lobby.getRooms())];
     }
 
+    /**
+     *
+     * @param {SocketIO.Socket} socket
+     * @param {IUserStatsRequest} req
+     * @returns {[]}
+     */
     public sendUserStats(socket: Socket, req: IUserStatsRequest): IEvent[] {
         return [StatsManager.sendUserStats(socket, req, this._registeredNames)];
     }
 
+    /**
+     *
+     * @param {SocketIO.Socket} socket
+     * @param {IGlobalStatsRequest} req
+     * @returns {Promise<[]>}
+     */
     public async sendGlobalStats(socket: Socket, req: IGlobalStatsRequest): Promise<IEvent[]> {
         return [await StatsManager.sendGlobalStats(socket, req)];
     }

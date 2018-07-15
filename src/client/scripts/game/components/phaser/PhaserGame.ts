@@ -1,7 +1,9 @@
 import Game = Phaser.Game;
-import World = Phaser.World;
-import game = PIXI.game;
 
+/**
+ * Creates Game Canvas, sets scaling, loads images into game.
+ * (Asynchron)
+ */
 export class PhaserGame {
 
     private _game: Game;
@@ -16,7 +18,6 @@ export class PhaserGame {
     constructor() {
         const width = document.getElementById("game").clientWidth + 20; // 20 Offset to allow mouse exit events
         const height = document.getElementById("game").clientHeight + 20;  // 20 Offset to allow mouse exit events
-        const self = this;
 
         this._loaded = new Promise((resolve, reject) => {
             this._game = new Phaser.Game(width, height, Phaser.AUTO, "game", {

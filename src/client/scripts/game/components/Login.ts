@@ -5,6 +5,11 @@ import {LocalPlayer} from "../entity/LocalPlayer/LocalPlayer";
 
 export class Login {
 
+    /**
+     *
+     * @param {ILoginUI} _ui
+     * @param {LocalPlayer} _localPlayer
+     */
     constructor(private _ui: ILoginUI, private _localPlayer: LocalPlayer = null) {
         ResponseManager.createLoginListener(this);
     }
@@ -20,6 +25,10 @@ export class Login {
         this.updateGameInfo("LocalPlayer: " + this._localPlayer.name);
     }
 
+    /**
+     * Update displayed game info
+     * @param {string} info
+     */
     public updateGameInfo(info: string): void {
         this._ui.updateGameInfo(info);
     }

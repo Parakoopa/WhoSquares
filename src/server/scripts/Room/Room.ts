@@ -19,7 +19,7 @@ import {StatsManager} from "../Stats/StatsManager";
  * Uses ServerGrid to calculate and check tile placements & missions
  * Uses ColorDistributer to assign each player a color
  * Uses Missiondistributer to assign mission(s) to each player
- * Uses TurnManager to determine turn order of players
+ * Uses TurnManager to determine turn order of list
  */
 export class Room extends RoomEvents implements IRoom, IDatabaseModel {
 
@@ -44,6 +44,12 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     public stats: IRoomStats = null;
     private _turnCounter: number = 0;
 
+    /**
+     *
+     * @param {string} _name
+     * @param {string} _key
+     * @param {number} maxSize
+     */
     constructor(private _name: string, private _key: string, maxSize: number) {
         super();
         this._players = new PlayerList(maxSize);
@@ -75,7 +81,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     }
 
     /**
-     * Maximum amount of players allowed in room
+     * Maximum amount of list allowed in room
      * @returns {number}
      */
     public get maxSize(): number {
@@ -103,7 +109,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     /**
      * Return NotInRoomEvent if client is not in room
      * Return NotOwnerEvent if requesting client is not room owner
-     * Return NotEnoughClientsEvent if room lacks players
+     * Return NotEnoughClientsEvent if room lacks list
      * Tells room to create a game
      */
     public startGame(client: Socket, sizeX: number, sizeY: number): IEvent[] {
@@ -142,7 +148,9 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      */
     public AddClient(socket: Socket, user: User): IEvent[] {
         let player: Player;
+
         if (this.hasStarted()) {
+            // Game already started so add player as observer
             player = this.createObserver(socket, user);
             // If started, include this in the replay log
             this.replay.push({player: RoomEvents.stripPlayer(player), type: "joined"} as ILogJoined);
@@ -150,8 +158,10 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
             player = this.createPlayer(socket, user);
         }
         this._players.push(player);
+        // Add player as room owner is no room owner exists yet
         if (!this._owner) this._owner = player;
 
+        // Create events and send them to all clients in room
         const otherPlayers = this._players.getPlayersExcept(player);
         const joinedEvent: IEvent =  this.joinedEvent(
             socket, this._name, this._key, player.color, otherPlayers, this.gridInfo, this._owner, null);
@@ -192,7 +202,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @param user
      */
     private createObserver(socket: Socket, user: User): Player {
-        const color = this._colorDistr.getFreeColor(this._players.players);
+        const color = this._colorDistr.getFreeColor(this._players.list);
         return new Player(user, socket, color, true);
     }
 
@@ -203,7 +213,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @param user
      */
     private createPlayer(socket: Socket, user: User): Player {
-        const color = this._colorDistr.getFreeColor(this._players.players);
+        const color = this._colorDistr.getFreeColor(this._players.list);
         const player: Player = new Player(user, socket, color, true);
         player.mission = this._missionDistr.getMission();
         return player;
@@ -218,11 +228,12 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         const player = this._players.getPlayerForSocket(client);
         if (!player) return null;
         if (this.hasStarted()) {
+            // Remove player from game
             this._serverGrid.removePlayer(player);
             // If started, include this in the replay
             this.replay.push({player: RoomEvents.stripPlayer(player), type: "left"} as ILogLeft);
         }
-        // if this players turn, remove it
+        // if player is at turn, remove it
         if (this._turnManager.curPlayer() === player) {
             this._turnManager.setNextPlayer();
             this._turnManager.removePlayer(player);
@@ -271,7 +282,9 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         this._gameEnded = false;
         this._serverGrid = new ServerGrid(sizeX, sizeY);
         this.assignMissions();
-        const startEvents: IEvent[] = this.startEvent(this._players.players, this.name, sizeX, sizeY);
+
+        // Tell all clients in room that game started
+        const startEvents: IEvent[] = this.startEvent(this._players.list, this.name, sizeX, sizeY);
         const informTurnEvent: IEvent = this.informTurnEvent(this._players.getAllSockets(), this._turnManager.curPlayer());
         startEvents.push(informTurnEvent);
 
@@ -281,8 +294,9 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         return startEvents;
     }
 
+
     private assignMissions(): void {
-        for (const player of this._players.players) {
+        for (const player of this._players.list) {
             player.mission = this._missionDistr.getMission();
         }
     }
@@ -292,7 +306,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * and adds all to turnmanager order
      */
     private observerToPlayer(): void {
-        for (const player of this._players.players) {
+        for (const player of this._players.list) {
             player.isObserver = false;
             this._turnManager.addPlayer(player);
         }
@@ -308,7 +322,9 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @param x
      * @param y
      */
-    public placeTile(client: Socket, y: number, x: number): IEvent[] { // IPlacedTileResponse | INotYourTurnResponse
+    public placeTile(client: Socket, y: number, x: number): IEvent[] {
+
+        // This block manages invalid requests
         if (this._gameEnded) return [this.gameAlreadyEnded(client, this._name)];
         const player: Player = this._players.getPlayerForSocket(client);
         if (!player) return [this.invalidPlayerEvent(client, this.name)];
@@ -318,6 +334,7 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         if (player !== this._turnManager.curPlayer()) {
             return [this.notYourTurnEvent(client, this.name)];
         }
+
         const sockets = this._players.getAllSockets();
         if (this._serverGrid.placeTile(player, y, x)) {
             const placedEvent: IEvent = this.placedEvent(sockets, this.name, player, y, x); // Also sets next client
@@ -328,6 +345,9 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
                 type: "tilePlaced",
                 x, y
             } as ILogTilePlaced);
+
+            // Check win condition
+            // Currently checked every time and not based on winGameRequest!
             const winTiles = player.mission.check(player, this._serverGrid.gridInfo);
             if (winTiles.length > 0) {
                 return [placedEvent, this.processGameEnd(sockets, winTiles, player)];
@@ -362,6 +382,12 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
         return this.winGameEvent(sockets, this.name, player, player.mission.name(), winTiles);
     }
 
+    /**
+     * Distribute chat message among all clients in room
+     * @param {SocketIO.Socket} client
+     * @param {string} message
+     * @returns {[]}
+     */
     public chatMessage(client: Socket, message: string): IEvent[] {
         const player: IPlayer = this._players.getPlayerForSocket(client);
         if (!player) return [this.invalidPlayerEvent(client, this.name)];
@@ -371,29 +397,49 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
     }
 
     /**
-     * Count of all clients in room (players + observers)
+     * Count of all clients in room (list + observers)
      * @returns {number}
      */
     public size(): number {
         return this._players.size();
     }
 
+    /**
+     *
+     * @returns {boolean}
+     */
     public hasStarted(): boolean {
         return !!this._serverGrid;
     }
 
+    /**
+     *
+     * @returns {boolean}
+     */
     public hasEnded() {
         return this._gameEnded;
     }
 
+    /**
+     *
+     * @returns {number}
+     */
     public getCurrentTurnNumber() {
         return this._turnCounter;
     }
 
+    /**
+     *
+     * @returns {number}
+     */
     public getGridSizeX() {
         return this._serverGrid.sizeX;
     }
 
+    /**
+     *
+     * @returns {number}
+     */
     public getGridSizeY() {
         return this._serverGrid.sizeY;
     }

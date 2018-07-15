@@ -1,5 +1,5 @@
 /**
- * Stores all players of an active game in a chronological order
+ * Stores all list of an active game in a chronological order
  */
 import {Player} from "../Player";
 

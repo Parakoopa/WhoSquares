@@ -1,5 +1,5 @@
-import {IEvent} from "../Event";
 import {Socket} from "socket.io";
+import {IEvent} from "../Event";
 import {Player} from "./Player";
 
 /**
@@ -68,7 +68,6 @@ export class RoomEvents {
      * @param {Client[]} clients
      * @param {string} roomName
      * @param otherPlayer
-     * @param roomOwner
      * @returns {IEvent}
      */
     public otherJoinedEvent(clients: Socket[], roomName: string, otherPlayer: IPlayer): IEvent {

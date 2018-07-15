@@ -2,6 +2,11 @@ import {Helper} from "./Helper";
 
 export abstract class FormMission implements IMission {
 
+    /**
+     * @param {IPlayer} player
+     * @param {IPlayer[][]} grid
+     * @returns {ITile[]}
+     */
     public check(player: IPlayer, grid: IPlayer[][]): ITile[] {
         const form = this.getForm();
 
@@ -58,8 +63,25 @@ export abstract class FormMission implements IMission {
         return Helper.equalsPlayer(player1, player2);
     }
 
+    /**
+     * A Form is represented by ad 2d matrix
+     * @returns {number[][]}
+     */
     public abstract getForm(): number[][];
+
+    /**
+     * What does the player has to do?
+     * @returns {string}
+     */
     public abstract description(): string;
+
+    /**
+     * @returns {string}
+     */
     public abstract name(): string;
+
+    /**
+     * @returns {string}
+     */
     public abstract imgpath(): string;
 }
