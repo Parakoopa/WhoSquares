@@ -8,6 +8,9 @@ export interface IChatInputState {
     text: string;
 }
 
+/**
+ * Defines the Chat-Input!
+ */
 export class ChatInput extends React.Component<IChatInputProps, IChatInputState> {
 
     constructor(props: IChatInputProps) {

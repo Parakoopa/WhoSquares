@@ -8,6 +8,9 @@ export interface INewRoomFormState {
     roomname: string;
 }
 
+/**
+ * Defines a Form for a new Room.
+ */
 export class NewRoomForm extends React.Component<INewRoomFormProps, INewRoomFormState> {
 
     constructor(props: INewRoomFormProps) {
@@ -29,6 +32,11 @@ export class NewRoomForm extends React.Component<INewRoomFormProps, INewRoomForm
         this.setState({roomname: event.target.value});
     }
 
+    /**
+     * Textfield cant be empty!
+     *
+     * @returns {boolean}
+     */
     private validateForm() {
         return this.state.roomname.length > 0;
     }

@@ -1,5 +1,8 @@
 import * as React from "react";
 
+/**
+ * Central Definition for all Route-Actions!
+ */
 export class Routes  {
 
     // Util

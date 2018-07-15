@@ -7,6 +7,9 @@ export interface IHeaderState {
 
 }
 
+/**
+ * Defines the Header-Component.
+ */
 export class Header extends React.Component<IHeaderProps, IHeaderState> {
     public render(): any {
 

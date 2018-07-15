@@ -9,7 +9,16 @@ export interface IChatMessageProps {
 export interface IChatMessageState {
 }
 
+/**
+ * Defines a ChatMessage
+ */
 export class ChatMessage extends React.Component<IChatMessageProps, IChatMessageState> {
+
+    /**
+     * Gets the Color of the Player as HTML-Color. 0 if the Player is null.
+     *
+     * @returns {string}
+     */
     private getActivePlayerColorHtml(): string {
         let color;
         if (this.props.player == null)

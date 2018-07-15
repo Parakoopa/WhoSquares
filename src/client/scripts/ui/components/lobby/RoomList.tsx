@@ -1,5 +1,4 @@
 import * as React from "react";
-import {ILoginViewProps} from "../../views/LoginView";
 
 export interface IRoomListProps {
     roomlist: IRoomListResponse;
@@ -10,12 +9,17 @@ export interface IRoomListProps {
 export interface IRoomListState {
 }
 
+/**
+ * Defines a RoomList-Component.
+ */
 export class RoomList extends React.Component<IRoomListProps, IRoomListState> {
 
     public render(): any {
+        // If something is missing -> No Rooms!
         if (!this.props.roomlist || !this.props.roomlist.rooms || this.props.roomlist.rooms.length === 0)
             return <h2>No rooms...</h2>;
 
+        // Maps the Roomnames to individual Buttons
         const list = this.props.roomlist.rooms.map((room, i) => {
             if (!room.ended) {
                 return <div key={i}>

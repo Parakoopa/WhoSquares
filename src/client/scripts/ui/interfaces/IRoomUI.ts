@@ -1,3 +1,6 @@
+/**
+ * Defines the fFnctions for the Room.
+ */
 export interface IRoomUI {
 
     otherLeftRoom(player: IPlayer): void;

@@ -8,6 +8,9 @@ export interface IChatMessagesProps {
 export interface IChatMessagesState {
 }
 
+/**
+ * Defines a List of ChatMessages
+ */
 export class ChatMessages extends React.Component<IChatMessagesProps, IChatMessagesState> {
 
     private static ID = "MessageList";
@@ -18,12 +21,16 @@ export class ChatMessages extends React.Component<IChatMessagesProps, IChatMessa
         this.state = {messages: []};
     }
 
+    /**
+     * After a new Update, Scroll to the bottom to see newest Message!
+     */
     public componentDidUpdate() {
         const objDiv = document.getElementById(ChatMessages.ID);
         objDiv.scrollTop = objDiv.scrollHeight;
     }
 
     public render(): any {
+        // Maps the messages to an individual ChatMessage!
         const messages = this.props.messages.map((message, i) => {
             return (
                 <ChatMessage key={i} player={message.props.player} message={message.props.message}/>
