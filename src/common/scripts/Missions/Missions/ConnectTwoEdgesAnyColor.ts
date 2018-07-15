@@ -1,5 +1,4 @@
 import {ConnectEdges} from "./ConnectEdges";
-import {Helper} from "../Helper";
 
 export class ConnectTwoEdgesAnyColor extends ConnectEdges {
     public description(): string {
@@ -13,6 +12,11 @@ export class ConnectTwoEdgesAnyColor extends ConnectEdges {
         return "../../../img/mission_2edges_any_color.png";
     }
 
+    /**
+     * @param {IPlayer} player
+     * @param {IPlayer[][]} grid
+     * @returns {ITile[]}
+     */
     public check(player: IPlayer, grid: IPlayer[][]): ITile[] {
         let i;
         const gridHeight = grid.length;

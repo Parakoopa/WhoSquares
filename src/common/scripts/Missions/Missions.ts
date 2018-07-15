@@ -1,15 +1,14 @@
+import {ConnectEdges} from "./Missions/ConnectEdges";
+import {ConnectTwoEdgesAnyColor} from "./Missions/ConnectTwoEdgesAnyColor";
+import {Cover15Mission} from "./Missions/Cover15Mission";
 import {FormMissionCircle} from "./Missions/FormMissionCircle";
 import {FormMissionL} from "./Missions/FormMissionL";
 import {FormMissionLineHorizontal} from "./Missions/FormMissionLineHorizontal";
 import {FormMissionLineVertical} from "./Missions/FormMissionLineVertical";
 import {FormMissionT} from "./Missions/FormMissionT";
-import {Cover15Mission} from "./Missions/Cover15Mission";
-import {ConnectEdges} from "./Missions/ConnectEdges";
-import {ConnectTwoEdgesAnyColor} from "./Missions/ConnectTwoEdgesAnyColor";
 
 export class Missions {
 
-    // ToDo somehow get rid of getMission and use dependency injection
     /**
      * Returns a IMission instance based on name of class
      * @param {string} missionName

@@ -1,4 +1,11 @@
 export class Helper {
+
+    /**
+     *
+     * @param {IPlayer} player1
+     * @param {IPlayer} player2
+     * @returns {boolean}
+     */
     public static equalsPlayer(player1: IPlayer, player2: IPlayer) {
         if (player1 == null && player2 == null)
             return true;

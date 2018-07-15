@@ -1,16 +1,33 @@
 import {Helper} from "../Helper";
 
 export class ConnectEdges implements IMission {
+
+    /**
+     * @returns {string}
+     */
     public description(): string {
         return "Connect two edges of the grid that are opposite to each other";
     }
+
+    /**
+     * @returns {string}
+     */
     public name(): string {
         return "Connect Edges";
     }
+
+    /**
+     * @returns {string}
+     */
     public imgpath(): string {
         return "../../../img/mission_edges.png";
     }
 
+    /**
+     * @param {IPlayer} player
+     * @param {IPlayer[][]} grid
+     * @returns {ITile[]}
+     */
     public check(player: IPlayer, grid: IPlayer[][]): ITile[] {
         let i;
         const gridHeight = grid.length;
