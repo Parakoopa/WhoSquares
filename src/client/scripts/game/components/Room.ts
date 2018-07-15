@@ -8,6 +8,9 @@ import {LocalPlayerManager} from "../entity/LocalPlayer/LocalPlayerManager";
 import {Grid} from "./phaser/grid/Grid";
 import {GridFactory} from "./phaser/grid/GridFactory";
 
+/**
+ * Manages players joining leaving, game logic & chat
+ */
 export class Room {
 
     private readonly _requestEmitter: RequestEmitter;
@@ -50,7 +53,6 @@ export class Room {
     }
 
     /**
-     *
      * @returns {IPlayer[]}
      */
     public get otherPlayers(): IPlayer[] {
@@ -61,10 +63,19 @@ export class Room {
         RequestManager.requestEmitter.joinRoom(roomName);
     }
 
+    /**
+     * Send Request to start game with given board size
+     * @param {number} x
+     * @param {number} y
+     */
     public actionStartGame(x: number, y: number): void {
         this._requestEmitter.startGame(x, y);
     }
 
+    /**
+     * Send Request for chat message
+     * @param {string} message
+     */
     public actionSendRoomMessage(message: string) {
         this._requestEmitter.roomMessage(message);
     }
@@ -75,7 +86,6 @@ export class Room {
      * @param {number} sizeY
      * @param missionName
      */
-    // ToDo maybe inform roomview instead of using turninfo
     public startedGame(sizeX: number, sizeY: number, missionName: string): void {
         if (this._grid) this.destroyGrid();
         this._grid = GridFactory.createGrid(sizeX, sizeY, this._localPlayer.color, this._requestEmitter);
@@ -83,6 +93,10 @@ export class Room {
         this.updateMission( this._localPlayer.mission);
     }
 
+    /**
+     * Used to assign or update player mission
+     * @param {IMission} mission
+     */
     public updateMission(mission: IMission): void {
         this._localPlayer.mission = mission;
         this._ui.updateMission(mission);
@@ -151,6 +165,11 @@ export class Room {
         this._ui.updatePlayerList(this._otherPlayers);
     }
 
+    /**
+     * Returns player by index
+     * @param {IPlayer} otherPlayer
+     * @returns {number}
+     */
     private getPlayerByIndex(otherPlayer: IPlayer): number {
         for (let i = 0; i < this.otherPlayers.length; i++) {
             if (LocalPlayerManager.equalsIPlayer(this._otherPlayers[i], otherPlayer)) return i;
@@ -177,10 +196,19 @@ export class Room {
         this._ui.updateTurnInfo( player );
     }
 
+    /**
+     * Display incoming chat message
+     * @param {IPlayer} player
+     * @param {string} message
+     */
     public roomMessage(player: IPlayer, message: string): void {
         this._ui.sendRoomMessage(player, message);
     }
 
+    /**
+     * Request server to leave room
+     * @param {() => void} callback
+     */
     public actionLeaveRoom( callback: () => void): void {
         this._requestEmitter.leaveRoom();
         callback();
@@ -196,10 +224,17 @@ export class Room {
         // destroy itself?
     }
 
+    /**
+     * @returns {boolean}
+     */
     public hasGrid() {
         return !!this._grid;
     }
 
+    /**
+     * update game info to be displayed
+     * @param {string} info
+     */
     public updateGameInfo(info: string): void {
         this._ui.updateGameInfo(info);
     }

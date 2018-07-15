@@ -2,7 +2,5 @@ version: '2'
 services:
   mongodb:
     image: library/mongo:3.4
-    volumes:
-      - "./mongodb-data:/data/db"
     ports:
      - 27017:27017

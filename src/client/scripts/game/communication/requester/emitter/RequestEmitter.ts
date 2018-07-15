@@ -1,10 +1,12 @@
 import Socket = SocketIOClient.Socket;
 import {LocalPlayerManager} from "../../../entity/LocalPlayer/LocalPlayerManager";
 
+/**
+ * Used to send Requests from client to server
+ */
 export class RequestEmitter {
 
     /**
-     * Sends Requests to Server (Inputs from InputManager f.e.)
      * @param {SocketIOClient.Socket} _socket
      */
     constructor(private _socket: Socket) {}
@@ -65,6 +67,10 @@ export class RequestEmitter {
         this._socket.emit("placeTile" , {playerKey, roomKey, y, x});
     }
 
+    /**
+     * Send a chatMessage to server
+     * @param {string} message
+     */
     public roomMessage(message: string): void {
         const playerKey = LocalPlayerManager.getLocalPlayer().key;
         const roomKey = LocalPlayerManager.getLocalPlayer().room.key;

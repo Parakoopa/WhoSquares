@@ -1,18 +1,25 @@
 import Socket = SocketIOClient.Socket;
 import {Login} from "../../../components/Login";
 
+/**
+ * Distributes Login specific events of given socket
+ */
 export class LoginUiListener {
 
     constructor(socket: Socket, private _login: Login) {
         this.listen(socket);
     }
 
+    /**
+     * Update login component in case of f.e. page refresh
+     * @param {Login} val
+     */
     public reListen(val: Login) {
         this._login = val;
     }
 
     /**
-     * Listen for ErrorResponses on socket to be displayed via UiManager
+     * Listen for events on socket
      * @param {SocketIOClient.Socket} socket
      */
     private listen(socket: Socket) {

@@ -1,19 +1,25 @@
 import Socket = SocketIOClient.Socket;
 import {Room} from "../../../components/Room";
 
-// ToDo rename into messageListener or smth like that
+/**
+ * Listen for room specific events on sockets
+ */
 export class RoomUiListener {
 
     constructor(socket: Socket, private _room: Room) {
         this.listen(socket);
     }
 
+    /**
+     * Update room component in case of f.e. page refresh
+     * @param {Room} val
+     */
     public reListen(val: Room) {
         this._room = val;
     }
 
     /**
-     * Listen for ErrorResponses on socket to be displayed via UiManager
+     * Listen for events on socket
      * @param {SocketIOClient.Socket} socket
      */
     public listen(socket: Socket) {

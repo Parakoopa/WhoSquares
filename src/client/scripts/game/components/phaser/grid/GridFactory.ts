@@ -2,6 +2,9 @@ import {RequestEmitter} from "../../../communication/requester/emitter/RequestEm
 import {PhaserGame} from "../PhaserGame";
 import {Grid} from "./Grid";
 
+/**
+ * Responsible for (re)creating Phaser & grid.
+ */
 export class GridFactory {
 
     private static _phaserGame: PhaserGame;
@@ -44,8 +47,7 @@ export class GridFactory {
      * @returns {Grid}
      */
     public static createGrid(sizeX: number, sizeY: number, overColor: number, requestEmitter: RequestEmitter): Grid {
-        // ToDo add Callback
-        this._phaserGame = new PhaserGame();
+        if (!this._phaserGame) this._phaserGame = new PhaserGame();
         return new Grid(requestEmitter, overColor, sizeX, sizeY, "gridTile", this._phaserGame, 40);
     }
 
