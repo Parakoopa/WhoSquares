@@ -256,7 +256,12 @@ export class Room extends RoomEvents implements IRoom, IDatabaseModel {
      * @returns {boolean}
      */
     public isEmpty(): boolean {
-        return this._players.isEmpty;
+        if (!this.hasStarted()) {
+            // If the game hasn't started yet, the room is only considered empty if there are no players at all
+            return this._players.isEmpty;
+        }
+        // Otherwise the game is considered empty if only observers are left
+        return this._players.isEmptyOrOnlyObservers;
     }
 
     /**
