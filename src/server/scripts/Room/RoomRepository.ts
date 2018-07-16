@@ -43,6 +43,10 @@ export class RoomRepository {
     private static _instance: RoomRepository;
     private readonly collectionPromise: Promise<Collection<IRoomMongoSchema>>;
 
+    /**
+     * This is a singleton. Get the instance.
+     * @returns {RoomRepository}
+     */
     public static get instance(): RoomRepository {
         if (!this._instance) {
             this._instance = new RoomRepository();
@@ -50,6 +54,9 @@ export class RoomRepository {
         return this._instance;
     }
 
+    /**
+     * Initialise the repository by loading the collection and create the indicies in the collection
+     */
     private constructor() {
         this.collectionPromise = DatabaseConnection.collection(RoomRepository.COLLECTION_NAME);
         // When the collection is loaded, init index over key field.
@@ -58,22 +65,41 @@ export class RoomRepository {
         });
     }
 
+    /**
+     * Get a room object by it's key
+     * @param {string} key
+     * @returns {Promise<Room>}
+     */
     public async getByKey(key: string): Promise<Room> {
         const collection = await this.collectionPromise;
         return await RoomRepository.transformDbToRoom(await collection.findOne({key}));
     }
 
+    /**
+     * Get a room object by it's MongoDB object ID
+     * @param {ObjectID} id
+     * @returns {Promise<Room>}
+     */
     public async getByObjectId(id: ObjectId): Promise<Room> {
         const collection = await this.collectionPromise;
         return await RoomRepository.transformDbToRoom(await collection.findOne({_id: id}));
     }
 
+    /**
+     * Get all room objects
+     * @returns {Promise<Room[]>}
+     */
     public async getAll(): Promise<Room[]> {
         const collection = await this.collectionPromise;
         const mongoResult = await collection.find({}).toArray();
         return await Promise.all(mongoResult.map(RoomRepository.transformDbToRoom));
     }
 
+    /**
+     * Save a room object to the database
+     * @param {Room} room
+     * @returns {Promise<ObjectID>}
+     */
     public async save(room: Room): Promise<ObjectId> {
         const collection = await this.collectionPromise;
         if (!room._id) {
@@ -84,11 +110,21 @@ export class RoomRepository {
         return room._id;
     }
 
+    /**
+     * Delete a room in the DB
+     * @param {Room} room
+     * @returns {Promise<void>}
+     */
     public async delete(room: Room): Promise<void> {
         const collection = await this.collectionPromise;
         await collection.deleteOne({_id: room._id});
     }
 
+    /**
+     * Transform a database room object to a game room object.
+     * @param {IRoomMongoSchema} mongoRoom
+     * @returns {Promise<Room>}
+     */
     private static async transformDbToRoom(mongoRoom: IRoomMongoSchema): Promise<Room> {
         return new DbToRoom(mongoRoom).transform();
     }

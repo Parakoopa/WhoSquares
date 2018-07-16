@@ -5,11 +5,19 @@ import {IRoomMongoSchema, IRoomMongoSchemaPlayer} from "../RoomRepository";
  * Transforms a {Room} to a {IRoomMongoSchema}
  */
 export class RoomToDb {
-    
+
+    /**
+     * Initialise transform class with room object
+     * @param {Room} room
+     */
     constructor(
         private room: Room
     ) {}
 
+    /**
+     * Executes the transformation.
+     * @returns {IRoomMongoSchema}
+     */
     public transform(): IRoomMongoSchema {
         return {
             _id: this.room._id,
@@ -30,6 +38,10 @@ export class RoomToDb {
         };
     }
 
+    /**
+     * Transforms room player list to database player list
+     * @returns {IRoomMongoSchemaPlayer[]}
+     */
     private getPlayers(): IRoomMongoSchemaPlayer[] {
         const list: IRoomMongoSchemaPlayer[] = [];
         let index = 0;
@@ -45,6 +57,10 @@ export class RoomToDb {
         return list;
     }
 
+    /**
+     * Transforms the grid.
+     * @returns {string[][]}
+     */
     private getGrid(): string[][] {
         const serializedGrid: string[][] = [];
         const grid = this.room._serverGrid.gridInfo;

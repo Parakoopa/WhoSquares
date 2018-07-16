@@ -10,10 +10,18 @@ import {IRoomMongoSchema} from "../RoomRepository";
  */
 export class DbToRoom {
 
+    /**
+     * Initialise transform class with a schema.
+     * @param {IRoomMongoSchema} schema
+     */
     constructor(
         private schema: IRoomMongoSchema
     ) {}
 
+    /**
+     * Execute the transformations. Returns the room representing the schema.
+     * @returns {Promise<Room>}
+     */
     public async transform(): Promise<Room> {
         const room = new Room(
             this.schema.name,
@@ -31,6 +39,11 @@ export class DbToRoom {
         return room;
     }
 
+    /**
+     * Convert player information
+     * @param {Room} room
+     * @returns {Promise<Player[]>}
+     */
     private async buildPlayers(room: Room): Promise<Player[]> {
         for (const player of this.schema.players) {
             const playerObj = new Player(
@@ -45,6 +58,11 @@ export class DbToRoom {
         return room.players.list;
     }
 
+    /**
+     * Build the grid from database information
+     * @param {Room} room
+     * @returns {ServerGrid}
+     */
     private buildGrid(room: Room): ServerGrid {
         const grid = new ServerGrid(
             this.schema.gridSize.x,
@@ -62,6 +80,10 @@ export class DbToRoom {
         return grid;
     }
 
+    /**
+     * Fill the turn manager of the room with the correct information
+     * @param {Room} room
+     */
     private fillTurnManager(room: Room) {
         room.players.list.forEach((player) => {
             room._turnManager.addPlayer(player);
