@@ -8,6 +8,11 @@ import {RoomRepository} from "../Room/RoomRepository";
 import {User} from "../User/User";
 import {GlobalStatsRepository} from "./GlobalStatsRepository";
 
+/**
+ * Class StatsManager.
+ * Manages statistics by generating and updating after a game and providing interfaces
+ * for retrieving them.
+ */
 export class StatsManager {
     /**
      * Reads all information from the room's replay and current state
@@ -142,6 +147,12 @@ export class StatsManager {
         };
     }
 
+    /**
+     * Send the global stats as an event to the client
+     * @param {SocketIO.Socket} socket
+     * @param {IGlobalStatsRequest} req
+     * @returns {Promise<>}
+     */
     public static async sendGlobalStats(socket: Socket, req: IGlobalStatsRequest): Promise<IEvent> {
         const globals = await GlobalStatsRepository.instance.get();
         return {

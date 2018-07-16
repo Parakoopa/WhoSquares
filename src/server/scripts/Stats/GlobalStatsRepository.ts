@@ -10,7 +10,8 @@ export interface IGlobalStatsMongoSchema extends IDatabaseModel, IGlobalStatsRes
 }
 
 /**
- * Room Repository. Manages persistence (+serialization) of room objects and related data.
+ * GlobalStatsRepository. Manages persistence (+serialization) of global statistics.
+ * The repository is a singleton that manages a single model instance.
  */
 export class GlobalStatsRepository {
     private static readonly COLLECTION_NAME = "global";
@@ -18,6 +19,10 @@ export class GlobalStatsRepository {
     private readonly collectionPromise: Promise<Collection<IGlobalStatsMongoSchema>>;
     private objectId: ObjectID = new ObjectID("globalStats_");
 
+    /**
+     * This class is a singleton, get it's instance.
+     * @returns {GlobalStatsRepository}
+     */
     public static get instance(): GlobalStatsRepository {
         if (!this._instance) {
             this._instance = new GlobalStatsRepository();
@@ -25,10 +30,17 @@ export class GlobalStatsRepository {
         return this._instance;
     }
 
+    /**
+     * Loads the database collection
+     */
     private constructor() {
         this.collectionPromise = DatabaseConnection.collection(GlobalStatsRepository.COLLECTION_NAME);
     }
 
+    /**
+     * Get the global statistic model instance
+     * @returns {Promise<IGlobalStatsMongoSchema>}
+     */
     public async get(): Promise<IGlobalStatsMongoSchema> {
         const collection = await this.collectionPromise;
         const instance = await collection.findOne({_id: this.objectId});
@@ -44,6 +56,12 @@ export class GlobalStatsRepository {
         };
     }
 
+    /**
+     * Save the global statistics instance.
+     * The _id field is ignored and instead set to the expected value for this model.
+     * @param {IGlobalStatsMongoSchema} stats
+     * @returns {Promise<void>}
+     */
     public async save(stats: IGlobalStatsMongoSchema): Promise<void> {
         const collection = await this.collectionPromise;
         stats._id = this.objectId;
