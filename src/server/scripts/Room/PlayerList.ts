@@ -48,7 +48,14 @@ export class PlayerList {
      * @returns {boolean}
      */
     public get isEmpty(): boolean {
-        return this._list.length === 0 || !this._list.find((p) => !p.isObserver);
+        return this._list.length === 0;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    public get isEmptyOrOnlyObservers(): boolean {
+        return this.isEmpty || !this._list.find((p) => !p.isObserver);
     }
 
     /**
